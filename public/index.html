@@ -235,37 +235,38 @@
         <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ecosistema Base</p>
             
-            <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad Inicial
             </button>
-            <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero de Control
             </button>
-            <button onclick="App.navigate('conversations')" id="nav-conversations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
+            <button onclick="App.navigate('conversations')" id="nav-conversations" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <span class="flex items-center gap-3"><i data-lucide="message-square" class="w-4 h-4"></i> Conversaciones</span>
                 <span class="bg-rose-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">2</span>
             </button>
-            <button onclick="App.navigate('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="kanban-square" class="w-4 h-4"></i> Oportunidades (Opps)
             </button>
-            <button onclick="App.navigate('contacts')" id="nav-contacts" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('contacts')" id="nav-contacts" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="users" class="w-4 h-4"></i> Contactos / CRM
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Marketing & Tráfico</p>
-            <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="share-2" class="w-4 h-4"></i> Publicador Orgánico
             </button>
-            <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
+            <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Ads Manager (Rocket)</span>
                 <span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.2 rounded font-bold">21</span>
             </button>
-            <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <!-- ENLACE REDIRIGIDO AL BUILDER EXTERNO -->
+            <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="layers" class="w-4 h-4"></i> Embudos y Sitios Web
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Automatización</p>
-            <button onclick="App.navigate('automations')" id="nav-automations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="App.navigate('automations')" id="nav-automations" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
                 <i data-lucide="git-branch" class="w-4 h-4"></i> Workflow Builder
             </button>
         </nav>
@@ -655,50 +656,6 @@
                 </div>
             </section>
 
-            <!-- MÓDULO INTEGRADO: EMBUDOS Y SITIOS WEB (LANDING PAGES) -->
-            <section id="view-funnels" class="hidden space-y-4">
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
-                        <p class="text-xs text-slate-500">Crea y gestiona páginas de aterrizaje conectadas directamente con tus anuncios de Meta Ads.</p>
-                    </div>
-                    <button onclick="FunnelsManager.createFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all">+ Nuevo Embudo</button>
-                </div>
-                
-                <div id="funnels-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-                <!-- EDITOR DE EMBUDOS / PASOS -->
-                <div id="funnel-editor-container" class="hidden bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
-                    <div class="flex justify-between items-center border-b pb-3">
-                        <div>
-                            <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-0.5 rounded uppercase">Editor de Sitio</span>
-                            <h4 class="text-sm font-extrabold text-slate-800 mt-0.5" id="editor-funnel-title">Configuración de Embudo</h4>
-                        </div>
-                        <button onclick="FunnelsManager.closeEditor()" class="text-xs text-blue-600 font-bold hover:underline">← Volver al listado</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
-                        <div class="border-r border-slate-100 pr-4 space-y-2">
-                            <p class="font-bold text-slate-400 uppercase text-[10px]">Pasos del Embudo</p>
-                            <div id="editor-steps-list" class="space-y-1.5"></div>
-                            <button onclick="alert('Paso añadido al embudo con éxito')" class="w-full mt-2 border border-dashed border-slate-300 py-2 rounded-lg text-slate-500 hover:bg-slate-50 font-bold">+ Agregar Paso</button>
-                        </div>
-                        <div class="md:col-span-2 space-y-4">
-                            <p class="font-bold text-slate-400 uppercase text-[10px]">Personalización & Variables Dinámicas</p>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">URL Pública del Sitio / Paso</label>
-                                <input type="text" id="step-url-input" class="w-full border p-2.5 rounded-lg bg-slate-50 font-mono text-slate-600">
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">Nombre del Negocio (`{{ custom_values.nombre_de_negocio }}`)</label>
-                                <input type="text" id="step-custom-name" value="Stelafunnels Enterprise" class="w-full border p-2.5 rounded-lg">
-                            </div>
-                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-lg shadow-sm">Guardar Cambios del Sitio</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section id="view-settings" class="hidden space-y-4">
                 <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                     <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Configuración del Perfil de Cliente</h3>
@@ -963,13 +920,23 @@
             },
 
             navigate(viewId) {
-                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+                // REDIRECCIÓN LIMPIA AL NUEVO BUILDER EXTERNO
+                if (viewId === 'funnels') {
+                    window.location.href = '/builder';
+                    return;
+                }
+
+                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'settings'];
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if(el) el.classList.add('hidden');
                     const nav = document.getElementById(`nav-${v}`);
                     if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
                 });
+
+                // También ocultar el botón de funnels de la clase active si se usa
+                const funnelsNav = document.getElementById('nav-funnels');
+                if(funnelsNav) funnelsNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
 
                 const targetView = document.getElementById(`view-${viewId}`);
                 if (targetView) targetView.classList.remove('hidden');
@@ -986,7 +953,6 @@
                 if (viewId === 'conversations') ChatEngine.render();
                 if (viewId === 'contacts') this.renderContacts();
                 if (viewId === 'ads-manager') AdsManager.render();
-                if (viewId === 'funnels') FunnelsManager.render();
 
                 lucide.createIcons();
             },
@@ -1173,52 +1139,6 @@
                 if(templateEl) templateEl.innerText = campaign.templateName;
                 this.switchTab('builder');
             }
-        };
-
-        const FunnelsManager = {
-            render() {
-                const container = document.getElementById('funnels-list-container');
-                const editor = document.getElementById('funnel-editor-container');
-                if(!container) return;
-                container.classList.remove('hidden');
-                editor.classList.add('hidden');
-                
-                container.innerHTML = Store.funnels.map(f => `
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
-                                <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
-                            </div>
-                            <button onclick="FunnelsManager.editFunnel('${f.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold">Editar Embudo</button>
-                        </div>
-                        <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
-                            <span>Pasos del embudo: <strong>${f.steps}</strong></span>
-                            <span>Actualización: ${f.updated}</span>
-                        </div>
-                    </div>`).join('');
-            },
-            createFunnel() {
-                const newId = 'f' + Date.now();
-                const newFunnel = { id: newId, name: 'Nuevo Embudo Comercial', updated: 'Hoy', steps: 2, url: 'https://stelafunnels.io/nuevo-sitio' };
-                Store.funnels.push(newFunnel);
-                this.editFunnel(newId);
-            },
-            editFunnel(id) {
-                const f = Store.funnels.find(item => item.id === id);
-                if(!f) return;
-                document.getElementById('funnels-list-container').classList.add('hidden');
-                document.getElementById('funnel-editor-container').classList.remove('hidden');
-                document.getElementById('editor-funnel-title').innerText = `Embudo: ${f.name}`;
-                document.getElementById('step-url-input').value = f.url;
-
-                const stepsList = document.getElementById('editor-steps-list');
-                stepsList.innerHTML = `
-                    <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 font-bold">Paso 1: Inicio / Captación</div>
-                    <div class="p-2.5 bg-slate-50 border rounded-lg text-slate-600">Paso 2: Formulario de Registro</div>`;
-            },
-            closeEditor() { this.render(); },
-            saveChanges() { alert("¡Cambios del sitio guardados con éxito!"); this.render(); }
         };
 
         const ChatEngine = {
