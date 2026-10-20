@@ -100,11 +100,12 @@ app.post('/api/auth/register', async (req, res) => {
                             return res.status(500).json({ success: false, error: 'Error interno al registrar el usuario.' });
                         }
 
-                        // Guardar sesión activa inmediata
+                        // Guardar sesión activa inmediata incluyendo la foto de perfil en null o gravatar
                         req.session.user = { 
                             id: userId, 
                             name: userName, 
                             email: email.toLowerCase(), 
+                            picture: null,
                             role, 
                             status 
                         };
@@ -167,6 +168,7 @@ app.post('/api/auth/login', async (req, res) => {
                 id: user.id, 
                 name: user.name, 
                 email: user.email, 
+                picture: null,
                 role: user.role, 
                 status: user.status 
             };
@@ -186,7 +188,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON META
+// 🔑 RUTAS DE AUTENTICACIÓN CON META (FACEBOOK)
 // ==========================================
 app.get('/auth/facebook', (req, res) => {
     const appId = process.env.FACEBOOK_APP_ID;
@@ -224,17 +226,25 @@ app.get('/auth/facebook/callback', async (req, res) => {
         const llResponse = await fetch(longLivedUrl);
         const llData = await llResponse.json();
 
-        global.metaAccessToken = llData.access_token || data.access_token;
+        const accessToken = llData.access_token || data.access_token;
+        global.metaAccessToken = accessToken;
+
+        // Consultar foto y datos reales del perfil de Facebook
+        const profileResp = await fetch(`https://graph.facebook.com/v25.0/me?fields=id,name,email,picture&access_token=${accessToken}`);
+        const profileData = await profileResp.json();
+
         req.session.user = { 
-            id: 'meta_admin', 
-            name: "Administrador Meta", 
-            email: "meta@stelafunnels.com", 
+            id: 'meta_' + (profileData.id || 'admin'), 
+            name: profileData.name || "Administrador Meta", 
+            email: profileData.email || "meta@stelafunnels.com", 
+            picture: profileData.picture?.data?.url || null, 
             role: 'admin', 
             status: 'active' 
         };
 
         res.redirect('/?success=meta_connected');
     } catch (err) {
+        console.error("Error en callback Facebook:", err);
         res.redirect('/?error=server_error');
     }
 });
@@ -294,12 +304,14 @@ app.get('/auth/google/callback', async (req, res) => {
             id: 'google_' + (userData.id || Date.now()),
             name: userData.name || "Usuario Google",
             email: userData.email || "admin@stelafunnels.com",
+            picture: userData.picture || null, 
             role: 'admin',
             status: 'active'
         };
 
         res.redirect('/?success=google_connected');
     } catch (err) {
+        console.error("Error en callback Google:", err);
         res.redirect('/?error=server_error');
     }
 });
