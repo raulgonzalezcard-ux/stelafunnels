@@ -45,11 +45,11 @@
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
-    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (TIPO ROCKET OS) -->
-    <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center hidden">
+    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (VISIBLE POR DEFECTO PARA EVITAR PARPADEOS AL ACTUALIZAR) -->
+    <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center">
         <div class="w-full h-full grid grid-cols-1 md:grid-cols-2 bg-white">
             
-            <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS (FONDO BLANCO / GRIS CLARO) -->
+            <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS -->
             <div class="p-8 md:p-16 flex flex-col justify-between bg-white text-left overflow-y-auto custom-scrollbar">
                 
                 <div class="max-w-md w-full mx-auto space-y-6">
@@ -188,7 +188,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: BANNER NEGRO/DARK SLATE CORPORATIVO ESTILO ROCKET -->
+            <!-- COLUMNA DERECHA: BANNER CORPORATIVO -->
             <div class="hidden md:flex bg-[#0f172a] p-16 flex-col justify-between relative overflow-hidden text-left">
                 <div class="relative z-10 space-y-6 max-w-lg">
                     <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-400/20 text-blue-400 rounded-full text-xs font-semibold uppercase tracking-wider">
@@ -270,7 +270,7 @@
             </button>
         </nav>
 
-        <!-- PERFIL DE USUARIO DINÁMICO (AVATAR DE GRAVATAR O INICIALES) -->
+        <!-- PERFIL DE USUARIO DINÁMICO (AVATAR DE GRAVATAR O FOTO SOCIAL) -->
         <div class="p-4 border-t border-slate-800 bg-[#0b1322] flex items-center gap-3">
             <div id="user-avatar-container" class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md overflow-hidden shrink-0">
                 US
@@ -693,6 +693,7 @@
         </div>
     </main>
 
+    <!-- MODAL DE OPORTUNIDAD -->
     <div id="modal-lead-dom" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all text-left">
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
@@ -794,7 +795,7 @@
                 }
             },
 
-            // 🛑 LÓGICA DE AVATAR (GRAVATAR O FOTO SOCIAL)
+            // 🛑 LÓGICA DE AVATAR (FOTO REAL O GRAVATAR)
             setUserProfileUI(user) {
                 const avatarContainer = document.getElementById('user-avatar-container');
                 const nameDisplay = document.getElementById('user-name-display');
@@ -807,7 +808,6 @@
                     if (user.picture) {
                         avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
                     } else if (user.email) {
-                        // Generar Gravatar mediante MD5 del correo
                         const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
                         const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
                         
