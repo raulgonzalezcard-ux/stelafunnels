@@ -22,7 +22,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error al conectar con la base de datos SQLite:', err.message);
     } else {
-        console.log('📦 Conectado a la Base de Datos SQLite de producción.');
+        console.log('📦 Conectado a la Base de Datos SQLite de producción[cite: 13].');
     }
 });
 
@@ -87,8 +87,8 @@ app.post('/api/auth/register', async (req, res) => {
             try {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 const userId = Date.now().toString();
-                const userName = name || 'Empresa CRM';
-                const status = 'active'; // 'active' o 'suspended'
+                const userName = name || 'Empresa Global';
+                const status = 'active'; 
                 const role = 'admin';
 
                 db.run(
@@ -129,7 +129,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// 2. INICIO DE SESIÓN CON VALIDACIÓN DE ESTADO (ACTIVO / SUSPENDIDO)
+// 2. INICIO DE SESIÓN ESTRICTO (VALIDA SI EL CORREO ESTÁ REGISTRADO)
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -139,22 +139,27 @@ app.post('/api/auth/login', async (req, res) => {
         }
 
         db.get(`SELECT * FROM users WHERE email = ?`, [email.toLowerCase()], async (err, user) => {
-            if (err || !user) {
-                return res.status(401).json({ success: false, error: 'Credenciales inválidas o usuario no registrado.' });
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Error interno del servidor.' });
             }
 
-            // 🛑 VALIDACIÓN CLAVE: Si la cuenta está suspendida por falta de pago
+            // 🛑 VALIDACIÓN ESTRICTA SOLICITADA: Si el correo no existe en la base de datos
+            if (!user) {
+                return res.status(401).json({ success: false, error: 'El correo electrónico no está registrado en el sistema.' });
+            }
+
+            // 🛑 VALIDACIÓN DE ESTADO (Activo / Suspendido)
             if (user.status === 'suspended') {
                 return res.status(403).json({ 
                     success: false, 
-                    error: 'Esta subcuenta se ha pausado por falta de pago o renovación.',
+                    error: 'Esta cuenta se ha pausado por falta de pago o renovación.',
                     suspended: true 
                 });
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.status(401).json({ success: false, error: 'Credenciales inválidas.' });
+                return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
             }
 
             // Crear sesión segura
@@ -166,7 +171,7 @@ app.post('/api/auth/login', async (req, res) => {
                 status: user.status 
             };
 
-            console.log(`🔓 Sesión iniciada: ${email}`);
+            console.log(`🔓 Sesión iniciada correctamente: ${email}`);
             return res.json({ 
                 success: true, 
                 message: '¡Bienvenido de nuevo!', 
