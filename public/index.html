@@ -655,26 +655,45 @@
                 </div>
             </section>
 
+            <!-- MÓDULO INTEGRADO: EMBUDOS Y SITIOS WEB (LANDING PAGES) -->
             <section id="view-funnels" class="hidden space-y-4">
                 <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
                     <div>
-                        <h3 class="text-sm font-bold text-slate-900">Embudos de Captación Comercial</h3>
-                        <p class="text-xs text-slate-500">Páginas de aterrizaje activas sincronizadas con dominios cloud.</p>
+                        <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
+                        <p class="text-xs text-slate-500">Crea y gestiona páginas de aterrizaje conectadas directamente con tus anuncios de Meta Ads.</p>
                     </div>
+                    <button onclick="FunnelsManager.createFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all">+ Nuevo Embudo</button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="text-xs font-black text-slate-800">Funnel Principal: Captación Exclusiva Global</h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5">URL: https://cliente.rocketfunnel.com/captacion</p>
-                            </div>
-                            <span class="bg-emerald-100 text-emerald-800 font-bold text-[9px] px-2 py-0.5 rounded">Online</span>
+                
+                <div id="funnels-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+                <!-- EDITOR DE EMBUDOS / PASOS -->
+                <div id="funnel-editor-container" class="hidden bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <div>
+                            <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-0.5 rounded uppercase">Editor de Sitio</span>
+                            <h4 class="text-sm font-extrabold text-slate-800 mt-0.5" id="editor-funnel-title">Configuración de Embudo</h4>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 pt-2 border-t text-center text-xs">
-                            <div><p class="text-[10px] text-slate-400 font-medium">Visitas Únicas</p><p class="font-black text-slate-800 mt-0.5">1,420</p></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">Registros</p><p class="font-black text-slate-800 mt-0.5">84</p></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">Conversión</p><p class="font-black text-blue-600 mt-0.5">5.9%</p></div>
+                        <button onclick="FunnelsManager.closeEditor()" class="text-xs text-blue-600 font-bold hover:underline">← Volver al listado</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+                        <div class="border-r border-slate-100 pr-4 space-y-2">
+                            <p class="font-bold text-slate-400 uppercase text-[10px]">Pasos del Embudo</p>
+                            <div id="editor-steps-list" class="space-y-1.5"></div>
+                            <button onclick="alert('Paso añadido al embudo con éxito')" class="w-full mt-2 border border-dashed border-slate-300 py-2 rounded-lg text-slate-500 hover:bg-slate-50 font-bold">+ Agregar Paso</button>
+                        </div>
+                        <div class="md:col-span-2 space-y-4">
+                            <p class="font-bold text-slate-400 uppercase text-[10px]">Personalización & Variables Dinámicas</p>
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-700">URL Pública del Sitio / Paso</label>
+                                <input type="text" id="step-url-input" class="w-full border p-2.5 rounded-lg bg-slate-50 font-mono text-slate-600">
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-700">Nombre del Negocio (`{{ custom_values.nombre_de_negocio }}`)</label>
+                                <input type="text" id="step-custom-name" value="Stelafunnels Enterprise" class="w-full border p-2.5 rounded-lg">
+                            </div>
+                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-lg shadow-sm">Guardar Cambios del Sitio</button>
                         </div>
                     </div>
                 </div>
@@ -736,6 +755,7 @@
         const Store = {
             leads: [],
             campaigns: [],
+            funnels: [],
             activeChatId: null,
             pagesData: [],
 
@@ -744,6 +764,11 @@
                     { id: 'c1', name: '500€ al mes', status: 'Paused', created: '05/08/2026 08:02 PM', budget: 3.00, cost: 87.30, impressions: 8230, results: 4, cpa: 21.83, templateName: '500€ al mes 3' },
                     { id: 'c2', name: 'contado 7 días', status: 'Paused', created: '05/08/2026 07:46 PM', budget: 3.00, cost: 86.16, impressions: 12272, results: 0, cpa: 0, templateName: 'contado 7 días template' },
                     { id: 'c3', name: 'valoración', status: 'Paused', created: '05/08/2026 07:38 PM', budget: 1.00, cost: 5.23, impressions: 817, results: 0, cpa: 0, templateName: 'valoracion v1' }
+                ];
+
+                this.funnels = [
+                    { id: 'f1', name: 'Captaciones Exclusivas', updated: '05 Nov 2026', steps: 3, url: 'https://stelafunnels.io/captacion' },
+                    { id: 'f2', name: 'Compradores Calificados', updated: '18 Feb 2026', steps: 2, url: 'https://stelafunnels.io/compradores' }
                 ];
 
                 this.leads = [
@@ -761,7 +786,6 @@
                 this.populateStageSelectors();
                 SocialPublisher.setupEvents();
 
-                // 🛑 Solución al parpadeo: Validar sesión antes de mostrar la UI
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
@@ -778,7 +802,6 @@
                     document.getElementById('view-login').classList.remove('hidden');
                 }
 
-                // Detectar re-dirección de OAuth
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('success')) {
                     try {
@@ -795,7 +818,6 @@
                 }
             },
 
-            // 🛑 LÓGICA DE AVATAR (FOTO REAL O GRAVATAR)
             setUserProfileUI(user) {
                 const avatarContainer = document.getElementById('user-avatar-container');
                 const nameDisplay = document.getElementById('user-name-display');
@@ -964,6 +986,7 @@
                 if (viewId === 'conversations') ChatEngine.render();
                 if (viewId === 'contacts') this.renderContacts();
                 if (viewId === 'ads-manager') AdsManager.render();
+                if (viewId === 'funnels') FunnelsManager.render();
 
                 lucide.createIcons();
             },
@@ -1150,6 +1173,52 @@
                 if(templateEl) templateEl.innerText = campaign.templateName;
                 this.switchTab('builder');
             }
+        };
+
+        const FunnelsManager = {
+            render() {
+                const container = document.getElementById('funnels-list-container');
+                const editor = document.getElementById('funnel-editor-container');
+                if(!container) return;
+                container.classList.remove('hidden');
+                editor.classList.add('hidden');
+                
+                container.innerHTML = Store.funnels.map(f => `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
+                                <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
+                            </div>
+                            <button onclick="FunnelsManager.editFunnel('${f.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold">Editar Embudo</button>
+                        </div>
+                        <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
+                            <span>Pasos del embudo: <strong>${f.steps}</strong></span>
+                            <span>Actualización: ${f.updated}</span>
+                        </div>
+                    </div>`).join('');
+            },
+            createFunnel() {
+                const newId = 'f' + Date.now();
+                const newFunnel = { id: newId, name: 'Nuevo Embudo Comercial', updated: 'Hoy', steps: 2, url: 'https://stelafunnels.io/nuevo-sitio' };
+                Store.funnels.push(newFunnel);
+                this.editFunnel(newId);
+            },
+            editFunnel(id) {
+                const f = Store.funnels.find(item => item.id === id);
+                if(!f) return;
+                document.getElementById('funnels-list-container').classList.add('hidden');
+                document.getElementById('funnel-editor-container').classList.remove('hidden');
+                document.getElementById('editor-funnel-title').innerText = `Embudo: ${f.name}`;
+                document.getElementById('step-url-input').value = f.url;
+
+                const stepsList = document.getElementById('editor-steps-list');
+                stepsList.innerHTML = `
+                    <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 font-bold">Paso 1: Inicio / Captación</div>
+                    <div class="p-2.5 bg-slate-50 border rounded-lg text-slate-600">Paso 2: Formulario de Registro</div>`;
+            },
+            closeEditor() { this.render(); },
+            saveChanges() { alert("¡Cambios del sitio guardados con éxito!"); this.render(); }
         };
 
         const ChatEngine = {
