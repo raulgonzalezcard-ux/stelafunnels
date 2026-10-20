@@ -37,6 +37,16 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
+// Crear tabla de Embudos / Landing Pages si no existe
+db.run(`CREATE TABLE IF NOT EXISTS funnels (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    url TEXT NOT NULL,
+    steps INTEGER DEFAULT 1,
+    updated TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // 🔑 Variables globales para tokens de redes sociales
 global.metaAccessToken = null;
 global.googleAccessToken = null;
@@ -100,7 +110,6 @@ app.post('/api/auth/register', async (req, res) => {
                             return res.status(500).json({ success: false, error: 'Error interno al registrar el usuario.' });
                         }
 
-                        // Guardar sesión activa inmediata incluyendo la foto de perfil en null o gravatar
                         req.session.user = { 
                             id: userId, 
                             name: userName, 
@@ -144,12 +153,10 @@ app.post('/api/auth/login', async (req, res) => {
                 return res.status(500).json({ success: false, error: 'Error interno del servidor.' });
             }
 
-            // 🛑 VALIDACIÓN ESTRICTA SOLICITADA: Si el correo no existe en la base de datos
             if (!user) {
                 return res.status(401).json({ success: false, error: 'El correo electrónico no está registrado en el sistema.' });
             }
 
-            // 🛑 VALIDACIÓN DE ESTADO (Activo / Suspendido)
             if (user.status === 'suspended') {
                 return res.status(403).json({ 
                     success: false, 
@@ -163,7 +170,6 @@ app.post('/api/auth/login', async (req, res) => {
                 return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
             }
 
-            // Crear sesión segura
             req.session.user = { 
                 id: user.id, 
                 name: user.name, 
@@ -185,6 +191,34 @@ app.post('/api/auth/login', async (req, res) => {
         console.error('Error en login:', error);
         return res.status(500).json({ success: false, error: 'Error interno al procesar el ingreso.' });
     }
+});
+
+// ==========================================
+// 🚀 RUTAS API DE EMBUDOS Y SITIOS WEB (FUNNELS)
+// ==========================================
+app.get('/api/funnels', (req, res) => {
+    db.all(`SELECT * FROM funnels ORDER BY created_at DESC`, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: 'Error al consultar embudos.' });
+        }
+        res.json({ success: true, funnels: rows });
+    });
+});
+
+app.post('/api/funnels', (req, res) => {
+    const { id, name, url, steps, updated } = req.body;
+    const funnelId = id || 'f_' + Date.now();
+    
+    db.run(
+        `INSERT OR REPLACE INTO funnels (id, name, url, steps, updated) VALUES (?, ?, ?, ?, ?)`,
+        [funnelId, name || 'Nuevo Embudo', url || '', steps || 1, updated || 'Hoy'],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Error al guardar embudo.' });
+            }
+            res.json({ success: true, id: funnelId });
+        }
+    );
 });
 
 // ==========================================
@@ -229,7 +263,6 @@ app.get('/auth/facebook/callback', async (req, res) => {
         const accessToken = llData.access_token || data.access_token;
         global.metaAccessToken = accessToken;
 
-        // Consultar foto y datos reales del perfil de Facebook
         const profileResp = await fetch(`https://graph.facebook.com/v25.0/me?fields=id,name,email,picture&access_token=${accessToken}`);
         const profileData = await profileResp.json();
 
