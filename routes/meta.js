@@ -16,11 +16,11 @@ const requireAuth = (req, res, next) => {
 };
 
 // =========================================================================
-// 🔍 0. ESTADO DE CONEXIÓN: Verificar si el usuario tiene token de Meta activo
+// 🔍 0. ESTADO DE CONEXIÓN: Verificar si hay token de Meta en SQLite
 // =========================================================================
-router.get('/status', requireAuth, (req, res) => {
-    const userId = req.session.user.id;
-    db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], (err, row) => {
+router.get('/status', (req, res) => {
+    // Verificamos directamente si cualquier usuario administrador tiene un token activo registrado
+    db.get(`SELECT meta_access_token FROM users WHERE meta_access_token IS NOT NULL AND meta_access_token != '' LIMIT 1`, [], (err, row) => {
         if (err || !row || !row.meta_access_token) {
             return res.json({ connected: false });
         }
