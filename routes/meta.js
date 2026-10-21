@@ -16,6 +16,19 @@ const requireAuth = (req, res, next) => {
 };
 
 // =========================================================================
+// 🔍 0. ESTADO DE CONEXIÓN: Verificar si el usuario tiene token de Meta activo
+// =========================================================================
+router.get('/status', requireAuth, (req, res) => {
+    const userId = req.session.user.id;
+    db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], (err, row) => {
+        if (err || !row || !row.meta_access_token) {
+            return res.json({ connected: false });
+        }
+        res.json({ connected: true });
+    });
+});
+
+// =========================================================================
 // 📋 1. TRAER INFORMACIÓN: Listar las páginas vinculadas del usuario actual
 // =========================================================================
 router.get('/pages', requireAuth, async (req, res) => {
