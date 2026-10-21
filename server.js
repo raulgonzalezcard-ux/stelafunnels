@@ -73,7 +73,7 @@ app.use(session({
     cookie: { 
         secure: false, // Desactivado para evitar bloqueos del proxy inverso en Coolify
         httpOnly: true,
-        sameSite: 'lax', // Mantiene la cookie al volver de dominios externos como Facebook
+        sameSite: 'lax', // Mantiene la cookie al volver de dominios externos como Facebook/Google
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
@@ -274,7 +274,6 @@ app.get('/auth/facebook/callback', async (req, res) => {
                     return res.redirect('/?error=db_save_failed');
                 }
                 
-                // Establecer la sesión activa de inmediato para evitar que pida login
                 req.session.user = userDataObj;
 
                 req.session.save((saveErr) => {
@@ -287,7 +286,6 @@ app.get('/auth/facebook/callback', async (req, res) => {
             });
         };
 
-        // 3. Verificar si hay sesión activa o buscar al usuario existente/registrado para asociarle el token
         if (req.session && req.session.user && req.session.user.id) {
             persistTokenAndLogin(req.session.user.id, req.session.user);
         } else {
@@ -303,7 +301,6 @@ app.get('/auth/facebook/callback', async (req, res) => {
                         status: user.status
                     });
                 } else {
-                    // Si no hay ningún usuario en la BD, crear uno por defecto automáticamente
                     const defaultUserId = 'meta_user_' + Date.now();
                     const hashedPassword = bcrypt.hashSync('default_pass_2026', 10);
                     db.run(
@@ -334,7 +331,7 @@ app.get('/auth/facebook/callback', async (req, res) => {
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0
+// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0 (ACTUALIZADO Y CORREGIDO)
 // ==========================================
 app.get('/auth/google', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -384,16 +381,42 @@ app.get('/auth/google/callback', async (req, res) => {
         });
         const userData = await userResp.json();
 
-        req.session.user = {
-            id: 'google_' + (userData.id || Date.now()),
-            name: userData.name || "Usuario Google",
-            email: userData.email || "admin@stelafunnels.com",
-            picture: userData.picture || null, 
-            role: 'admin',
-            status: 'active'
-        };
+        const googleEmail = userData.email || "admin@stelafunnels.com";
+        const googleName = userData.name || "Usuario Google";
+        const googleId = 'google_' + (userData.id || Date.now());
 
-        res.redirect('/?success=google_connected');
+        // Verificar si el usuario ya existe en SQLite por correo
+        db.get(`SELECT * FROM users WHERE email = ?`, [googleEmail.toLowerCase()], (err, existingUser) => {
+            if (existingUser) {
+                req.session.user = {
+                    id: existingUser.id,
+                    name: existingUser.name,
+                    email: existingUser.email,
+                    picture: userData.picture || null,
+                    role: existingUser.role,
+                    status: existingUser.status
+                };
+                return req.session.save(() => res.redirect('/?success=google_connected'));
+            } else {
+                const hashedPassword = bcrypt.hashSync('google_oauth_pass_2026', 10);
+                db.run(
+                    `INSERT INTO users (id, name, email, password, status, role) VALUES (?, ?, ?, ?, 'active', 'admin')`,
+                    [googleId, googleName, googleEmail.toLowerCase(), hashedPassword],
+                    (insertErr) => {
+                        req.session.user = {
+                            id: googleId,
+                            name: googleName,
+                            email: googleEmail.toLowerCase(),
+                            picture: userData.picture || null,
+                            role: 'admin',
+                            status: 'active'
+                        };
+                        return req.session.save(() => res.redirect('/?success=google_connected'));
+                    }
+                );
+            }
+        });
+
     } catch (err) {
         console.error("Error en callback Google:", err);
         res.redirect('/?error=server_error');
