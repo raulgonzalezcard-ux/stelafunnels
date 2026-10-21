@@ -1622,21 +1622,26 @@ async function checkMetaConnectionStatus() {
     }
 }
 
-// Ejecutar al cargar la vista de Launchpad
+// Ejecutar al cargar la vista
 document.addEventListener("DOMContentLoaded", () => {
-    // Forzar estado conectado de Meta si la URL trae el parámetro de éxito
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('success') || urlParams.get('success') === 'meta_connected') {
-        const actionContainer = document.getElementById('meta-connection-action');
-        if (actionContainer) {
-            actionContainer.innerHTML = `
-                <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Conectado
-                </div>
-                <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
-            `;
-            return; // Evita que la función normal sobrescriba el estado visual
-        }
+    
+    // Si regresamos con éxito de Meta, limpiamos la URL y forzamos el estado verde
+    if (urlParams.get('success') === 'meta_connected' || urlParams.has('success')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        setTimeout(() => {
+            const actionContainer = document.getElementById('meta-connection-action');
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Conectado
+                    </div>
+                    <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+                `;
+            }
+        }, 300);
+        return;
     }
 
     checkMetaConnectionStatus();
