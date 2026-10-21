@@ -306,34 +306,110 @@
 
         <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-[#f8fafc]" id="main-view-router">
             
-            <section id="view-launchpad" class="hidden space-y-6">
+         <section id="view-launchpad" class="hidden space-y-6">
+    <div>
+        <h2 class="text-xl font-extrabold text-slate-950 tracking-tight">Launchpad Inicial</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para habilitar la pauta publicitaria y la sincronización de leads.</p>
+    </div>
+
+    <!-- TARJETAS DE INTEGRACIÓN DEL LAUNCHPAD -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
+        
+        <!-- 1. Descargar App Móvil -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-slate-100 text-slate-800 rounded-2xl shrink-0"><i data-lucide="smartphone" class="w-6 h-6"></i></div>
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">¡Te damos la bienvenida a Rocket OS!</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para activar la automatización completa y el rastreo.</p>
+                    <h4 class="text-xs font-bold text-slate-900">Descárguese nuestra aplicación</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Interactúe con sus clientes potenciales dondequiera que esté.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="facebook" class="w-6 h-6"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800">Meta Business & API de Conversiones</h4>
-                                <p class="text-xs text-slate-500">Requerido para Ads Manager e inyección de leads en 3 clics.</p>
-                            </div>
-                        </div>
-                        <button onclick="window.location.href='/auth/facebook'" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">Conectar</button>
-                    </div>
-                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800">WhatsApp Business Cloud API</h4>
-                                <p class="text-xs text-slate-500">Para flujos de auto-respuesta instantáneos con IA.</p>
-                            </div>
-                        </div>
-                        <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Conectado</span>
-                    </div>
+            </div>
+            <button onclick="alert('Enlace de descarga enviado por SMS.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Enviar enlace
+            </button>
+        </div>
+
+        <!-- 2. Google Business Profile -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0"><i data-lucide="globe" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Google Business Profile</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Gestione su perfil desde su CRM. Supervise y responda a las reseñas de perfil.</p>
                 </div>
-            </section>
+            </div>
+            <button onclick="window.location.href='/auth/google'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+        <!-- 3. FACEBOOK & LEAD ADS (EL BLOQUE EXACTO DE TU CAPTURA) -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-blue-50/30 hover:bg-blue-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm"><i data-lucide="facebook" class="w-6 h-6"></i></div>
+                <div class="max-w-xl">
+                    <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
+                    <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                        ¡Impresionante! Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook ahora pueden rellenarse en su CRM y ya puede responder directamente a las solicitudes de Facebook Messenger en la página de conversaciones.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- Indicador de Estado Dinámico -->
+                <div id="launchpad-meta-status" class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
+                </div>
+                <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+            </div>
+        </div>
+
+        <!-- 4. Webchat Widget -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-cyan-50 text-cyan-600 rounded-2xl shrink-0"><i data-lucide="message-square" class="w-6 h-6"></i></div>
+                <div class="max-w-xl">
+                    <h4 class="text-xs font-bold text-slate-900">Widget Webchat de Sitio Web</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Genere clientes potenciales desde su sitio web conectando el widget de webchat. <br>
+                        <span class="text-[10px] text-slate-400 italic">(La comprobación del estado del widget de chat puede no ser precisa si el código no está directamente incrustado en el sitio web).</span>
+                    </p>
+                </div>
+            </div>
+            <button onclick="alert('Código widget copiado al portapapeles.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+        <!-- 5. WhatsApp Business -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Integre WhatsApp Business API</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Comuníquese en tiempo real y llegue a sus clientes en su plataforma preferida.</p>
+                </div>
+            </div>
+            <button onclick="alert('Asistente de conexión WhatsApp Cloud API iniciado.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+        <!-- 6. Stripe Payments -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-purple-50 text-purple-600 rounded-2xl shrink-0"><i data-lucide="credit-card" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Pasarela de Pagos Stripe</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Conecte su cuenta de Stripe para empezar a aceptar pagos y contratos digitales.</p>
+                </div>
+            </div>
+            <button onclick="alert('Redirigiendo a Stripe Connect...');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+    </div>
+</section>
 
             <section id="view-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
