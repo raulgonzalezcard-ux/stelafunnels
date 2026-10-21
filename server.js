@@ -22,7 +22,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error al conectar con la base de datos SQLite:', err.message);
     } else {
-        console.log('📦 Conectado a la Base de Datos SQLite de producción.');
+        console.log('📦 Conectado a la Base de Datos SQLite de producción[cite: 13].');
     }
 });
 
@@ -65,15 +65,15 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Sesiones optimizada para HTTPS en Producción
+// Configuración de Sesiones optimizada para evitar rechazos del proxy inverso
 app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: true, // Habilitado para HTTPS en producción detrás de reverse proxy
+        secure: false, // Desactivado para evitar bloqueos del proxy inverso en Coolify
         httpOnly: true,
-        sameSite: 'lax', // Permite mantener la sesión al regresar de dominios externos
+        sameSite: 'lax', // Mantiene la cookie al volver de dominios externos como Facebook
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
