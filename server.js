@@ -26,12 +26,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-// Crear tabla de usuarios/inquilinos si no existe
+// Crear tabla de usuarios/inquilinos con la columna meta_access_token integrada
 db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    meta_access_token TEXT,
     status TEXT DEFAULT 'active',
     role TEXT DEFAULT 'admin',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -264,54 +265,21 @@ app.get('/auth/facebook/callback', async (req, res) => {
 
         const accessToken = llData.access_token || data.access_token;
 
-        // 3. Obtener el perfil de usuario de Meta (Facebook)
-        const profileResp = await fetch(`https://graph.facebook.com/v25.0/me?fields=id,name,email,picture&access_token=${accessToken}`);
-        const profileData = await profileResp.json();
+        // 3. Guardar el token directamente vinculado al usuario activo actual en la sesión
+        if (req.session && req.session.user && req.session.user.id) {
+            const userId = req.session.user.id;
+            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, userId], (updateErr) => {
+                if (updateErr) {
+                    console.error("❌ Error al actualizar token Meta en BD:", updateErr);
+                } else {
+                    console.log(`✅ ¡Token de Meta guardado exitosamente para el usuario ID: ${userId}!`);
+                }
+            });
+        } else {
+            console.warn("⚠️ Advertencia: No hay sesión activa de usuario durante el callback de Meta.");
+        }
 
-        const metaUserId = 'meta_' + (profileData.id || Date.now());
-        const userName = profileData.name || "Administrador Meta";
-        const userEmail = profileData.email || `${profileData.id || 'user'}@meta-user.com`;
-        const userPicture = profileData.picture?.data?.url || null;
-
-        // 4. Verificar si el usuario ya existe en SQLite o crearlo, y actualizar su meta_access_token
-        db.get(`SELECT * FROM users WHERE email = ?`, [userEmail.toLowerCase()], (err, existingUser) => {
-            if (existingUser) {
-                // Actualizar token del usuario existente
-                db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, existingUser.id], (updateErr) => {
-                    if (updateErr) console.error("Error al actualizar token Meta en BD:", updateErr);
-                });
-
-                req.session.user = { 
-                    id: existingUser.id, 
-                    name: existingUser.name, 
-                    email: existingUser.email, 
-                    picture: userPicture,
-                    role: existingUser.role, 
-                    status: existingUser.status 
-                };
-            } else {
-                // Crear nuevo usuario con el token de Meta
-                const hashedPassword = bcrypt.hashSync('meta_secure_pass_2026', 10);
-                db.run(
-                    `INSERT INTO users (id, name, email, password, meta_access_token, status, role) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                    [metaUserId, userName, userEmail.toLowerCase(), hashedPassword, accessToken, 'active', 'admin'],
-                    (insertErr) => {
-                        if (insertErr) console.error("Error al registrar usuario Meta:", insertErr);
-                    }
-                );
-
-                req.session.user = { 
-                    id: metaUserId, 
-                    name: userName, 
-                    email: userEmail.toLowerCase(), 
-                    picture: userPicture,
-                    role: 'admin', 
-                    status: 'active' 
-                };
-            }
-
-            res.redirect('/?success=meta_connected');
-        });
+        res.redirect('/?success=meta_connected');
 
     } catch (err) {
         console.error("Error crítico en callback Facebook:", err);
