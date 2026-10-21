@@ -343,26 +343,22 @@
             </button>
         </div>
 
-        <!-- 3. FACEBOOK & LEAD ADS (EL BLOQUE EXACTO DE TU CAPTURA) -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-blue-50/30 hover:bg-blue-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm"><i data-lucide="facebook" class="w-6 h-6"></i></div>
-                <div class="max-w-xl">
-                    <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
-                    <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                        ¡Impresionante! Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook ahora pueden rellenarse en su CRM y ya puede responder directamente a las solicitudes de Facebook Messenger en la página de conversaciones.
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-                <!-- Indicador de Estado Dinámico -->
-                <div id="launchpad-meta-status" class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
-                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
-                </div>
-                <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
-            </div>
+  <!-- FACEBOOK & LEAD ADS (DINÁMICO SEGÚN LA SUB-CUENTA) -->
+<div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white hover:bg-slate-50/50 transition-all border-b border-slate-100">
+    <div class="flex items-start gap-4">
+        <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm"><i data-lucide="facebook" class="w-6 h-6"></i></div>
+        <div class="max-w-xl">
+            <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
+            <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM y podrá responder a los mensajes en la página de conversaciones.
+            </p>
         </div>
-
+    </div>
+    <div id="meta-connection-action" class="flex items-center gap-2 shrink-0">
+        <!-- El estado se inyecta dinámicamente mediante JavaScript según la base de datos -->
+        <span class="text-xs text-slate-400 font-medium">Verificando estado...</span>
+    </div>
+</div>
         <!-- 4. Webchat Widget -->
         <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
             <div class="flex items-start gap-4">
@@ -1118,6 +1114,10 @@
                     if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
                 }
 
+                if (viewId === 'launchpad') {
+                    checkMetaConnectionStatus();
+                }
+
                 if (viewId === 'dashboard') this.renderDashboard();
                 if (viewId === 'pipeline') this.renderPipeline();
                 if (viewId === 'conversations') ChatEngine.render();
@@ -1572,7 +1572,47 @@
             }
         };
 
-        window.onload = () => App.init();
+        
+// Función para verificar si la subcuenta actual tiene Meta conectado en producción
+async function checkMetaConnectionStatus() {
+    const actionContainer = document.getElementById('meta-connection-action');
+    if (!actionContainer) return;
+
+    try {
+        const response = await fetch('/api/meta/status'); // Endpoint que verifica el token en SQLite
+        const data = await response.json();
+
+        if (data.connected) {
+            actionContainer.innerHTML = `
+                <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
+                </div>
+                <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+            `;
+        } else {
+            actionContainer.innerHTML = `
+                <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                    Conectar
+                </button>
+            `;
+        }
+        lucide.createIcons();
+    } catch (e) {
+        actionContainer.innerHTML = `
+            <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                Conectar
+            </button>
+        `;
+        lucide.createIcons();
+    }
+}
+
+// Ejecutar al cargar la vista de Launchpad
+document.addEventListener("DOMContentLoaded", () => {
+    checkMetaConnectionStatus();
+});
+
+window.onload = () => App.init();
     </script>
 </body>
 </html>
