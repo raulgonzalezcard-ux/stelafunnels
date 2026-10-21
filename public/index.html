@@ -235,38 +235,37 @@
         <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ecosistema Base</p>
             
-            <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad Inicial
             </button>
-            <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero de Control
             </button>
-            <button onclick="App.navigate('conversations')" id="nav-conversations" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('conversations')" id="nav-conversations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
                 <span class="flex items-center gap-3"><i data-lucide="message-square" class="w-4 h-4"></i> Conversaciones</span>
                 <span class="bg-rose-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">2</span>
             </button>
-            <button onclick="App.navigate('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="kanban-square" class="w-4 h-4"></i> Oportunidades (Opps)
             </button>
-            <button onclick="App.navigate('contacts')" id="nav-contacts" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('contacts')" id="nav-contacts" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="users" class="w-4 h-4"></i> Contactos / CRM
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Marketing & Tráfico</p>
-            <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="share-2" class="w-4 h-4"></i> Publicador Orgánico
             </button>
-            <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
                 <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Ads Manager (Rocket)</span>
                 <span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.2 rounded font-bold">21</span>
             </button>
-            <!-- ENLACE REDIRIGIDO AL BUILDER EXTERNO -->
-            <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="layers" class="w-4 h-4"></i> Embudos y Sitios Web
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Automatización</p>
-            <button onclick="App.navigate('automations')" id="nav-automations" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white">
+            <button onclick="App.navigate('automations')" id="nav-automations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="git-branch" class="w-4 h-4"></i> Workflow Builder
             </button>
         </nav>
@@ -656,6 +655,109 @@
                 </div>
             </section>
 
+            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB (DENTRO DEL CRM SIN RECARGAS NI PERDER EL MENÚ) -->
+            <section id="view-funnels" class="hidden space-y-4">
+                
+                <!-- SUB-VISTA 1: LISTADO DE EMBUDOS ACTIVOS -->
+                <div id="funnels-subview-list" class="space-y-4">
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
+                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de aterrizaje sin salir de la plataforma.</p>
+                        </div>
+                        <button onclick="FunnelsManager.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nuevo Embudo
+                        </button>
+                    </div>
+
+                    <div id="funnels-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <!-- SUB-VISTA 2: CONSTRUCTOR / EDITOR VISUAL INTEGRADO CON VIDEO Y CAMPOS DE FORMULARIO -->
+                <div id="funnels-subview-builder" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm flex justify-between items-center shrink-0">
+                        <div class="flex items-center gap-3">
+                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver al Listado
+                            </button>
+                            <div>
+                                <h3 class="text-xs font-black text-slate-800 truncate" id="builder-funnel-title">Linktree para Clientes | Xtucasa</h3>
+                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Cambios
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex gap-4 overflow-hidden">
+                        
+                        <!-- LONA / CANVAS DE EDICIÓN VISUAL -->
+                        <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800 shadow-inner">
+                            <div id="landing-preview-canvas" class="w-full max-w-2xl bg-cover bg-center rounded-2xl p-8 border-2 border-amber-500/80 shadow-2xl space-y-6 relative min-h-[600px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                                
+                                <div class="text-center pt-4">
+                                    <div class="inline-block bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-6 py-2 rounded-lg font-black text-lg tracking-wider backdrop-blur-md cursor-pointer hover:border-amber-400 transition-all">
+                                        <span id="preview-logo-text">xtucasa</span>
+                                    </div>
+                                </div>
+
+                                <!-- CONTENEDOR DE VIDEO DESTACADO -->
+                                <div class="max-w-md mx-auto w-full bg-slate-900/80 rounded-xl overflow-hidden border border-slate-700 shadow-xl p-2">
+                                    <div class="aspect-video bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center">
+                                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" alt="Video Cover" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg relative z-10">
+                                            <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BOTONES DE ACCIÓN PRINCIPALES -->
+                                <div class="space-y-3 max-w-md mx-auto w-full">
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos (Formulario Pop-up)</button>
+                                </div>
+
+                                <div class="text-center text-white space-y-2 pt-6 border-t border-white/10">
+                                    <h4 id="preview-business-name" class="font-bold text-sm tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
+                                    <div class="text-[11px] text-slate-300 space-y-1 font-mono">
+                                        <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
+                                        <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PANEL LATERAL DE PROPIEDADES DE CAMPOS DE FORMULARIO -->
+                        <div class="w-80 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
+                            <div class="space-y-4 text-xs">
+                                <h4 class="font-extrabold text-slate-900 text-sm border-b pb-2">Campos del Formulario Integrado</h4>
+                                <div>
+                                    <label class="block font-bold text-slate-600 mb-1">Nombre del Negocio</label>
+                                    <input type="text" id="inspector-business-input" value="Xtucasa Inmobiliaria" oninput="FunnelsManager.updateLiveText(this.value)" class="w-full border border-slate-200 p-2.5 rounded-lg font-semibold outline-none focus:border-blue-500">
+                                </div>
+                                <div class="space-y-2 pt-2 border-t">
+                                    <p class="font-bold text-slate-500 uppercase text-[10px]">Campos Capturados en el CRM</p>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Nombre Completo</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Teléfono / WhatsApp</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Correo Electrónico</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Comentarios o Consulta</label>
+                                </div>
+                            </div>
+
+                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all">Guardar y Publicar Sitio</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+
             <section id="view-settings" class="hidden space-y-4">
                 <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                     <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Configuración del Perfil de Cliente</h3>
@@ -920,23 +1022,13 @@
             },
 
             navigate(viewId) {
-                // REDIRECCIÓN LIMPIA AL NUEVO BUILDER EXTERNO
-                if (viewId === 'funnels') {
-                    window.location.href = '/builder';
-                    return;
-                }
-
-                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'settings'];
+                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if(el) el.classList.add('hidden');
                     const nav = document.getElementById(`nav-${v}`);
                     if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
                 });
-
-                // También ocultar el botón de funnels de la clase active si se usa
-                const funnelsNav = document.getElementById('nav-funnels');
-                if(funnelsNav) funnelsNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
 
                 const targetView = document.getElementById(`view-${viewId}`);
                 if (targetView) targetView.classList.remove('hidden');
@@ -953,6 +1045,7 @@
                 if (viewId === 'conversations') ChatEngine.render();
                 if (viewId === 'contacts') this.renderContacts();
                 if (viewId === 'ads-manager') AdsManager.render();
+                if (viewId === 'funnels') FunnelsManager.render();
 
                 lucide.createIcons();
             },
@@ -1139,6 +1232,64 @@
                 if(templateEl) templateEl.innerText = campaign.templateName;
                 this.switchTab('builder');
             }
+        };
+
+        const FunnelsManager = {
+            render() {
+                const listSub = document.getElementById('funnels-subview-list');
+                const builderSub = document.getElementById('funnels-subview-builder');
+                const grid = document.getElementById('funnels-cards-grid');
+
+                if (listSub) listSub.classList.remove('hidden');
+                if (builderSub) builderSub.classList.add('hidden');
+
+                if (grid) {
+                    grid.innerHTML = Store.funnels.map(f => `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
+                                    <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
+                                </div>
+                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    Editar Embudo
+                                </button>
+                            </div>
+                            <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
+                                <span>Pasos activos: <strong>${f.steps}</strong></span>
+                                <span>Actualizado: ${f.updated}</span>
+                            </div>
+                        </div>`).join('');
+                }
+
+                lucide.createIcons();
+            },
+
+            openBuilder(id) {
+                const f = Store.funnels.find(item => item.id === id);
+                if(!f) return;
+
+                document.getElementById('funnels-subview-list').classList.add('hidden');
+                document.getElementById('funnels-subview-builder').classList.remove('hidden');
+
+                document.getElementById('builder-funnel-title').innerText = f.name;
+                document.getElementById('builder-funnel-url').innerText = f.url;
+                lucide.createIcons();
+            },
+
+            createNewFunnel() {
+                const newId = 'f' + Date.now();
+                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial', updated: 'Ahora', steps: 1, url: 'https://stelafunnels.io/nuevo-sitio' });
+                this.openBuilder(newId);
+            },
+
+            updateLiveText(val) {
+                const nameEl = document.getElementById('preview-business-name');
+                if(nameEl) nameEl.innerText = val || '{{ custom_values.nombre_de_negocio }}';
+            },
+
+            closeBuilder() { this.render(); },
+            saveChanges() { alert("🎉 ¡Embudo guardado y publicado en producción con éxito!"); this.render(); }
         };
 
         const ChatEngine = {
