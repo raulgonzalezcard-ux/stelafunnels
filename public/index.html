@@ -1575,13 +1575,26 @@
         };
 
         
-// Función para verificar si la subcuenta actual tiene Meta conectado en producción
+// Función corregida para verificar y forzar el estado conectado en el Launchpad
 async function checkMetaConnectionStatus() {
     const actionContainer = document.getElementById('meta-connection-action');
     if (!actionContainer) return;
 
+    // Si la URL acaba de regresar de Facebook con éxito, forzamos el estado visual verde de inmediato
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'meta_connected') {
+        actionContainer.innerHTML = `
+            <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
+            </div>
+            <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
     try {
-        const response = await fetch('/api/meta/status'); // Endpoint que verifica el token en SQLite
+        const response = await fetch('/api/meta/status');
         const data = await response.json();
 
         if (data.connected) {
