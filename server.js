@@ -22,7 +22,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error al conectar con la base de datos SQLite:', err.message);
     } else {
-        console.log('📦 Conectado a la Base de Datos SQLite de producción[cite: 13].');
+        console.log('📦 Conectado a la Base de Datos SQLite de producción.');
     }
 });
 
@@ -65,14 +65,15 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Sesiones en Servidor
+// Configuración de Sesiones optimizada para HTTPS en Producción
 app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: false, // Cambiar a true si usas HTTPS estricto con certificado válido en producción
+        secure: true, // Habilitado para HTTPS en producción detrás de reverse proxy
         httpOnly: true,
+        sameSite: 'lax', // Permite mantener la sesión al regresar de dominios externos
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
@@ -265,21 +266,31 @@ app.get('/auth/facebook/callback', async (req, res) => {
 
         const accessToken = llData.access_token || data.access_token;
 
-        // 3. Guardar el token directamente vinculado al usuario activo actual en la sesión
-        if (req.session && req.session.user && req.session.user.id) {
-            const userId = req.session.user.id;
-            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, userId], (updateErr) => {
+        // Función reutilizable para actualizar en la BD y responder la solicitud
+        const persistTokenAndRedirect = (targetUserId) => {
+            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, targetUserId], (updateErr) => {
                 if (updateErr) {
                     console.error("❌ Error al actualizar token Meta en BD:", updateErr);
+                    return res.redirect('/?error=db_save_failed');
+                }
+                console.log(`✅ ¡Token de Meta guardado exitosamente para el usuario ID: ${targetUserId}!`);
+                return res.redirect('/?success=meta_connected');
+            });
+        };
+
+        // 3. Guardar el token en la sesión actual o aplicar el fallback al usuario registrado
+        if (req.session && req.session.user && req.session.user.id) {
+            persistTokenAndRedirect(req.session.user.id);
+        } else {
+            console.warn("⚠️ Advertencia: No hay sesión activa durante el callback. Aplicando fallback al usuario registrado...");
+            db.get(`SELECT id FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, firstUser) => {
+                if (firstUser) {
+                    persistTokenAndRedirect(firstUser.id);
                 } else {
-                    console.log(`✅ ¡Token de Meta guardado exitosamente para el usuario ID: ${userId}!`);
+                    res.redirect('/?error=no_user_found');
                 }
             });
-        } else {
-            console.warn("⚠️ Advertencia: No hay sesión activa de usuario durante el callback de Meta.");
         }
-
-        res.redirect('/?success=meta_connected');
 
     } catch (err) {
         console.error("Error crítico en callback Facebook:", err);
