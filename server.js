@@ -266,28 +266,63 @@ app.get('/auth/facebook/callback', async (req, res) => {
 
         const accessToken = llData.access_token || data.access_token;
 
-        // Función reutilizable para actualizar en la BD y responder la solicitud
-        const persistTokenAndRedirect = (targetUserId) => {
+        // Función reutilizable para actualizar en la BD, iniciar sesión y redirigir
+        const persistTokenAndLogin = (targetUserId, userDataObj) => {
             db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, targetUserId], (updateErr) => {
                 if (updateErr) {
                     console.error("❌ Error al actualizar token Meta en BD:", updateErr);
                     return res.redirect('/?error=db_save_failed');
                 }
-                console.log(`✅ ¡Token de Meta guardado exitosamente para el usuario ID: ${targetUserId}!`);
-                return res.redirect('/?success=meta_connected');
+                
+                // Establecer la sesión activa de inmediato para evitar que pida login
+                req.session.user = userDataObj;
+
+                req.session.save((saveErr) => {
+                    if (saveErr) {
+                        console.error("❌ Error al guardar la sesión:", saveErr);
+                    }
+                    console.log(`✅ ¡Token de Meta guardado y sesión iniciada para el usuario ID: ${targetUserId}!`);
+                    return res.redirect('/?success=meta_connected');
+                });
             });
         };
 
-        // 3. Guardar el token en la sesión actual o aplicar el fallback al usuario registrado
+        // 3. Verificar si hay sesión activa o buscar al usuario existente/registrado para asociarle el token
         if (req.session && req.session.user && req.session.user.id) {
-            persistTokenAndRedirect(req.session.user.id);
+            persistTokenAndLogin(req.session.user.id, req.session.user);
         } else {
-            console.warn("⚠️ Advertencia: No hay sesión activa durante el callback. Aplicando fallback al usuario registrado...");
-            db.get(`SELECT id FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, firstUser) => {
-                if (firstUser) {
-                    persistTokenAndRedirect(firstUser.id);
+            console.warn("⚠️ Advertencia: No hay sesión activa durante el callback. Buscando usuario en BD...");
+            db.get(`SELECT * FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, user) => {
+                if (user) {
+                    persistTokenAndLogin(user.id, {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        picture: null,
+                        role: user.role,
+                        status: user.status
+                    });
                 } else {
-                    res.redirect('/?error=no_user_found');
+                    // Si no hay ningún usuario en la BD, crear uno por defecto automáticamente
+                    const defaultUserId = 'meta_user_' + Date.now();
+                    const hashedPassword = bcrypt.hashSync('default_pass_2026', 10);
+                    db.run(
+                        `INSERT INTO users (id, name, email, password, meta_access_token, status, role) VALUES (?, ?, ?, ?, ?, 'active', 'admin')`,
+                        [defaultUserId, 'Administrador Global', 'admin@stelafunnels.com', hashedPassword, accessToken],
+                        (insertErr) => {
+                            if (insertErr) {
+                                return res.redirect('/?error=no_user_found');
+                            }
+                            persistTokenAndLogin(defaultUserId, {
+                                id: defaultUserId,
+                                name: 'Administrador Global',
+                                email: 'admin@stelafunnels.com',
+                                picture: null,
+                                role: 'admin',
+                                status: 'active'
+                            });
+                        }
+                    );
                 }
             });
         }
