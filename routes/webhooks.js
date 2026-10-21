@@ -1,40 +1,34 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Ruta hacia la base de datos JSON de tu CRM
-const DB_PATH = path.join(__dirname, '../crm_database.json');
+// Conexión a la base de datos SQLite de producción
+const dbPath = path.join(__dirname, '../database.sqlite');
+const db = new sqlite3.Database(dbPath);
 
-// Función auxiliar para cargar y guardar leads de forma persistente
-function loadLeads() {
-    try {
-        if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify([]));
-        return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-    } catch (error) {
-        console.error("❌ Error leyendo la base de datos JSON:", error.message);
-        return [];
-    }
-}
-
-function saveLead(newLead) {
-    try {
-        const leads = loadLeads();
-        leads.unshift(newLead);
-        fs.writeFileSync(DB_PATH, JSON.stringify(leads, null, 2));
-    } catch (error) {
-        console.error("❌ Error escribiendo en la base de datos JSON:", error.message);
-    }
-}
+// Crear tabla de leads en SQLite si no existe
+db.run(`CREATE TABLE IF NOT EXISTS leads (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    name TEXT,
+    email TEXT,
+    phone TEXT,
+    value REAL DEFAULT 0,
+    stage TEXT DEFAULT 'lead_entrante',
+    source TEXT,
+    status TEXT DEFAULT 'Abierto',
+    tags TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
 
 // 🌐 Verificación del Webhook exigido por Meta Developers
 router.get('/', (req, res) => {
-    const VERIFY_TOKEN = "mi_token_secreto_de_rocket_os_123"; 
+    const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || "mi_token_secreto_de_rocket_os_123"; 
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    // Validamos de forma segura y cerramos la conexión pase lo que pase
     if (mode === 'subscribe' && token === VERIFY_TOKEN) {
         console.log('✅ Webhook verificado correctamente ante Meta Developers.');
         return res.status(200).send(challenge);
@@ -45,7 +39,6 @@ router.get('/', (req, res) => {
         return res.sendStatus(403);
     }
 
-    // Fallback de seguridad: si entran desde el navegador o falta un parámetro, respondemos 400 en vez de congelar el servidor
     return res.status(400).send('Faltan parámetros de validación de Meta.');
 });
 
@@ -53,11 +46,10 @@ router.get('/', (req, res) => {
 router.post('/', async (req, res) => {
     const body = req.body;
 
-    // Responder rápido a Meta (dentro de los 200ms obligatorios) para evitar baneos o reintentos agresivos
+    // Responder rápido a Meta (dentro de los 200ms obligatorios)
     if (body.object === 'page') {
         res.status(200).send('EVENT_RECEIVED');
 
-        // Control de errores por si body.entry viene indefinido
         if (!body.entry || !Array.isArray(body.entry)) return;
 
         for (let entry of body.entry) {
@@ -67,69 +59,87 @@ router.post('/', async (req, res) => {
                 if (change.field === 'leadgen') {
                     const leadId = change.value.leadgen_id;
                     const pageId = change.value.page_id;
-                    console.log(`🎯 ¡Nuevo Lead detectado por Meta! ID: ${leadId} en la Página: ${pageId}`);
+                    console.log(`🎯 ¡Nuevo Lead detectado por Meta! ID: ${leadId} en la Página ID: ${pageId}`);
 
-                    // 🔄 ESTRATEGIA DE RESPALDO: Intentar usar el token de la sesión u ocupar el permanente verificado
-                    let accessToken = global.metaAccessToken;
-
-                    if (!accessToken) {
-                        console.warn("⚠️ [CRM Webhook] 'global.metaAccessToken' está vacío debido a un reinicio. Usando Token Permanente de Respaldo...");
-                        // Usamos tu token de página comercial definitivo de Meta
-                        accessToken = "EAAdZAo1GbxjQBR7pTOH8PyvfoBpH0aTVVp3BCO6en0ltaZCHqp9MhaxibBDC9hZBlmocLMNZCgvvFcMLeoynb13LZCXuBlcZAU4rjkzdqqRZAhTy5jcaK8Tc10Y8LcWKex5CzTvZCXp2YrIKB8XBx6ss5pVsyiTZAL9Qc4oGzwxjZCOOQcajHb6fTyoZCnp04KUpfNkaw2LaiJJnO5KZA6EGiEbtSJ5ncX4KoBJHffpm7uMZD";
-                    }
-
-                    try {
-                        // 🛰️ CONSULTA EN VIVO A FACEBOOK GRAPH API PARA EXTRAER LOS DATOS REALES
-                        const fbGraphUrl = `https://graph.facebook.com/v25.0/${leadId}?access_token=${accessToken}`;
-                        const response = await fetch(fbGraphUrl);
-                        const metaData = await response.json();
-
-                        if (metaData.error) {
-                            console.error("❌ Error de Meta al decodificar el Lead ID:", metaData.error.message);
-                            continue;
+                    // Buscar en la base de datos qué usuario tiene un token activo que pueda administrar esta página
+                    db.all(`SELECT id, meta_access_token FROM users WHERE meta_access_token IS NOT NULL`, [], async (err, users) => {
+                        if (err || !users || users.length === 0) {
+                            console.error("❌ No hay usuarios con tokens de Meta registrados en la base de datos.");
+                            return;
                         }
 
-                        // Mapeo seguro de los campos del formulario del video
-                        const fieldData = metaData.field_data || [];
-                        let clientData = { name: '', email: '', phone: '' };
+                        let targetUserToken = null;
+                        let targetUserId = null;
 
-                        fieldData.forEach(field => {
-                            if (field.name === 'full_name' || field.name === 'name') clientData.name = field.values[0];
-                            if (field.name === 'email') clientData.email = field.values[0];
-                            if (field.name === 'phone_number' || field.name === 'phone') clientData.phone = field.values[0];
-                        });
+                        for (let user of users) {
+                            try {
+                                const testUrl = `https://graph.facebook.com/v19.0/${pageId}?access_token=${user.meta_access_token}`;
+                                const testRes = await fetch(testUrl);
+                                const testData = await testRes.json();
+                                if (!testData.error) {
+                                    targetUserToken = user.meta_access_token;
+                                    targetUserId = user.id;
+                                    break;
+                                }
+                            } catch (e) {}
+                        }
 
-                        // 💰 LÓGICA DE MONETIZACIÓN REAL (Calculando tus ganancias inmobiliarias)
-                        const valorPropiedad = 150000; // Valor base estimado de la propiedad del video
-                        const porcentajeComision = 0.05; // 5% de comisión de ganancia para tu agencia
-                        const gananciaEstimada = valorPropiedad * porcentajeComision;
+                        // Fallback si no encuentra coincidencia exacta de página
+                        if (!targetUserToken) {
+                            targetUserToken = global.metaAccessToken || users[0].meta_access_token;
+                            targetUserId = users[0].id;
+                        }
 
-                        // Construcción de la oportunidad estructurada para tu base de datos
-                        const nuevaOportunidad = {
-                            id: leadId,
-                            name: clientData.name || 'Cliente Potencial de Prueba (Meta)',
-                            email: clientData.email || 'sin_email@facebook.com',
-                            phone: clientData.phone || 'Sin número registrado',
-                            value: valorPropiedad,            // Valor comercial total
-                            earnings: gananciaEstimada,       // 💰 Monetización neta de ganancias
-                            stage: 'lead_entrante',           // Columna inicial del embudo Kanban
-                            source: 'Facebook Lead Ads Video',
-                            status: 'Abierto',
-                            tags: ['Video Captación', 'Meta Live'],
-                            createdAt: new Date().toISOString(),
-                            messages: [{ sender: 'lead', text: 'Vio tu video publicitario y completó el formulario de cotización.' }]
-                        };
+                        try {
+                            const fbGraphUrl = `https://graph.facebook.com/v19.0/${leadId}?access_token=${targetUserToken}`;
+                            const response = await fetch(fbGraphUrl);
+                            const metaData = await response.json();
 
-                        // Guardar permanentemente en tu crm_database.json
-                        saveLead(nuevaOportunidad);
-                        
-                        console.log(`🚀 [CRM] ¡Oportunidad financiera inyectada con éxito!`);
-                        console.log(`   👉 Cliente: ${nuevaOportunidad.name}`);
-                        console.log(`   💰 Trato: $${nuevaOportunidad.value} USD | Ganancia Esperada: $${nuevaOportunidad.earnings} USD`);
+                            if (metaData.error) {
+                                console.error("❌ Error de Meta al decodificar el Lead ID:", metaData.error.message);
+                                return;
+                            }
 
-                    } catch (error) {
-                        console.error("❌ Error crítico procesando la información del lead:", error.message);
-                    }
+                            const fieldData = metaData.field_data || [];
+                            let clientData = { name: '', email: '', phone: '' };
+
+                            fieldData.forEach(field => {
+                                if (field.name === 'full_name' || field.name === 'name') clientData.name = field.values[0];
+                                if (field.name === 'email') clientData.email = field.values[0];
+                                if (field.name === 'phone_number' || field.name === 'phone') clientData.phone = field.values[0];
+                            });
+
+                            const valorPropiedad = 150000; // Valor base del lead inmobiliario
+                            const nuevaOportunidad = {
+                                id: leadId,
+                                user_id: targetUserId,
+                                name: clientData.name || 'Cliente Potencial (Meta Ads)',
+                                email: clientData.email || 'sin_email@facebook.com',
+                                phone: clientData.phone || 'Sin número registrado',
+                                value: valorPropiedad,
+                                stage: 'lead_entrante',
+                                source: 'Facebook Lead Ads',
+                                status: 'Abierto',
+                                tags: JSON.stringify(['Meta Ads', 'Producción'])
+                            };
+
+                            // Guardar en la base de datos SQLite asociada al inquilino correcto
+                            db.run(
+                                `INSERT OR REPLACE INTO leads (id, user_id, name, email, phone, value, stage, source, status, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                [nuevaOportunidad.id, nuevaOportunidad.user_id, nuevaOportunidad.name, nuevaOportunidad.email, nuevaOportunidad.phone, nuevaOportunidad.value, nuevaOportunidad.stage, nuevaOportunidad.source, nuevaOportunidad.status, nuevaOportunidad.tags],
+                                (insertErr) => {
+                                    if (insertErr) {
+                                        console.error("❌ Error guardando lead en SQLite:", insertErr);
+                                    } else {
+                                        console.log(`🚀 [CRM] Lead ${nuevaOportunidad.name} guardado en SQLite para el inquilino ID: ${targetUserId}`);
+                                    }
+                                }
+                            );
+
+                        } catch (error) {
+                            console.error("❌ Error crítico procesando el lead de Meta:", error.message);
+                        }
+                    });
                 }
             }
         }
