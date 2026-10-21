@@ -913,7 +913,7 @@
             }
         };
 
-        const App = {
+     const App = {
             chartInstance: null,
 
             async init() {
@@ -921,6 +921,26 @@
                 this.populateStageSelectors();
                 SocialPublisher.setupEvents();
 
+                // 🚀 PRIORIDAD ABSOLUTA: Si regresamos de Meta con éxito, omitimos el fetch de sesión inicial
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success') || urlParams.get('success') === 'meta_connected') {
+                    document.getElementById('view-login').classList.add('hidden');
+                    this.navigate('launchpad');
+                    
+                    // Intentamos recuperar los datos del usuario en segundo plano sin bloquear la vista
+                    try {
+                        const res = await fetch('/api/user-session');
+                        const data = await res.json();
+                        if (data.loggedIn && data.user) {
+                            this.setUserProfileUI(data.user);
+                        }
+                    } catch (e) {}
+
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    return;
+                }
+
+                // Flujo normal de verificación para cuando entras por primera vez de forma directa
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
@@ -936,6 +956,7 @@
                     console.error("Error al verificar sesión", e);
                     document.getElementById('view-login').classList.remove('hidden');
                 }
+            },
 
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('success')) {
