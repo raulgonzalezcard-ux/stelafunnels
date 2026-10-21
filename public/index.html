@@ -45,18 +45,20 @@
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
-    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN -->
+    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (VISIBLE POR DEFECTO PARA EVITAR PARPADEOS AL ACTUALIZAR) -->
     <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center">
         <div class="w-full h-full grid grid-cols-1 md:grid-cols-2 bg-white">
             
-            <!-- COLUMNA IZQUIERDA: FORMULARIOS -->
+            <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS -->
             <div class="p-8 md:p-16 flex flex-col justify-between bg-white text-left overflow-y-auto custom-scrollbar">
+                
                 <div class="max-w-md w-full mx-auto space-y-6">
+                    <!-- Brand / Logo -->
                     <div class="flex items-center gap-3 mb-8">
                         <img src="img/imageInmueble2.png" alt="Stelafunnels Logo" class="h-10 object-contain" onerror="this.src='img/imageInmueble3.png'">
                     </div>
 
-                    <!-- MÓDULO 1: LOGIN -->
+                    <!-- MÓDULO 1: INICIO DE SESIÓN CON CONTRASEÑA -->
                     <div id="auth-mode-login" class="space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión</h2>
@@ -66,14 +68,14 @@
                         <form onsubmit="App.handlePasswordLogin(event)" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Correo electrónico *</label>
-                                <input type="email" id="auth-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                                <input type="email" id="auth-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all placeholder-slate-400">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label class="block text-xs font-bold text-slate-700">Password *</label>
                                     <a href="#" class="text-[11px] text-slate-500 hover:text-blue-600">Restablecer contraseña</a>
                                 </div>
-                                <input type="password" id="auth-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                                <input type="password" id="auth-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all placeholder-slate-400">
                             </div>
 
                             <div id="auth-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
@@ -95,28 +97,43 @@
                         </div>
                     </div>
 
-                    <!-- MÓDULO 2: OTP -->
+                    <!-- MÓDULO 2: INICIO DE SESIÓN CON CÓDIGO OTP -->
                     <div id="auth-mode-otp" class="hidden space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión con código</h2>
-                            <p class="text-xs text-slate-500 mt-1">Introduzca su correo para recibir un código de acceso.</p>
+                            <p class="text-xs text-slate-500 mt-1">Introduzca su correo para recibir un código acceso.</p>
                         </div>
+
                         <form onsubmit="App.handleOtpRequest(event)" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Correo electrónico *</label>
                                 <input type="email" id="otp-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
                             </div>
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">Generar código seguro</button>
+
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">
+                                Generar código seguro
+                            </button>
                         </form>
-                        <button onclick="App.switchAuthMode('login')" type="button" class="w-full bg-white hover:bg-slate-50 text-red-600 border border-red-200 font-bold text-xs py-2.5 rounded-lg transition-all">Inicie sesión con contraseña</button>
+
+                        <button onclick="App.switchAuthMode('login')" type="button" class="w-full bg-white hover:bg-slate-50 text-red-600 border border-red-200 font-bold text-xs py-2.5 rounded-lg transition-all">
+                            Inicie sesión con una contraseña
+                        </button>
+
+                        <div class="text-center pt-2">
+                            <p class="text-xs text-slate-500">
+                                ¿Es nuevo por aquí? 
+                                <button onclick="App.switchAuthMode('signup')" class="text-blue-600 font-bold hover:underline">Registrarse</button>
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- MÓDULO 3: SIGNUP -->
+                    <!-- MÓDULO 3: REGISTRO DE NUEVOS CLIENTES -->
                     <div id="auth-mode-signup" class="hidden space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Registrarse</h2>
                             <p class="text-xs text-slate-500 mt-1">Configure el acceso a su cuenta en unos segundos.</p>
                         </div>
+
                         <form onsubmit="App.handleRegisterSubmit(event)" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nombre completo *</label>
@@ -129,12 +146,21 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
                                 <input type="password" id="reg-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                                <p class="text-[10px] text-slate-400 mt-1">Utilice al menos 8 caracteres, incluidas letras y números.</p>
                             </div>
+
                             <div id="reg-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">Regístrese y active su cuenta</button>
+
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">
+                                Regístrese y active su cuenta
+                            </button>
                         </form>
+
                         <div class="text-center pt-2">
-                            <p class="text-xs text-slate-500">¿Ya tiene una cuenta? <button onclick="App.switchAuthMode('login')" class="text-blue-600 font-bold hover:underline">Inicie sesión</button></p>
+                            <p class="text-xs text-slate-500">
+                                ¿Ya tiene una cuenta? 
+                                <button onclick="App.switchAuthMode('login')" class="text-blue-600 font-bold hover:underline">Inicie sesión</button>
+                            </p>
                         </div>
                     </div>
 
@@ -144,6 +170,7 @@
                         <div class="flex-grow border-t border-slate-200"></div>
                     </div>
 
+                    <!-- Redes Sociales -->
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="App.handleSocialLogin('Google')" type="button" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-200 transition-all">
                             <i data-lucide="chrome" class="w-4 h-4 text-red-500"></i> Google
@@ -152,6 +179,7 @@
                             <i data-lucide="facebook" class="w-4 h-4 text-blue-600"></i> Meta
                         </button>
                     </div>
+
                 </div>
 
                 <div class="max-w-md w-full mx-auto pt-8 flex justify-between items-center text-xs text-slate-400">
@@ -160,7 +188,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: BANNER -->
+            <!-- COLUMNA DERECHA: BANNER CORPORATIVO -->
             <div class="hidden md:flex bg-[#0f172a] p-16 flex-col justify-between relative overflow-hidden text-left">
                 <div class="relative z-10 space-y-6 max-w-lg">
                     <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-400/20 text-blue-400 rounded-full text-xs font-semibold uppercase tracking-wider">
@@ -173,6 +201,7 @@
                         Control total de oportunidades, embudos de conversión y automatizaciones en una sola plataforma multi-inquilino.
                     </p>
                 </div>
+
                 <div class="relative z-10 pt-8 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
                     <span>Estado del Servidor</span>
                     <span class="flex items-center gap-2 text-emerald-400 font-semibold">
@@ -207,20 +236,20 @@
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ecosistema Base</p>
             
             <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad
+                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad Inicial
             </button>
             <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero de Control
             </button>
             <button onclick="App.navigate('conversations')" id="nav-conversations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
                 <span class="flex items-center gap-3"><i data-lucide="message-square" class="w-4 h-4"></i> Conversaciones</span>
                 <span class="bg-rose-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">2</span>
             </button>
             <button onclick="App.navigate('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="kanban-square" class="w-4 h-4"></i> Clientes Potenciales
+                <i data-lucide="kanban-square" class="w-4 h-4"></i> Oportunidades (Opps)
             </button>
             <button onclick="App.navigate('contacts')" id="nav-contacts" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="users" class="w-4 h-4"></i> Contactos
+                <i data-lucide="users" class="w-4 h-4"></i> Contactos / CRM
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Marketing & Tráfico</p>
@@ -228,20 +257,20 @@
                 <i data-lucide="share-2" class="w-4 h-4"></i> Publicador Orgánico
             </button>
             <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
-                <span class="flex items-center gap-3"><i data-lucide="badge-percent" class="w-4 h-4"></i> Lanzar Anuncios</span>
+                <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Ads Manager (Rocket)</span>
                 <span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.2 rounded font-bold">21</span>
             </button>
             <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="panel-top" class="w-4 h-4"></i> Sitios
+                <i data-lucide="layers" class="w-4 h-4"></i> Embudos y Sitios Web
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Automatización</p>
             <button onclick="App.navigate('automations')" id="nav-automations" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="git-branch" class="w-4 h-4"></i> Automatización
+                <i data-lucide="git-branch" class="w-4 h-4"></i> Workflow Builder
             </button>
         </nav>
 
-        <!-- PERFIL DE USUARIO -->
+        <!-- PERFIL DE USUARIO DINÁMICO (AVATAR DE GRAVATAR O FOTO SOCIAL) -->
         <div class="p-4 border-t border-slate-800 bg-[#0b1322] flex items-center gap-3">
             <div id="user-avatar-container" class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md overflow-hidden shrink-0">
                 US
@@ -275,11 +304,10 @@
 
         <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-[#f8fafc]" id="main-view-router">
             
-            <!-- VISTA LAUNCHPAD -->
             <section id="view-launchpad" class="hidden space-y-6">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">¡Te damos la bienvenida a Launchpad!</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para activar la automatización y recepción de prospectos.</p>
+                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">¡Te damos la bienvenida a Rocket OS!</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para activar la automatización completa y el rastreo.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between">
@@ -287,7 +315,7 @@
                             <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="facebook" class="w-6 h-6"></i></div>
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800">Meta Business & API de Conversiones</h4>
-                                <p class="text-xs text-slate-500">Requerido para Lanzar Anuncios e inyección de leads en tiempo real.</p>
+                                <p class="text-xs text-slate-500">Requerido para Ads Manager e inyección de leads en 3 clics.</p>
                             </div>
                         </div>
                         <button onclick="window.location.href='/auth/facebook'" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">Conectar</button>
@@ -305,7 +333,6 @@
                 </div>
             </section>
 
-            <!-- VISTA DASHBOARD -->
             <section id="view-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
@@ -354,7 +381,6 @@
                 </div>
             </section>
 
-            <!-- VISTA PUBLICADOR SOCIAL -->
             <section id="view-social-media" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
@@ -437,7 +463,6 @@
                 </div>
             </section>
 
-            <!-- VISTA CONVERSACIONES -->
             <section id="view-conversations" class="hidden h-[calc(100vh-140px)] bg-white border border-slate-200 rounded-xl shadow-sm flex overflow-hidden">
                 <div class="w-80 border-r border-slate-200 flex flex-col bg-slate-50 shrink-0">
                     <div class="p-3 border-b border-slate-200 bg-white flex items-center gap-2">
@@ -464,8 +489,8 @@
                     <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar flex flex-col" id="chat-messages-box"></div>
                     <div class="p-3 bg-white border-t border-slate-200 shrink-0 shadow-xl">
                         <form id="chat-input-form" class="flex gap-2" onsubmit="ChatEngine.sendMessage(event)">
-                            <input type="text" id="chat-text-input" placeholder="Escribe tu respuesta..." class="flex-1 text-xs border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 transition-all">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md">
+                            <input type="text" id="chat-text-input" placeholder="Escribe tu respuesta o selecciona una plantilla automatizada..." class="flex-1 text-xs border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 transition-all">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-blue-500/10">
                                 <span>Enviar</span> <i data-lucide="send" class="w-3.5 h-3.5"></i>
                             </button>
                         </form>
@@ -473,12 +498,10 @@
                 </div>
             </section>
 
-            <!-- VISTA PIPELINE (CLIENTES POTENCIALES) -->
             <section id="view-pipeline" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-4">
                 <div class="flex-1 flex gap-4 overflow-x-auto pb-2 custom-scrollbar items-start" id="kanban-board-dom"></div>
             </section>
 
-            <!-- VISTA CONTACTOS -->
             <section id="view-contacts" class="hidden space-y-4">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar">
@@ -499,30 +522,23 @@
                 </div>
             </section>
 
-            <!-- VISTA LANZAR ANUNCIOS (ADS MANAGER CON PESTAÑAS: Tablero, Métricas, Constructor) -->
             <section id="view-ads-manager" class="hidden space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-200 pb-2 text-xs font-semibold shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="AdsManager.switchTab('list')" id="btn-ads-tab-list" class="px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-bold">Tablero</button>
-                        <button onclick="AdsManager.switchTab('metrics')" id="btn-ads-tab-metrics" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Métricas</button>
-                        <button onclick="AdsManager.switchTab('builder')" id="btn-ads-tab-builder" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Constructor & Previsualizador</button>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-blue-600 font-black text-lg">∞</span>
-                        <span class="text-red-500 font-black text-lg">G</span>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
-                            <i data-lucide="rocket" class="w-3.5 h-3.5"></i> Lanzar nueva campaña
-                        </button>
-                    </div>
+                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs font-semibold shrink-0">
+                    <button onclick="AdsManager.switchTab('list')" id="btn-ads-tab-list" class="px-4 py-2 border-b-2 border-blue-600 text-blue-600">Listado de Campañas</button>
+                    <button onclick="AdsManager.switchTab('builder')" id="btn-ads-tab-builder" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Constructor & Previsualizador</button>
                 </div>
 
-                <!-- SUB-VISTA 1: TABLERO -->
                 <div id="subview-ads-list" class="space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-xs">
                         <div class="flex flex-wrap gap-1.5">
-                            <button class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">Active <span class="ml-1 bg-emerald-200 px-1 rounded text-[10px]">1</span></button>
-                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold">Paused <span class="ml-1 bg-slate-200 px-1 rounded text-[10px]">20</span></button>
+                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold">Active <span class="ml-1 bg-slate-200 px-1 rounded text-[10px]">1</span></button>
+                            <button class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-200">Paused <span class="ml-1 bg-blue-100 px-1 rounded text-[10px]">20</span></button>
                             <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold">All Campaigns <span class="ml-1 bg-slate-200 px-1 rounded text-[10px]">21</span></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-medium">Proveedor Integrado:</span>
+                            <button class="px-2.5 py-1.5 rounded-lg bg-white border text-slate-700 font-bold flex items-center gap-1"><span class="text-blue-600 font-black">∞</span> Facebook Ads</button>
+                            <button class="px-2.5 py-1.5 rounded-lg bg-white border text-slate-400 flex items-center gap-1"><span class="text-red-500 font-bold">G</span> Google</button>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -547,34 +563,6 @@
                     </div>
                 </div>
 
-                <!-- SUB-VISTA 2: MÉTRICAS -->
-                <div id="subview-ads-metrics" class="hidden space-y-4">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-800 text-sm">Desglose Analítico en Tiempo Real</span>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg">Sincronizar Métricas</button>
-                    </div>
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse min-w-[1000px]">
-                                <thead>
-                                    <tr class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                                        <th class="p-4">Campaign</th>
-                                        <th class="p-4">Costo</th>
-                                        <th class="p-4">Impresiones</th>
-                                        <th class="p-4">Clicks</th>
-                                        <th class="p-4">Resultados</th>
-                                        <th class="p-4">CTR</th>
-                                        <th class="p-4">CR</th>
-                                        <th class="p-4">CPA</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 text-xs text-slate-700" id="ads-metrics-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SUB-VISTA 3: CONSTRUCTOR & MOCKUP -->
                 <div id="subview-ads-builder" class="hidden h-[calc(100vh-210px)] flex gap-4 overflow-hidden items-stretch">
                     <div class="w-60 bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between shrink-0 shadow-sm">
                         <div class="space-y-4">
@@ -583,11 +571,18 @@
                                 <div class="space-y-1">
                                     <button class="w-full text-left text-xs font-semibold p-2 rounded-lg text-slate-600 hover:bg-slate-50 flex items-center gap-2"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Campaign Level</button>
                                     <button class="w-full text-left text-xs font-bold p-2 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-2"><i data-lucide="sliders" class="w-3.5 h-3.5"></i> Configuración Base</button>
+                                    <button class="w-full text-left text-xs font-medium p-2 rounded-lg text-slate-500 hover:bg-slate-50 flex justify-between items-center">
+                                        <span class="truncate">Custom Location | Global</span> <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         <div class="space-y-2 border-t border-slate-100 pt-4">
-                            <button class="w-full bg-blue-600 text-white font-bold text-xs py-2 rounded-lg shadow transition-all">Publicar Cambios</button>
+                            <div class="flex items-center justify-between text-xs p-1">
+                                <span class="font-bold text-slate-500">Estado: Pausado</span>
+                                <div class="w-8 h-4 bg-slate-200 rounded-full relative cursor-not-allowed"><div class="w-3 h-3 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"></div></div>
+                            </div>
+                            <button class="w-full bg-blue-400 text-white font-bold text-xs py-2 rounded-lg cursor-not-allowed shadow-inner">Publicar Cambios</button>
                         </div>
                     </div>
 
@@ -601,94 +596,174 @@
                         <div class="border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden text-xs shadow-sm">
                             <div class="grid grid-cols-3 p-3 bg-white"><span class="font-semibold text-slate-400">Campaign Name</span><span class="col-span-2 font-black text-slate-800" id="builder-meta-name">-</span></div>
                             <div class="grid grid-cols-3 p-3 bg-white"><span class="font-semibold text-slate-400">Objetivo Meta</span><span class="col-span-2 font-bold text-slate-700">Generación de Clientes Potenciales</span></div>
+                            <div class="grid grid-cols-3 p-3 bg-white items-center"><span class="font-semibold text-slate-400">Daily Budget</span><span class="col-span-2 font-black text-slate-800 flex items-center gap-1">€ 3.00/día <i data-lucide="pencil" class="w-3 h-3 text-slate-400"></i></span></div>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-1">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Plantilla del Sistema Sincronizada</p>
+                            <h4 class="text-xs font-black text-slate-800" id="builder-meta-template">-</h4>
+                            <p class="text-[11px] text-slate-400">Esta plantilla inyecta automáticamente los campos en el CRM al recibir un webhook.</p>
                         </div>
                     </div>
 
                     <div class="w-80 bg-white border border-slate-200 rounded-xl p-4 flex flex-col shrink-0 overflow-y-auto custom-scrollbar shadow-sm">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Vista de Feed Móvil</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Vista de Feed Móvil (Mockup)</p>
                         <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xl flex flex-col border-4 border-slate-900">
+                            <div class="bg-slate-900 px-4 py-1.5 flex justify-between items-center text-[10px] text-white font-medium shrink-0"><span>9:41</span><div class="w-12 h-3.5 bg-black rounded-full"></div><i data-lucide="battery" class="w-3.5 h-3.5"></i></div>
                             <div class="relative aspect-[3/4] bg-slate-900 w-full overflow-hidden flex items-end">
-                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Creative" class="absolute inset-0 w-full h-full object-cover opacity-90">
-                                <div class="relative p-4 w-full text-center z-10"><span class="text-3xl font-black text-white tracking-tight">Lead Gen</span></div>
+                                <img src="img/imageInmueble1.png" alt="Creative Advisor" class="absolute inset-0 w-full h-full object-cover opacity-90" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+                                <div class="relative p-4 w-full text-center z-10"><span class="text-4xl font-black text-white tracking-tight drop-shadow-2xl">500€<span class="text-sm font-normal">/mes</span></span></div>
+                            </div>
+                            <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-2 shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <h5 class="text-[11px] font-black text-slate-800 truncate">💥 ¡Escala tus ventas sin estrés!</h5>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">💥 Automatiza tu negocio con nuestro plan.</p>
+                                </div>
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-2 rounded-lg shadow-md shrink-0 transition-all">Learn more</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- VISTA AUTOMATIZACIONES -->
             <section id="view-automations" class="hidden space-y-6">
                 <div>
                     <h2 class="text-base font-extrabold text-slate-900 tracking-tight">Workflow Engine Visual</h2>
-                    <p class="text-xs text-slate-500">Automatizaciones lógicas ejecutadas en tiempo de ejecución.</p>
+                    <p class="text-xs text-slate-500">Automatizaciones lógicas ejecutadas en tiempo de ejecución de sub-cuenta.</p>
                 </div>
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col items-center overflow-x-auto min-h-[500px] justify-start pt-10">
                     <div class="w-64 bg-amber-50 border-2 border-amber-400 p-4 rounded-xl text-center shadow-md relative node-line">
-                        <span class="text-[9px] font-black bg-amber-400 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">DISPARADOR</span>
+                        <span class="text-[9px] font-black bg-amber-400 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">DISPARADOR (TRIGGER)</span>
                         <h4 class="text-xs font-black text-slate-800 mt-2">Formulario de Facebook Recibido</h4>
+                        <p class="text-[10px] text-slate-500 mt-1">Campaña vinculada: "500€ al mes"</p>
+                    </div>
+                    <div class="w-64 bg-white border-2 border-slate-200 p-4 rounded-xl text-center shadow-md relative mt-6 node-line">
+                        <span class="text-[9px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">ACCIÓN CRM</span>
+                        <h4 class="text-xs font-black text-slate-800 mt-2">Crear/Actualizar Oportunidad</h4>
+                        <p class="text-[10px] text-slate-500 mt-1">Fase: Lead Entrante · Estado: Abierto</p>
+                    </div>
+                    <div class="w-64 bg-white border-2 border-slate-200 p-4 rounded-xl text-center shadow-md relative mt-6 node-line">
+                        <span class="text-[9px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">COMUNICACIÓN OMNICANAL</span>
+                        <h4 class="text-xs font-black text-slate-800 mt-2">Enviar Mensaje de WhatsApp</h4>
+                        <p class="text-[10px] text-slate-500 mt-1">Plantilla: Auto-respuesta de bienvenida de IA</p>
+                    </div>
+                    <div class="w-64 bg-white border-2 border-slate-200 p-4 rounded-xl text-center shadow-md relative mt-6 node-line-last">
+                        <span class="text-[9px] font-black bg-purple-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">NOTIFICACIÓN</span>
+                        <h4 class="text-xs font-black text-slate-800 mt-2">Alerta Push interna al Broker</h4>
+                        <p class="text-[10px] text-slate-500 mt-1">Asignado a: Administrador</p>
                     </div>
                 </div>
             </section>
 
-            <!-- VISTA SITIOS (EMBUDOS Y SITIOS WEB / CAPTACIONES) -->
+            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB (DENTRO DEL CRM SIN RECARGAS NI PERDER EL MENÚ) -->
             <section id="view-funnels" class="hidden space-y-4">
+                
+                <!-- SUB-VISTA 1: LISTADO DE EMBUDOS ACTIVOS -->
                 <div id="funnels-subview-list" class="space-y-4">
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
                         <div>
-                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Captaciones)</h3>
-                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de aterrizaje.</p>
+                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
+                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de aterrizaje sin salir de la plataforma.</p>
                         </div>
                         <button onclick="FunnelsManager.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nuevo Embudo
                         </button>
                     </div>
+
                     <div id="funnels-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
+                <!-- SUB-VISTA 2: CONSTRUCTOR / EDITOR VISUAL INTEGRADO CON VIDEO Y CAMPOS DE FORMULARIO -->
                 <div id="funnels-subview-builder" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-3">
+                    
                     <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm flex justify-between items-center shrink-0">
                         <div class="flex items-center gap-3">
-                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border">
+                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all">
                                 <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver al Listado
                             </button>
                             <div>
-                                <h3 class="text-xs font-black text-slate-800 truncate" id="builder-funnel-title">Linktree para Clientes</h3>
-                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio</p>
+                                <h3 class="text-xs font-black text-slate-800 truncate" id="builder-funnel-title">Linktree para Clientes | Xtucasa</h3>
+                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</p>
                             </div>
                         </div>
-                        <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md">Publicar Cambios</button>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Cambios
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex-1 flex gap-4 overflow-hidden">
-                        <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800">
+                        
+                        <!-- LONA / CANVAS DE EDICIÓN VISUAL -->
+                        <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800 shadow-inner">
                             <div id="landing-preview-canvas" class="w-full max-w-2xl bg-cover bg-center rounded-2xl p-8 border-2 border-amber-500/80 shadow-2xl space-y-6 relative min-h-[600px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                                
                                 <div class="text-center pt-4">
-                                    <div class="inline-block bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-6 py-2 rounded-lg font-black text-lg tracking-wider">
+                                    <div class="inline-block bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-6 py-2 rounded-lg font-black text-lg tracking-wider backdrop-blur-md cursor-pointer hover:border-amber-400 transition-all">
                                         <span id="preview-logo-text">xtucasa</span>
                                     </div>
                                 </div>
+
+                                <!-- CONTENEDOR DE VIDEO DESTACADO -->
                                 <div class="max-w-md mx-auto w-full bg-slate-900/80 rounded-xl overflow-hidden border border-slate-700 shadow-xl p-2">
                                     <div class="aspect-video bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center">
-                                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg"><i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i></div>
+                                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" alt="Video Cover" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg relative z-10">
+                                            <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- BOTONES DE ACCIÓN PRINCIPALES -->
                                 <div class="space-y-3 max-w-md mx-auto w-full">
-                                    <button class="w-full bg-white text-slate-900 font-extrabold text-sm py-3 px-4 rounded-xl shadow-lg">Vende tu Propiedad</button>
-                                    <button class="w-full bg-white text-slate-900 font-extrabold text-sm py-3 px-4 rounded-xl shadow-lg">Catálogo de Propiedades</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos (Formulario Pop-up)</button>
+                                </div>
+
+                                <div class="text-center text-white space-y-2 pt-6 border-t border-white/10">
+                                    <h4 id="preview-business-name" class="font-bold text-sm tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
+                                    <div class="text-[11px] text-slate-300 space-y-1 font-mono">
+                                        <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
+                                        <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- PANEL LATERAL DE PROPIEDADES DE CAMPOS DE FORMULARIO -->
                         <div class="w-80 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
                             <div class="space-y-4 text-xs">
-                                <h4 class="font-extrabold text-slate-900 text-sm border-b pb-2">Configuración de Captación</h4>
+                                <h4 class="font-extrabold text-slate-900 text-sm border-b pb-2">Campos del Formulario Integrado</h4>
                                 <div>
                                     <label class="block font-bold text-slate-600 mb-1">Nombre del Negocio</label>
                                     <input type="text" id="inspector-business-input" value="Xtucasa Inmobiliaria" oninput="FunnelsManager.updateLiveText(this.value)" class="w-full border border-slate-200 p-2.5 rounded-lg font-semibold outline-none focus:border-blue-500">
                                 </div>
+                                <div class="space-y-2 pt-2 border-t">
+                                    <p class="font-bold text-slate-500 uppercase text-[10px]">Campos Capturados en el CRM</p>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Nombre Completo</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Teléfono / WhatsApp</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Correo Electrónico</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Comentarios o Consulta</label>
+                                </div>
                             </div>
-                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow">Guardar y Publicar</button>
+
+                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all">Guardar y Publicar Sitio</button>
                         </div>
+
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="view-settings" class="hidden space-y-4">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Configuración del Perfil de Cliente</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div><label class="block font-bold text-slate-500 mb-1 uppercase tracking-wider text-[10px]">API Webhook Endpoint</label><input type="text" readonly value="https://n8n.stelafunnels.com/webhook-test/e2f39420-ac3a-4b2f-b8f4-7766fc37b590" class="w-full bg-slate-50 border p-2.5 rounded-lg font-mono text-slate-600 outline-none"></div>
+                        <div><label class="block font-bold text-slate-500 mb-1 uppercase tracking-wider text-[10px]">Ecosistema Integrador</label><input type="text" readonly value="SaaS Core Architecture Mode v4.2" class="w-full bg-slate-50 border p-2.5 rounded-lg text-slate-600 outline-none"></div>
                     </div>
                 </div>
             </section>
@@ -712,18 +787,22 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Valor Comercial Trato (€)</label><input type="number" id="form-lead-value" required class="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:border-blue-500"></div>
-                    <div><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Origen de Tráfico</label><select id="form-lead-source" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 bg-white outline-none focus:border-blue-500"><option value="Facebook Ads">Facebook Ads</option><option value="Google Ads">Google Ads</option></select></div>
+                    <div><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Origen de Tráfico</label><select id="form-lead-source" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 bg-white outline-none focus:border-blue-500"><option value="Facebook Ads">Facebook Ads</option><option value="Google Ads">Google Ads</option><option value="WhatsApp Inbound">WhatsApp Inbound</option></select></div>
                 </div>
                 <div><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Fase del Pipeline Comercial</label><select id="form-lead-stage" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 bg-white outline-none focus:border-blue-500"></select></div>
-                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
-                    <button type="button" onclick="App.closeModal()" class="border px-4 py-2 rounded-lg text-xs font-semibold hover:bg-slate-50">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md">Guardar Datos</button>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Estatus Comercial</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="border border-slate-200 p-2 rounded-lg text-center block cursor-pointer text-xs font-semibold has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500"><input type="radio" name="form-lead-status" value="Abierto" checked class="sr-only"> Abierto</label>
+                        <label class="border border-slate-200 p-2 rounded-lg text-center block cursor-pointer text-xs font-semibold has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500"><input type="radio" name="form-lead-status" value="Ganado" class="sr-only"> Ganado</label>
+                        <label class="border border-slate-200 p-2 rounded-lg text-center block cursor-pointer text-xs font-semibold has-[:checked]:bg-rose-50 has-[:checked]:border-rose-500"><input type="radio" name="form-lead-status" value="Perdido" class="sr-only"> Perdido</label>
+                    </div>
                 </div>
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100"><button type="button" onclick="App.closeModal()" class="border px-4 py-2 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors">Cancelar</button><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md">Guardar Datos</button></div>
             </form>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL -->
     <script>
         const STAGES = {
             'lead_entrante': { name: 'Lead Entrante', color: 'bg-blue-500' },
@@ -741,16 +820,19 @@
 
             init() {
                 this.campaigns = [
-                    { id: 'c1', name: 'te ayudamos a vender', status: 'Active', created: '09/07/2026 04:40 PM', budget: 5.00, cost: 122.10, impressions: 10190, clicks: 380, results: 4, ctr: 3.73, cr: 1.05, cpa: 30.53, templateName: 'Vende tu Casa | Hipoteca Aprobada | Oferta Hoy' },
-                    { id: 'c2', name: 'Inversores. Vender rápido 15 días', status: 'Active', created: '08/10/2026 04:43 PM', budget: 8.00, cost: 181.14, impressions: 18292, clicks: 230, results: 7, ctr: 1.26, cr: 3.04, cpa: 25.88, templateName: 'Venta Inversor Express' }
+                    { id: 'c1', name: '500€ al mes', status: 'Paused', created: '05/08/2026 08:02 PM', budget: 3.00, cost: 87.30, impressions: 8230, results: 4, cpa: 21.83, templateName: '500€ al mes 3' },
+                    { id: 'c2', name: 'contado 7 días', status: 'Paused', created: '05/08/2026 07:46 PM', budget: 3.00, cost: 86.16, impressions: 12272, results: 0, cpa: 0, templateName: 'contado 7 días template' },
+                    { id: 'c3', name: 'valoración', status: 'Paused', created: '05/08/2026 07:38 PM', budget: 1.00, cost: 5.23, impressions: 817, results: 0, cpa: 0, templateName: 'valoracion v1' }
                 ];
 
                 this.funnels = [
-                    { id: 'f1', name: 'Captaciones', updated: 'Hace 1 hora', steps: 5, url: 'https://xtucasainmobiliaria.realestaterocket.io/inicio' }
+                    { id: 'f1', name: 'Captaciones Exclusivas', updated: '05 Nov 2026', steps: 3, url: 'https://stelafunnels.io/captacion' },
+                    { id: 'f2', name: 'Compradores Calificados', updated: '18 Feb 2026', steps: 2, url: 'https://stelafunnels.io/compradores' }
                 ];
 
                 this.leads = [
-                    { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+34 600 123 456', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio. Información por favor.' }, { sender: 'agent', text: 'Hola Carlos. Claro que sí, dime qué propiedad deseas valorar.' }] }
+                    { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+52 55 1234 5678', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio comercial. Solicito información.' }, { sender: 'agent', text: 'Hola Carlos. Un gusto saludarte, ¿en qué podemos ayudarte?' }] },
+                    { id: '2', name: 'Laura Restrepo', email: 'laura.res@gmail.com', phone: '+57 300 987 6543', value: 280000, stage: 'cita_agendada', source: 'Google Ads', status: 'Abierto', tags: ['Alta Gama'], messages: [{ sender: 'lead', text: 'Confirmado para la reunión del sábado.' }] }
                 ];
             }
         };
@@ -766,6 +848,7 @@
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
+                    
                     if (data.loggedIn && data.user) {
                         this.setUserProfileUI(data.user);
                         document.getElementById('view-login').classList.add('hidden');
@@ -774,15 +857,52 @@
                         document.getElementById('view-login').classList.remove('hidden');
                     }
                 } catch (e) {
+                    console.error("Error al verificar sesión", e);
                     document.getElementById('view-login').classList.remove('hidden');
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success')) {
+                    try {
+                        const res = await fetch('/api/user-session');
+                        const data = await res.json();
+                        if (data.loggedIn && data.user) {
+                            this.setUserProfileUI(data.user);
+                        }
+                    } catch (e) {}
+
+                    document.getElementById('view-login').classList.add('hidden');
+                    this.navigate('dashboard');
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
             },
 
             setUserProfileUI(user) {
+                const avatarContainer = document.getElementById('user-avatar-container');
                 const nameDisplay = document.getElementById('user-name-display');
                 const emailDisplay = document.getElementById('user-email-display');
-                if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente Real Estate';
-                if (emailDisplay) emailDisplay.innerText = user.email || 'info@xtucasa.com';
+
+                if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente';
+                if (emailDisplay) emailDisplay.innerText = user.email || '';
+
+                if (avatarContainer) {
+                    if (user.picture) {
+                        avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
+                    } else if (user.email) {
+                        const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
+                        const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
+                        
+                        const img = new Image();
+                        img.src = gravatarUrl;
+                        img.onload = () => {
+                            avatarContainer.innerHTML = `<img src="${gravatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+                        };
+                        img.onerror = () => {
+                            const initials = (user.name ? user.name.split(' ').map(n => n[0]).join('') : 'US').toUpperCase().substring(0, 2);
+                            avatarContainer.innerText = initials;
+                        };
+                    }
+                }
             },
 
             switchAuthMode(mode) {
@@ -797,21 +917,112 @@
 
             async handlePasswordLogin(e) {
                 e.preventDefault();
-                document.getElementById('view-login').classList.add('hidden');
-                this.navigate('dashboard');
-            },
+                const email = document.getElementById('auth-email').value.trim();
+                const password = document.getElementById('auth-password').value.trim();
+                const alertBox = document.getElementById('auth-alert-box');
+                const btn = document.getElementById('btn-login-submit');
 
-            handleOtpRequest(e) { e.preventDefault(); alert("Código OTP enviado."); },
-            handleSocialLogin(p) { alert("Iniciando sesión con " + p); },
+                alertBox.classList.add('hidden');
+                btn.innerText = "Verificando cuenta...";
+                btn.disabled = true;
 
-            logout() {
-                if (confirm("¿Deseas cerrar sesión?")) {
-                    document.getElementById('view-login').classList.remove('hidden');
+                try {
+                    const res = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await res.json();
+
+                    if (data.success && data.user) {
+                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                        alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
+                        alertBox.classList.remove('hidden');
+
+                        this.setUserProfileUI(data.user);
+                        setTimeout(() => {
+                            document.getElementById('view-login').classList.add('hidden');
+                            this.navigate('dashboard');
+                        }, 500);
+                    } else {
+                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                        alertBox.innerText = data.error || "Credenciales incorrectas o correo no registrado.";
+                        alertBox.classList.remove('hidden');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = "Error de conexión con el servidor.";
+                    alertBox.classList.remove('hidden');
+                } finally {
+                    btn.innerText = "Inicie sesión";
+                    btn.disabled = false;
                 }
             },
 
+            async handleRegisterSubmit(e) {
+                e.preventDefault();
+                const name = document.getElementById('reg-name').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const password = document.getElementById('reg-password').value.trim();
+                const alertBox = document.getElementById('reg-alert-box');
+
+                alertBox.classList.add('hidden');
+
+                try {
+                    const res = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                        alertBox.innerText = "¡Cuenta creada con éxito! Redirigiendo...";
+                        alertBox.classList.remove('hidden');
+
+                        this.setUserProfileUI(data.user);
+                        setTimeout(() => {
+                            document.getElementById('view-login').classList.add('hidden');
+                            this.navigate('dashboard');
+                        }, 800);
+                    } else {
+                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                        alertBox.innerText = data.error || "No se pudo crear la cuenta.";
+                        alertBox.classList.remove('hidden');
+                    }
+                } catch (err) {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = "Error al conectar con el servidor.";
+                    alertBox.classList.remove('hidden');
+                }
+            },
+
+            handleOtpRequest(e) {
+                e.preventDefault();
+                alert("Simulación OTP: Código enviado a su correo.");
+            },
+
+            handleSocialLogin(provider) {
+                if (provider === 'Google') window.location.href = '/auth/google';
+            },
+
+            async logout() {
+                const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
+                if (!confirmed) return;
+
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                } catch (e) {
+                    console.error("Error al cerrar sesión", e);
+                }
+
+                document.getElementById('view-login').classList.remove('hidden');
+            },
+
             navigate(viewId) {
-                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'funnels', 'automations'];
+                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if(el) el.classList.add('hidden');
@@ -826,7 +1037,7 @@
                 if (targetNav) {
                     targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
                     const titleEl = document.getElementById('current-view-title');
-                    if (titleEl) titleEl.innerText = targetNav.innerText.trim();
+                    if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
                 }
 
                 if (viewId === 'dashboard') this.renderDashboard();
@@ -850,8 +1061,10 @@
                 const totalLeads = Store.leads.length;
                 const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
                 
-                document.getElementById('dash-total-leads').innerText = totalLeads;
-                document.getElementById('dash-pipeline-value').innerText = `€${totalVal.toLocaleString()}`;
+                const totalLeadsEl = document.getElementById('dash-total-leads');
+                const pipelineValEl = document.getElementById('dash-pipeline-value');
+                if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
+                if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
 
                 const funnelContainer = document.getElementById('dash-funnel-container');
                 if (funnelContainer) {
@@ -932,7 +1145,7 @@
             openEditModal(id) {
                 const lead = Store.leads.find(l => l.id === id);
                 if(!lead) return;
-                document.getElementById('modal-title-dom').innerText = "Editar Oportunidad";
+                document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
                 document.getElementById('form-lead-id').value = lead.id;
                 document.getElementById('form-lead-name').value = lead.name;
                 document.getElementById('form-lead-email').value = lead.email;
@@ -971,59 +1184,52 @@
 
             switchTab(tabId) {
                 this.currentTab = tabId;
-                document.getElementById('subview-ads-list').classList.toggle('hidden', tabId !== 'list');
-                document.getElementById('subview-ads-metrics').classList.toggle('hidden', tabId !== 'metrics');
-                document.getElementById('subview-ads-builder').classList.toggle('hidden', tabId !== 'builder');
-
-                document.getElementById('btn-ads-tab-list').className = tabId === 'list' ? "px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-bold" : "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
-                document.getElementById('btn-ads-tab-metrics').className = tabId === 'metrics' ? "px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-bold" : "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
-                document.getElementById('btn-ads-tab-builder').className = tabId === 'builder' ? "px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-bold" : "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
-
+                const listEl = document.getElementById('subview-ads-list');
+                const builderEl = document.getElementById('subview-ads-builder');
+                if(listEl) listEl.classList.toggle('hidden', tabId !== 'list');
+                if(builderEl) builderEl.classList.toggle('hidden', tabId !== 'builder');
+                
+                const btnList = document.getElementById('btn-ads-tab-list');
+                const btnBuilder = document.getElementById('btn-ads-tab-builder');
+                if(btnList) btnList.className = tabId === 'list' ? "px-4 py-2 border-b-2 border-blue-600 text-blue-600" : "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+                if(btnBuilder) btnBuilder.className = tabId === 'builder' ? "px-4 py-2 border-b-2 border-blue-600 text-blue-600" : "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+                
+                if(tabId === 'builder' && Store.campaigns.length > 0) {
+                    this.loadIntoBuilder(Store.campaigns[0].id);
+                }
                 lucide.createIcons();
             },
 
             render() {
                 const tbody = document.getElementById('ads-table-body');
-                if (tbody) {
-                    tbody.innerHTML = Store.campaigns.map(c => `
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                Store.campaigns.forEach(c => {
+                    tbody.innerHTML += `
                         <tr class="hover:bg-slate-50 border-b border-slate-100">
-                            <td class="p-4 text-blue-600 font-bold text-center cursor-pointer" onclick="AdsManager.loadIntoBuilder('${c.id}')">»</td>
+                            <td class="p-4 text-slate-400 font-bold text-center cursor-pointer hover:text-blue-600" onclick="AdsManager.loadIntoBuilder('${c.id}')">»</td>
                             <td class="p-4">
                                 <div class="font-black text-slate-900 cursor-pointer hover:text-blue-600" onclick="AdsManager.loadIntoBuilder('${c.id}')">${c.name}</div>
-                                <div class="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5"><span class="text-blue-500 font-bold">∞</span> Landing Page</div>
+                                <div class="text-[10px] text-slate-400 flex gap-2 mt-0.5"><span class="text-blue-500 font-bold">∞</span> Landing Page <span class="bg-blue-50 text-blue-600 px-1 rounded font-bold text-[9px]">Kick Learning</span></div>
                             </td>
-                            <td class="p-4"><span class="flex items-center gap-1.5 font-bold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ${c.status}</span></td>
+                            <td class="p-4"><span class="flex items-center gap-1.5 font-semibold text-slate-600"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> ${c.status}</span></td>
                             <td class="p-4 text-slate-500 text-[11px]">${c.created}</td>
                             <td class="p-4 font-bold text-slate-800">€${c.budget.toFixed(2)}</td>
                             <td class="p-4 font-medium text-slate-700">€${c.cost.toFixed(2)}</td>
                             <td class="p-4 text-slate-600">${c.impressions.toLocaleString()}</td>
-                            <td class="p-4 font-black text-slate-900">${c.results}</td>
-                            <td class="p-4 font-bold text-slate-700">€${c.cpa.toFixed(2)}</td>
-                        </tr>
-                    `).join('');
-                }
-
-                const tbodyMetrics = document.getElementById('ads-metrics-table-body');
-                if (tbodyMetrics) {
-                    tbodyMetrics.innerHTML = Store.campaigns.map(c => `
-                        <tr class="hover:bg-slate-50 border-b border-slate-100">
-                            <td class="p-4 font-black text-slate-900 flex items-center gap-2"><span class="text-blue-600 font-bold">∞</span> ${c.name}</td>
-                            <td class="p-4 font-medium text-slate-700">€${c.cost.toFixed(2)}</td>
-                            <td class="p-4 text-slate-600">${c.impressions.toLocaleString()}</td>
-                            <td class="p-4 text-slate-600">${c.clicks}</td>
-                            <td class="p-4 font-black text-slate-900">${c.results}</td>
-                            <td class="p-4 text-slate-600">${c.ctr} %</td>
-                            <td class="p-4 text-slate-600">${c.cr} %</td>
-                            <td class="p-4 font-bold text-slate-800">€${c.cpa.toFixed(2)}</td>
-                        </tr>
-                    `).join('');
-                }
+                            <td class="p-4 font-black">${c.results || '-'}</td>
+                            <td class="p-4 font-bold text-slate-700">${c.cpa > 0 ? '€'+c.cpa.toFixed(2) : '-'}</td>
+                        </tr>`;
+                });
             },
 
             loadIntoBuilder(id) {
-                const c = Store.campaigns.find(item => item.id === id);
-                if (!c) return;
-                document.getElementById('builder-meta-name').innerText = c.name;
+                const campaign = Store.campaigns.find(c => c.id === id);
+                if(!campaign) return;
+                const nameEl = document.getElementById('builder-meta-name');
+                const templateEl = document.getElementById('builder-meta-template');
+                if(nameEl) nameEl.innerText = campaign.name;
+                if(templateEl) templateEl.innerText = campaign.templateName;
                 this.switchTab('builder');
             }
         };
@@ -1045,7 +1251,9 @@
                                     <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
                                     <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
                                 </div>
-                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">Editar Embudo</button>
+                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    Editar Embudo
+                                </button>
                             </div>
                             <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
                                 <span>Pasos activos: <strong>${f.steps}</strong></span>
@@ -1053,22 +1261,31 @@
                             </div>
                         </div>`).join('');
                 }
+
                 lucide.createIcons();
             },
 
             openBuilder(id) {
+                const f = Store.funnels.find(item => item.id === id);
+                if(!f) return;
+
                 document.getElementById('funnels-subview-list').classList.add('hidden');
                 document.getElementById('funnels-subview-builder').classList.remove('hidden');
+
+                document.getElementById('builder-funnel-title').innerText = f.name;
+                document.getElementById('builder-funnel-url').innerText = f.url;
                 lucide.createIcons();
             },
 
             createNewFunnel() {
-                this.openBuilder('new');
+                const newId = 'f' + Date.now();
+                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial', updated: 'Ahora', steps: 1, url: 'https://stelafunnels.io/nuevo-sitio' });
+                this.openBuilder(newId);
             },
 
             updateLiveText(val) {
-                const nameEl = document.getElementById('preview-logo-text');
-                if(nameEl) nameEl.innerText = val || 'xtucasa';
+                const nameEl = document.getElementById('preview-business-name');
+                if(nameEl) nameEl.innerText = val || '{{ custom_values.nombre_de_negocio }}';
             },
 
             closeBuilder() { this.render(); },
@@ -1104,8 +1321,10 @@
                 box.innerHTML = '';
                 if(!lead) return;
 
-                document.getElementById('chat-header-name').innerText = lead.name;
-                document.getElementById('chat-header-avatar').innerText = lead.name.charAt(0);
+                const nameEl = document.getElementById('chat-header-name');
+                const avatarEl = document.getElementById('chat-header-avatar');
+                if(nameEl) nameEl.innerText = lead.name;
+                if(avatarEl) avatarEl.innerText = lead.name.charAt(0);
 
                 lead.messages.forEach(m => {
                     const isLead = m.sender === 'lead';
@@ -1133,7 +1352,146 @@
         };
 
         const SocialPublisher = {
-            setupEvents() {}
+            setupEvents() {
+                const btnLoadPages = document.getElementById('btnLoadPages');
+                if (btnLoadPages) {
+                    btnLoadPages.addEventListener('click', async () => {
+                        const selector = document.getElementById('pageSelector');
+                        if(!selector) return;
+                        selector.innerHTML = '<option value="">Cargando páginas vinculadas...</option>';
+
+                        try {
+                            const response = await fetch('/api/meta/pages');
+                            const result = await response.json();
+
+                            if (result.success && result.pages.length > 0) {
+                                Store.pagesData = result.pages;
+                                selector.innerHTML = '';
+                                result.pages.forEach(page => {
+                                    const option = document.createElement('option');
+                                    option.value = page.id;
+                                    option.textContent = `${page.name} (${page.category})`;
+                                    selector.appendChild(option);
+                                });
+                            } else {
+                                selector.innerHTML = '<option value="">No se encontraron páginas.</option>';
+                                alert(result.error || "Asegúrate de haber conectado tu cuenta de Facebook.");
+                            }
+                        } catch (error) {
+                            console.error("Error cargando fanpages:", error);
+                            selector.innerHTML = '<option value="">Error de conexión</option>';
+                        }
+                    });
+                }
+
+                const formTextPost = document.getElementById('formTextPost');
+                if (formTextPost) {
+                    formTextPost.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const creds = this.getCredentials();
+                        if (!creds) return;
+
+                        const status = document.getElementById('statusText');
+                        this.showStatus(status, "Publicando...", "bg-blue-50 text-blue-700 border border-blue-200");
+
+                        try {
+                            const response = await fetch('/api/meta/post', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pageId: creds.pageId, pageToken: creds.pageToken, message: document.getElementById('textMessage').value })
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                this.showStatus(status, "🎉 ¡Publicado con éxito!", "bg-emerald-50 text-emerald-700 border border-emerald-200");
+                                document.getElementById('textMessage').value = '';
+                            } else {
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
+                            }
+                        } catch (err) {
+                            this.showStatus(status, "❌ Error crítico de servidor", "bg-red-50 text-red-700 border border-red-200");
+                        }
+                    });
+                }
+
+                const formPhotoPost = document.getElementById('formPhotoPost');
+                if (formPhotoPost) {
+                    formPhotoPost.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const creds = this.getCredentials();
+                        if (!creds) return;
+
+                        const status = document.getElementById('statusPhoto');
+                        this.showStatus(status, "Subiendo imagen...", "bg-blue-50 text-blue-700 border border-blue-200");
+
+                        try {
+                            const response = await fetch('/api/meta/photo', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pageId: creds.pageId, pageToken: creds.pageToken, imageUrl: document.getElementById('photoUrl').value, caption: document.getElementById('photoCaption').value })
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                this.showStatus(status, "🎉 ¡Foto subida al feed!", "bg-emerald-50 text-emerald-700 border border-emerald-200");
+                                document.getElementById('photoUrl').value = '';
+                                document.getElementById('photoCaption').value = '';
+                            } else {
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
+                            }
+                        } catch (err) {
+                            this.showStatus(status, "❌ Error de red", "bg-red-50 text-red-700 border border-red-200");
+                        }
+                    });
+                }
+
+                const formVideoPost = document.getElementById('formVideoPost');
+                if (formVideoPost) {
+                    formVideoPost.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const creds = this.getCredentials();
+                        if (!creds) return;
+
+                        const status = document.getElementById('statusVideo');
+                        this.showStatus(status, "Procesando video...", "bg-blue-50 text-blue-700 border border-blue-200");
+
+                        try {
+                            const response = await fetch('/api/meta/video', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pageId: creds.pageId, pageToken: creds.pageToken, videoUrl: document.getElementById('videoUrl').value, description: document.getElementById('videoDescription').value })
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                this.showStatus(status, "🎉 ¡Video publicado con éxito!", "bg-emerald-50 text-emerald-700 border border-emerald-200");
+                                document.getElementById('videoUrl').value = '';
+                                document.getElementById('videoDescription').value = '';
+                            } else {
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
+                            }
+                        } catch (err) {
+                            this.showStatus(status, "❌ Error de red", "bg-red-50 text-red-700 border border-red-200");
+                        }
+                    });
+                }
+            },
+
+            getCredentials() {
+                const selector = document.getElementById('pageSelector');
+                if(!selector) return null;
+                const pageId = selector.value;
+                if (!pageId) {
+                    alert("⚠️ Por favor selecciona una página de Facebook primero.");
+                    return null;
+                }
+                const selected = Store.pagesData.find(p => p.id === pageId);
+                return selected ? { pageId: pageId, pageToken: selected.access_token } : null;
+            },
+
+            showStatus(element, text, classes) {
+                if(!element) return;
+                element.className = `mt-3 p-2.5 rounded-lg text-xs font-semibold ${classes}`;
+                element.textContent = text;
+                element.classList.remove('hidden');
+            }
         };
 
         window.onload = () => App.init();
