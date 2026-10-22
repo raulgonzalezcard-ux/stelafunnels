@@ -66,11 +66,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-<<<<<<< HEAD
 // Configuración de Sesiones PERSISTENTES en Base de Datos SQLite
-=======
-// Configuración de Sesiones corregida con path global para producción HTTPS
->>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
 app.use(session({
     store: new SQLiteStore({
         db: 'sessions.sqlite',
@@ -79,23 +75,13 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
-<<<<<<< HEAD
-    proxy: true,
-    cookie: { 
-        secure: true,
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de persistencia
-=======
     proxy: true, // Confiar en el proxy inverso (Coolify / Nginx)
     cookie: { 
         secure: true, // Obligatorio con HTTPS
         httpOnly: true,
         sameSite: 'lax', 
-        path: '/', // 👈 ¡ESTA ES LA CLAVE ABSOLUTA PARA RUTAS ANIDADAS Y F5!
+        path: '/', // 👈 ¡CLAVE ABSOLUTA PARA RUTAS ANIDADAS Y F5!
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
->>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
     }
 }));
 
