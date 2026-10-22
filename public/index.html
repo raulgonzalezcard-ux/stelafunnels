@@ -919,7 +919,7 @@
    const App = {
         chartInstance: null,
 
-        async init() {
+      async init() {
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
@@ -950,7 +950,17 @@
                 if (data.loggedIn && data.user) {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
-                    this.navigate('dashboard');
+                    
+                    // 🚀 DETECTAR LA VISTA ACTUAL SEGÚN LA URL AL HACER F5
+                    const pathSegments = window.location.pathname.split('/');
+                    const lastSegment = pathSegments[pathSegments.length - 1];
+                    const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
+                    
+                    if (validViews.includes(lastSegment)) {
+                        this.navigate(lastSegment);
+                    } else {
+                        this.navigate('dashboard');
+                    }
                 } else {
                     document.getElementById('view-login').classList.remove('hidden');
                 }
