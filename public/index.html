@@ -45,20 +45,25 @@
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
-    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (VISIBLE POR DEFECTO PARA EVITAR PARPADEOS AL ACTUALIZAR) -->
+    <!-- OVERLAY DE CARGA (PREVIENE PARPADEOS DE UI AL HACER F5) -->
+    <div id="app-loading-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center gap-3">
+        <div class="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <span class="text-xs font-bold text-slate-400 tracking-wider uppercase">Cargando Rocket OS...</span>
+    </div>
+
+    <!-- PANTALLA DE AUTENTICACIÓN SPLIT-SCREEN -->
     <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center hidden">
         <div class="w-full h-full grid grid-cols-1 md:grid-cols-2 bg-white">
             
-            <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS -->
+            <!-- COLUMNA IZQUIERDA: FORMULARIOS -->
             <div class="p-8 md:p-16 flex flex-col justify-between bg-white text-left overflow-y-auto custom-scrollbar">
                 
                 <div class="max-w-md w-full mx-auto space-y-6">
-                    <!-- Brand / Logo -->
                     <div class="flex items-center gap-3 mb-8">
                         <img src="img/imageInmueble2.png" alt="Stelafunnels Logo" class="h-10 object-contain" onerror="this.src='img/imageInmueble3.png'">
                     </div>
 
-                    <!-- MÓDULO 1: INICIO DE SESIÓN CON CONTRASEÑA -->
+                    <!-- MÓDULO 1: INICIO DE SESIÓN -->
                     <div id="auth-mode-login" class="space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión</h2>
@@ -97,7 +102,7 @@
                         </div>
                     </div>
 
-                    <!-- MÓDULO 2: INICIO DE SESIÓN CON CÓDIGO OTP -->
+                    <!-- MÓDULO 2: OTP -->
                     <div id="auth-mode-otp" class="hidden space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión con código</h2>
@@ -127,7 +132,7 @@
                         </div>
                     </div>
 
-                    <!-- MÓDULO 3: REGISTRO DE NUEVOS CLIENTES -->
+                    <!-- MÓDULO 3: REGISTRO -->
                     <div id="auth-mode-signup" class="hidden space-y-5">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">Registrarse</h2>
@@ -146,7 +151,6 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
                                 <input type="password" id="reg-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
-                                <p class="text-[10px] text-slate-400 mt-1">Utilice al menos 8 caracteres, incluidas letras y números.</p>
                             </div>
 
                             <div id="reg-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
@@ -170,7 +174,6 @@
                         <div class="flex-grow border-t border-slate-200"></div>
                     </div>
 
-                    <!-- Redes Sociales -->
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="window.location.href='/auth/google'" type="button" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-200 transition-all">
                             <i data-lucide="chrome" class="w-4 h-4 text-red-500"></i> Google
@@ -183,32 +186,16 @@
                 </div>
 
                 <div class="max-w-md w-full mx-auto pt-8 flex justify-between items-center text-xs text-slate-400">
-                    <span>© Stelafunnels Sales CRM</span>
+                    <span>© Enterprise Sales CRM</span>
                     <a href="mailto:soporte@stelafunnels.com" class="hover:underline">Soporte técnico</a>
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: BANNER CORPORATIVO -->
-            <div class="hidden md:flex bg-[#0f172a] p-16 flex-col justify-between relative overflow-hidden text-left">
-                <div class="relative z-10 space-y-6 max-w-lg">
-                    <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-400/20 text-blue-400 rounded-full text-xs font-semibold uppercase tracking-wider">
-                        SaaS Omnicanal Enterprise
-                    </span>
-                    <h3 class="text-4xl font-extrabold text-white leading-tight">
-                        La suite comercial para escalar negocios globales.
-                    </h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">
-                        Control total de oportunidades, embudos de conversión y automatizaciones en una sola plataforma multi-inquilino.
-                    </p>
-                </div>
-
-                <div class="relative z-10 pt-8 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                    <span>Estado del Servidor</span>
-                    <span class="flex items-center gap-2 text-emerald-400 font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Producción en línea
-                    </span>
-                </div>
+            <!-- COLUMNA DERECHA: FONDO ABSTRACTO GLOBAL SIN TEXTOS SOLICITADO -->
+            <div class="hidden md:block bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1e293b_0%,transparent_70%)] opacity-50"></div>
+                <div class="absolute -right-20 -top-20 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
+                <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
             </div>
         </div>
     </div>
@@ -919,30 +906,35 @@
 const App = {
         chartInstance: null,
 
-      async init() {
+     async init() {
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
 
-            // 1. Si regresamos de conectar redes sociales
+            const loadingScreen = document.getElementById('app-loading-screen');
+
+            // 1. Si regresamos de OAuth de Meta o Google
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
-                document.getElementById('view-login').classList.add('hidden');
-                
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
                     if (data.loggedIn && data.user) {
                         this.setUserProfileUI(data.user);
+                        document.getElementById('view-login').classList.add('hidden');
+                        this.navigate('launchpad');
+                    } else {
+                        document.getElementById('view-login').classList.remove('hidden');
                     }
-                } catch (e) {}
-
-                this.navigate('launchpad');
+                } catch (e) {
+                    document.getElementById('view-login').classList.remove('hidden');
+                }
+                if (loadingScreen) loadingScreen.classList.add('hidden');
                 window.history.replaceState({}, document.title, window.location.pathname);
                 return;
             }
 
-            // 2. Verificación normal de sesión y recuperación de vista activa tras F5
+            // 2. Verificación de Sesión e invocación estricta de ruta tras F5
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -951,197 +943,52 @@ const App = {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
-                    // 🚀 DETECCIÓN MEJORADA DE SUB-RUTAS (Ej: /v2/location/ID/launchpad)
+                    // Extraer vista exacta de la URL (ej: /v2/location/123/launchpad -> launchpad)
                     const pathSegments = window.location.pathname.split('/').filter(Boolean);
-                    const lastSegment = pathSegments[pathSegments.length - 1] || 'dashboard';
-                    
+                    const lastSegment = pathSegments[pathSegments.length - 1];
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
                     
-                    if (validViews.includes(lastSegment)) {
-                        this.navigate(lastSegment);
-                    } else {
-                        this.navigate('dashboard');
-                    }
+                    const activeView = validViews.includes(lastSegment) ? lastSegment : 'dashboard';
+                    this.navigate(activeView);
                 } else {
                     document.getElementById('view-login').classList.remove('hidden');
                 }
             } catch (e) {
                 console.error("Error al verificar sesión", e);
                 document.getElementById('view-login').classList.remove('hidden');
-            }
-        },
-
-        setUserProfileUI(user) {
-            // 🚀 AQUí: Guardar el usuario activo globalmente para las URLs y tokens
-            window.currentUser = user;
-
-            const avatarContainer = document.getElementById('user-avatar-container');
-            const nameDisplay = document.getElementById('user-name-display');
-            const emailDisplay = document.getElementById('user-email-display');
-
-            if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente';
-            if (emailDisplay) emailDisplay.innerText = user.email || '';
-
-            if (avatarContainer) {
-                if (user.picture) {
-                    avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
-                } else if (user.email) {
-                    const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
-                    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
-                    
-                    const img = new Image();
-                    img.src = gravatarUrl;
-                    img.onload = () => {
-                        avatarContainer.innerHTML = `<img src="${gravatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
-                    };
-                    img.onerror = () => {
-                        const initials = (user.name ? user.name.split(' ').map(n => n[0]).join('') : 'US').toUpperCase().substring(0, 2);
-                        avatarContainer.innerText = initials;
-                    };
-                }
-            }
-        },
-
-        switchAuthMode(mode) {
-            document.getElementById('auth-mode-login').classList.add('hidden');
-            document.getElementById('auth-mode-otp').classList.add('hidden');
-            document.getElementById('auth-mode-signup').classList.add('hidden');
-
-            if (mode === 'login') document.getElementById('auth-mode-login').classList.remove('hidden');
-            if (mode === 'otp') document.getElementById('auth-mode-otp').classList.remove('hidden');
-            if (mode === 'signup') document.getElementById('auth-mode-signup').classList.remove('hidden');
-        },
-
-        async handlePasswordLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
-            const alertBox = document.getElementById('auth-alert-box');
-            const btn = document.getElementById('btn-login-submit');
-
-            alertBox.classList.add('hidden');
-            btn.innerText = "Verificando cuenta...";
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-
-                if (data.success && data.user) {
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
-                    alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
-                    alertBox.classList.remove('hidden');
-
-                    this.setUserProfileUI(data.user);
-                    setTimeout(() => {
-                        document.getElementById('view-login').classList.add('hidden');
-                        this.navigate('dashboard');
-                    }, 500);
-                } else {
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                    alertBox.innerText = data.error || "Credenciales incorrectas o correo no registrado.";
-                    alertBox.classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error(err);
-                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                alertBox.innerText = "Error de conexión con el servidor.";
-                alertBox.classList.remove('hidden');
             } finally {
-                btn.innerText = "Inicie sesión";
-                btn.disabled = false;
+                if (loadingScreen) loadingScreen.classList.add('hidden');
             }
-        },
-
-        async handleRegisterSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const alertBox = document.getElementById('reg-alert-box');
-
-            alertBox.classList.add('hidden');
-
-            try {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
-                    alertBox.innerText = "¡Cuenta creada con éxito! Redirigiendo...";
-                    alertBox.classList.remove('hidden');
-
-                    this.setUserProfileUI(data.user);
-                    setTimeout(() => {
-                        document.getElementById('view-login').classList.add('hidden');
-                        this.navigate('dashboard');
-                    }, 800);
-                } else {
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                    alertBox.innerText = data.error || "No se pudo crear la cuenta.";
-                    alertBox.classList.remove('hidden');
-                }
-            } catch (err) {
-                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                alertBox.innerText = "Error al conectar con el servidor.";
-                alertBox.classList.remove('hidden');
-            }
-        },
-
-        handleOtpRequest(e) {
-            e.preventDefault();
-            alert("Simulación OTP: Código enviado a su correo.");
-        },
-
-        handleSocialLogin(provider) {
-            if (provider === 'Google') window.location.href = '/auth/google';
-        },
-
-        async logout() {
-            const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
-            if (!confirmed) return;
-
-            try {
-                await fetch('/api/logout', { method: 'POST' });
-            } catch (e) {
-                console.error("Error al cerrar sesión", e);
-            }
-
-            // 🚀 AQUí: Limpiar usuario y restablecer la URL raíz
-            window.currentUser = null;
-            window.history.pushState({}, '', '/');
-            document.getElementById('view-login').classList.remove('hidden');
         },
 
         navigate(viewId) {
             const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
             
+            // Ocultar todas las secciones
             views.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
-                if(el) el.classList.add('hidden');
+                if (el) el.classList.add('hidden');
+                
                 const nav = document.getElementById(`nav-${v}`);
-                if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+                if (nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
             });
 
+            // Mostrar exclusivamente la vista activa
             const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.remove('hidden');
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
             
             const targetNav = document.getElementById(`nav-${viewId}`);
             if (targetNav) {
                 targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
                 const titleEl = document.getElementById('current-view-title');
-                if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
+                if (titleEl) {
+                    titleEl.innerText = targetNav.innerText.split('\n')[0].trim();
+                }
             }
 
-            // 🚀 AQUí: Usar estrictamente el ID real del usuario autenticado
+            // Actualizar URL sin recargar
             const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
             const newPath = viewId === 'dashboard' 
                 ? `/v2/location/${locationId}/dashboard` 
@@ -1149,10 +996,8 @@ const App = {
                 
             window.history.pushState({ view: viewId }, '', newPath);
 
-            if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') {
-                checkMetaConnectionStatus();
-            }
-
+            // Renderizar datos del módulo activo
+            if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') checkMetaConnectionStatus();
             if (viewId === 'dashboard') this.renderDashboard();
             if (viewId === 'pipeline') this.renderPipeline();
             if (viewId === 'conversations') ChatEngine.render();
