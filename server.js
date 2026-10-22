@@ -82,7 +82,6 @@ app.use(session({
 // 🔐 AUTENTICACIÓN TRADICIONAL (REGISTRO Y LOGIN)
 // ==========================================
 
-// 1. REGISTRO DE NUEVA CUENTA / EMPRESA
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
@@ -141,7 +140,6 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// 2. INICIO DE SESIÓN ESTRICTO (VALIDA SI EL CORREO ESTÁ REGISTRADO)
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -252,21 +250,18 @@ app.get('/auth/facebook/callback', async (req, res) => {
         const protocol = req.protocol;
         const redirectUri = `${protocol}://${host}/auth/facebook/callback`;
 
-        // 1. Intercambiar el código por el User Access Token de corta duración
         const tokenUrl = `https://graph.facebook.com/v25.0/oauth/access_token?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${appSecret}&code=${code}`;
         const response = await fetch(tokenUrl);
         const data = await response.json();
 
         if (data.error) return res.redirect('/?error=token_exchange_failed');
 
-        // 2. Obtener Token de Larga Duración (60 días)
         const longLivedUrl = `https://graph.facebook.com/v25.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${data.access_token}`;
         const llResponse = await fetch(longLivedUrl);
         const llData = await llResponse.json();
 
         const accessToken = llData.access_token || data.access_token;
 
-        // Función reutilizable para actualizar en la BD, iniciar sesión y redirigir
         const persistTokenAndLogin = (targetUserId, userDataObj) => {
             db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, targetUserId], (updateErr) => {
                 if (updateErr) {
@@ -289,7 +284,6 @@ app.get('/auth/facebook/callback', async (req, res) => {
         if (req.session && req.session.user && req.session.user.id) {
             persistTokenAndLogin(req.session.user.id, req.session.user);
         } else {
-            console.warn("⚠️ Advertencia: No hay sesión activa durante el callback. Buscando usuario en BD...");
             db.get(`SELECT * FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, user) => {
                 if (user) {
                     persistTokenAndLogin(user.id, {
@@ -331,12 +325,13 @@ app.get('/auth/facebook/callback', async (req, res) => {
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0 (ACTUALIZADO Y CORREGIDO)
+// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0 (CORREGIDO Y RESTAURADO)
 // ==========================================
 app.get('/auth/google', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const host = req.get('host');
-    const redirectUri = `https://${host}/auth/google/callback`;
+    const protocol = req.protocol; // 👈 Dinámico idéntico a Facebook para asegurar compatibilidad
+    const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
     if (!clientId) {
         console.error("❌ Error: GOOGLE_CLIENT_ID no está definido");
@@ -355,7 +350,8 @@ app.get('/auth/google/callback', async (req, res) => {
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         const host = req.get('host');
-        const redirectUri = `https://${host}/auth/google/callback`;
+        const protocol = req.protocol; // 👈 Dinámico
+        const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
         const tokenUrl = 'https://oauth2.googleapis.com/token';
         const params = new URLSearchParams({
@@ -385,7 +381,6 @@ app.get('/auth/google/callback', async (req, res) => {
         const googleName = userData.name || "Usuario Google";
         const googleId = 'google_' + (userData.id || Date.now());
 
-        // Verificar si el usuario ya existe en SQLite por correo
         db.get(`SELECT * FROM users WHERE email = ?`, [googleEmail.toLowerCase()], (err, existingUser) => {
             if (existingUser) {
                 req.session.user = {
