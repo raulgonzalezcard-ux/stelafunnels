@@ -46,7 +46,11 @@
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
     <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (VISIBLE POR DEFECTO PARA EVITAR PARPADEOS AL ACTUALIZAR) -->
+<<<<<<< HEAD
     <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center hidden">
+=======
+    <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center">
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
         <div class="w-full h-full grid grid-cols-1 md:grid-cols-2 bg-white">
             
             <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS -->
@@ -919,14 +923,23 @@
    const App = {
         chartInstance: null,
 
+<<<<<<< HEAD
    async init() {
+=======
+      async init() {
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
 
+<<<<<<< HEAD
             const urlParams = new URLSearchParams(window.location.search);
             
             // 1. Si venimos de conectar redes sociales con éxito
+=======
+            // 🚀 PRIORIDAD ABSOLUTA: Si regresamos de Meta o Google con éxito
+            const urlParams = new URLSearchParams(window.location.search);
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 document.getElementById('view-login').classList.add('hidden');
                 this.navigate('launchpad');
@@ -943,7 +956,11 @@
                 return;
             }
 
+<<<<<<< HEAD
             // 2. Flujo general de verificación de sesión (con soporte para F5 en sub-rutas)
+=======
+            // Flujo normal de verificación de sesión
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -952,7 +969,11 @@
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
+<<<<<<< HEAD
                     // Detectar la vista actual según la URL al hacer F5
+=======
+                    // 🚀 DETECTAR LA VISTA ACTUAL SEGÚN LA URL AL HACER F5
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
                     const pathSegments = window.location.pathname.split('/');
                     const lastSegment = pathSegments[pathSegments.length - 1];
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
@@ -963,7 +984,10 @@
                         this.navigate('dashboard');
                     }
                 } else {
+<<<<<<< HEAD
                     // Si no hay sesión activa, mostramos el login
+=======
+>>>>>>> 8f08ec9ea420ea48c23de17e4fc279344463a7ec
                     document.getElementById('view-login').classList.remove('hidden');
                 }
             } catch (e) {
