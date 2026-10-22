@@ -7,13 +7,13 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session); // 👈 Añadir esta línea
+const SQLiteStore = require('connect-sqlite3')(session);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configurar trust proxy para servidores detrás de Coolify / Nginx / Reverse Proxy
-app.set('trust proxy', 1);
+// 🔑 CORRECCIÓN CRÍTICA: Confiar en todos los saltos del proxy inverso de Coolify / Nginx
+app.set('trust proxy', true);
 
 // ==========================================
 // 📦 CONFIGURACIÓN DE LA BASE DE DATOS SQLITE
@@ -75,12 +75,12 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
-    proxy: true, // Confiar en el proxy inverso (Coolify / Nginx)
+    proxy: true, // Confiar en el proxy inverso
     cookie: { 
         secure: true, // Obligatorio con HTTPS
         httpOnly: true,
         sameSite: 'lax', 
-        path: '/', // 👈 ¡CLAVE ABSOLUTA PARA RUTAS ANIDADAS Y F5!
+        path: '/', 
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
@@ -332,12 +332,12 @@ app.get('/auth/facebook/callback', async (req, res) => {
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0 (CORREGIDO Y RESTAURADO)
+// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0
 // ==========================================
 app.get('/auth/google', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const host = req.get('host');
-    const protocol = req.protocol; // 👈 Dinámico idéntico a Facebook para asegurar compatibilidad
+    const protocol = req.protocol; 
     const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
     if (!clientId) {
@@ -357,7 +357,7 @@ app.get('/auth/google/callback', async (req, res) => {
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         const host = req.get('host');
-        const protocol = req.protocol; // 👈 Dinámico
+        const protocol = req.protocol; 
         const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
         const tokenUrl = 'https://oauth2.googleapis.com/token';
