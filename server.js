@@ -7,6 +7,7 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session); // 👈 Añadir esta línea
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,18 +23,29 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error al conectar con la base de datos SQLite:', err.message);
     } else {
-        console.log('📦 Conectado a la Base de Datos SQLite de producción.');
+        console.log('📦 Conectado a la Base de Datos SQLite de producción[cite: 13].');
     }
 });
 
-// Crear tabla de usuarios/inquilinos si no existe
+// Crear tabla de usuarios/inquilinos con la columna meta_access_token integrada
 db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    meta_access_token TEXT,
     status TEXT DEFAULT 'active',
     role TEXT DEFAULT 'admin',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
+// Crear tabla de Embudos / Landing Pages si no existe
+db.run(`CREATE TABLE IF NOT EXISTS funnels (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    url TEXT NOT NULL,
+    steps INTEGER DEFAULT 1,
+    updated TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
@@ -54,15 +66,22 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Sesiones en Servidor
+// Configuración de Sesiones PERSISTENTES en Base de Datos SQLite
 app.use(session({
+    store: new SQLiteStore({
+        db: 'sessions.sqlite',
+        dir: __dirname
+    }),
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: { 
-        secure: false, // Cambiar a true si usas HTTPS estricto con certificado válido en producción
+        secure: true,
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de persistencia
     }
 }));
 
@@ -70,7 +89,6 @@ app.use(session({
 // 🔐 AUTENTICACIÓN TRADICIONAL (REGISTRO Y LOGIN)
 // ==========================================
 
-// 1. REGISTRO DE NUEVA CUENTA / EMPRESA
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
@@ -87,8 +105,8 @@ app.post('/api/auth/register', async (req, res) => {
             try {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 const userId = Date.now().toString();
-                const userName = name || 'Empresa CRM';
-                const status = 'active'; // 'active' o 'suspended'
+                const userName = name || 'Empresa Global';
+                const status = 'active'; 
                 const role = 'admin';
 
                 db.run(
@@ -100,11 +118,11 @@ app.post('/api/auth/register', async (req, res) => {
                             return res.status(500).json({ success: false, error: 'Error interno al registrar el usuario.' });
                         }
 
-                        // Guardar sesión activa inmediata
                         req.session.user = { 
                             id: userId, 
                             name: userName, 
                             email: email.toLowerCase(), 
+                            picture: null,
                             role, 
                             status 
                         };
@@ -129,7 +147,6 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// 2. INICIO DE SESIÓN CON VALIDACIÓN DE ESTADO (ACTIVO / SUSPENDIDO)
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -139,34 +156,37 @@ app.post('/api/auth/login', async (req, res) => {
         }
 
         db.get(`SELECT * FROM users WHERE email = ?`, [email.toLowerCase()], async (err, user) => {
-            if (err || !user) {
-                return res.status(401).json({ success: false, error: 'Credenciales inválidas o usuario no registrado.' });
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Error interno del servidor.' });
             }
 
-            // 🛑 VALIDACIÓN CLAVE: Si la cuenta está suspendida por falta de pago
+            if (!user) {
+                return res.status(401).json({ success: false, error: 'El correo electrónico no está registrado en el sistema.' });
+            }
+
             if (user.status === 'suspended') {
                 return res.status(403).json({ 
                     success: false, 
-                    error: 'Esta subcuenta se ha pausado por falta de pago o renovación.',
+                    error: 'Esta cuenta se ha pausado por falta de pago o renovación.',
                     suspended: true 
                 });
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.status(401).json({ success: false, error: 'Credenciales inválidas.' });
+                return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
             }
 
-            // Crear sesión segura
             req.session.user = { 
                 id: user.id, 
                 name: user.name, 
                 email: user.email, 
+                picture: null,
                 role: user.role, 
                 status: user.status 
             };
 
-            console.log(`🔓 Sesión iniciada: ${email}`);
+            console.log(`🔓 Sesión iniciada correctamente: ${email}`);
             return res.json({ 
                 success: true, 
                 message: '¡Bienvenido de nuevo!', 
@@ -181,7 +201,35 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON META
+// 🚀 RUTAS API DE EMBUDOS Y SITIOS WEB (FUNNELS)
+// ==========================================
+app.get('/api/funnels', (req, res) => {
+    db.all(`SELECT * FROM funnels ORDER BY created_at DESC`, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: 'Error al consultar embudos.' });
+        }
+        res.json({ success: true, funnels: rows });
+    });
+});
+
+app.post('/api/funnels', (req, res) => {
+    const { id, name, url, steps, updated } = req.body;
+    const funnelId = id || 'f_' + Date.now();
+    
+    db.run(
+        `INSERT OR REPLACE INTO funnels (id, name, url, steps, updated) VALUES (?, ?, ?, ?, ?)`,
+        [funnelId, name || 'Nuevo Embudo', url || '', steps || 1, updated || 'Hoy'],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Error al guardar embudo.' });
+            }
+            res.json({ success: true, id: funnelId });
+        }
+    );
+});
+
+// ==========================================
+// 🔑 RUTAS DE AUTENTICACIÓN CON META (FACEBOOK)
 // ==========================================
 app.get('/auth/facebook', (req, res) => {
     const appId = process.env.FACEBOOK_APP_ID;
@@ -219,28 +267,78 @@ app.get('/auth/facebook/callback', async (req, res) => {
         const llResponse = await fetch(longLivedUrl);
         const llData = await llResponse.json();
 
-        global.metaAccessToken = llData.access_token || data.access_token;
-        req.session.user = { 
-            id: 'meta_admin', 
-            name: "Administrador Meta", 
-            email: "meta@stelafunnels.com", 
-            role: 'admin', 
-            status: 'active' 
+        const accessToken = llData.access_token || data.access_token;
+
+        const persistTokenAndLogin = (targetUserId, userDataObj) => {
+            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, targetUserId], (updateErr) => {
+                if (updateErr) {
+                    console.error("❌ Error al actualizar token Meta en BD:", updateErr);
+                    return res.redirect('/?error=db_save_failed');
+                }
+                
+                req.session.user = userDataObj;
+
+                req.session.save((saveErr) => {
+                    if (saveErr) {
+                        console.error("❌ Error al guardar la sesión:", saveErr);
+                    }
+                    console.log(`✅ ¡Token de Meta guardado y sesión iniciada para el usuario ID: ${targetUserId}!`);
+                    return res.redirect('/?success=meta_connected');
+                });
+            });
         };
 
-        res.redirect('/?success=meta_connected');
+        if (req.session && req.session.user && req.session.user.id) {
+            persistTokenAndLogin(req.session.user.id, req.session.user);
+        } else {
+            db.get(`SELECT * FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, user) => {
+                if (user) {
+                    persistTokenAndLogin(user.id, {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        picture: null,
+                        role: user.role,
+                        status: user.status
+                    });
+                } else {
+                    const defaultUserId = 'meta_user_' + Date.now();
+                    const hashedPassword = bcrypt.hashSync('default_pass_2026', 10);
+                    db.run(
+                        `INSERT INTO users (id, name, email, password, meta_access_token, status, role) VALUES (?, ?, ?, ?, ?, 'active', 'admin')`,
+                        [defaultUserId, 'Administrador Global', 'admin@stelafunnels.com', hashedPassword, accessToken],
+                        (insertErr) => {
+                            if (insertErr) {
+                                return res.redirect('/?error=no_user_found');
+                            }
+                            persistTokenAndLogin(defaultUserId, {
+                                id: defaultUserId,
+                                name: 'Administrador Global',
+                                email: 'admin@stelafunnels.com',
+                                picture: null,
+                                role: 'admin',
+                                status: 'active'
+                            });
+                        }
+                    );
+                }
+            });
+        }
+
     } catch (err) {
+        console.error("Error crítico en callback Facebook:", err);
         res.redirect('/?error=server_error');
     }
 });
 
 // ==========================================
-// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0
+// 🔑 RUTAS DE AUTENTICACIÓN CON GOOGLE OAUTH 2.0 (CORREGIDO Y RESTAURADO)
 // ==========================================
 app.get('/auth/google', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const host = req.get('host');
-    const redirectUri = `https://${host}/auth/google/callback`;
+    const protocol = req.protocol; // 👈 Dinámico idéntico a Facebook para asegurar compatibilidad
+    const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
     if (!clientId) {
         console.error("❌ Error: GOOGLE_CLIENT_ID no está definido");
@@ -259,7 +357,8 @@ app.get('/auth/google/callback', async (req, res) => {
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         const host = req.get('host');
-        const redirectUri = `https://${host}/auth/google/callback`;
+        const protocol = req.protocol; // 👈 Dinámico
+        const redirectUri = `${protocol}://${host}/auth/google/callback`;
 
         const tokenUrl = 'https://oauth2.googleapis.com/token';
         const params = new URLSearchParams({
@@ -285,16 +384,43 @@ app.get('/auth/google/callback', async (req, res) => {
         });
         const userData = await userResp.json();
 
-        req.session.user = {
-            id: 'google_' + (userData.id || Date.now()),
-            name: userData.name || "Usuario Google",
-            email: userData.email || "admin@stelafunnels.com",
-            role: 'admin',
-            status: 'active'
-        };
+        const googleEmail = userData.email || "admin@stelafunnels.com";
+        const googleName = userData.name || "Usuario Google";
+        const googleId = 'google_' + (userData.id || Date.now());
 
-        res.redirect('/?success=google_connected');
+        db.get(`SELECT * FROM users WHERE email = ?`, [googleEmail.toLowerCase()], (err, existingUser) => {
+            if (existingUser) {
+                req.session.user = {
+                    id: existingUser.id,
+                    name: existingUser.name,
+                    email: existingUser.email,
+                    picture: userData.picture || null,
+                    role: existingUser.role,
+                    status: existingUser.status
+                };
+                return req.session.save(() => res.redirect('/?success=google_connected'));
+            } else {
+                const hashedPassword = bcrypt.hashSync('google_oauth_pass_2026', 10);
+                db.run(
+                    `INSERT INTO users (id, name, email, password, status, role) VALUES (?, ?, ?, ?, 'active', 'admin')`,
+                    [googleId, googleName, googleEmail.toLowerCase(), hashedPassword],
+                    (insertErr) => {
+                        req.session.user = {
+                            id: googleId,
+                            name: googleName,
+                            email: googleEmail.toLowerCase(),
+                            picture: userData.picture || null,
+                            role: 'admin',
+                            status: 'active'
+                        };
+                        return req.session.save(() => res.redirect('/?success=google_connected'));
+                    }
+                );
+            }
+        });
+
     } catch (err) {
+        console.error("Error en callback Google:", err);
         res.redirect('/?error=server_error');
     }
 });

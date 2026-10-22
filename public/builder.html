@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stelafunnels | Constructor de Embudos y Landing Pages</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-slate-100">
+
+    <!-- BARRA SUPERIOR DE ACCIONES -->
+    <header class="bg-slate-900 border-b border-slate-800 h-16 flex items-center justify-between px-6 shrink-0 z-20">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='/'" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-800 px-3 py-2 rounded-lg transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al CRM
+            </button>
+            <div>
+                <h1 class="text-xs font-black text-white" id="builder-title-display">Linktree para Clientes | Xtucasa</h1>
+                <p class="text-[10px] text-blue-400 font-mono">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex bg-slate-800 p-1 rounded-lg gap-1 border border-slate-700">
+                <button title="Vista Escritorio" class="p-1.5 rounded bg-slate-700 text-white shadow"><i data-lucide="monitor" class="w-4 h-4"></i></button>
+                <button title="Vista Tablet" class="p-1.5 rounded text-slate-400 hover:text-white"><i data-lucide="tablet" class="w-4 h-4"></i></button>
+                <button title="Vista Móvil" class="p-1.5 rounded text-slate-400 hover:text-white"><i data-lucide="smartphone" class="w-4 h-4"></i></button>
+            </div>
+            <button onclick="BuilderApp.saveAndPublish()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg shadow-lg transition-all flex items-center gap-2">
+                <i data-lucide="send" class="w-4 h-4"></i> Publicar Sitio
+            </button>
+        </div>
+    </header>
+
+    <!-- CUERPO PRINCIPAL: CANVAS + INSPECTOR -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- LONA DE TRABAJO (PREVISUALIZADOR DE LA LANDING PAGE) -->
+        <div class="flex-1 bg-slate-950 p-8 overflow-y-auto custom-scrollbar flex justify-center items-start relative">
+            <div id="landing-canvas" class="w-full max-w-2xl bg-cover bg-center rounded-2xl p-8 border-2 border-blue-500/50 shadow-2xl space-y-6 relative min-h-[700px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                
+                <div class="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-wider shadow">
+                    Vista Previa en Vivo (Modo Edición)
+                </div>
+
+                <!-- LOGOTIPO -->
+                <div class="text-center pt-6">
+                    <div class="inline-block bg-slate-900/80 text-emerald-400 border border-emerald-500/40 px-6 py-2 rounded-xl font-black text-xl tracking-wider backdrop-blur-md cursor-pointer hover:border-blue-400 transition-all shadow-lg" onclick="BuilderApp.selectElement('logo')">
+                        <span id="preview-logo-text">xtucasa</span>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DE VIDEO DESTACADO -->
+                <div class="max-w-md mx-auto w-full bg-slate-900/80 rounded-xl overflow-hidden border border-slate-700 shadow-xl p-2 cursor-pointer hover:border-blue-400 transition-all" onclick="BuilderApp.selectElement('video')">
+                    <div class="aspect-video bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" alt="Video Cover" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg relative z-10">
+                            <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN Y FORMULARIO INTEGRADO -->
+                <div class="space-y-3 max-w-md mx-auto w-full">
+                    <button onclick="BuilderApp.selectElement('btn1')" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <span id="preview-btn1-text">Vende tu Propiedad</span>
+                    </button>
+                    
+                    <button onclick="BuilderApp.selectElement('btn2')" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <span id="preview-btn2-text">Catálogo de Propiedades</span>
+                        <span class="block text-[10px] font-normal text-slate-500">(Compra o Alquila)</span>
+                    </button>
+
+                    <button onclick="BuilderApp.selectElement('btn3')" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <span id="preview-btn3-text">Contáctanos (Formulario Pop-up)</span>
+                    </button>
+                </div>
+
+                <!-- PIE DE PÁGINA CON VARIABLES DINÁMICAS -->
+                <div class="text-center text-slate-300 space-y-2 pt-6 border-t border-slate-700/50">
+                    <h4 id="preview-business-name" class="font-bold text-sm tracking-wide cursor-pointer hover:text-blue-400" onclick="BuilderApp.selectElement('business')">
+                        {{ custom_values.nombre_de_negocio }}
+                    </h4>
+                    
+                    <div class="text-[11px] text-slate-400 space-y-1 font-mono">
+                        <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
+                        <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                        <p>📍 {{ custom_values.direccion_inmobiliaria }}</p>
+                    </div>
+
+                    <p class="text-[9px] text-slate-500 pt-2">
+                        Hecho por Stelafunnels · 2026 · Todos los derechos reservados
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- INSPECTOR LATERAL DERECHO DE PROPIEDADES -->
+        <div class="w-80 bg-slate-900 border-l border-slate-800 p-4 flex flex-col justify-between shrink-0 shadow-2xl overflow-y-auto custom-scrollbar">
+            <div class="space-y-4 text-xs">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="font-extrabold text-white text-sm">Inspector de Elemento</h3>
+                    <span class="text-[9px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30" id="inspector-badge">Logo</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Nombre del Elemento</label>
+                        <input type="text" id="inspector-name" value="Logotipo Principal" class="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-lg outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Acción al Hacer Clic / Formulario</label>
+                        <select id="inspector-action" class="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-lg outline-none focus:border-blue-500">
+                            <option value="popup">Abrir Formulario de Captura (Popup)</option>
+                            <option value="whatsapp">Redirigir a WhatsApp Directo</option>
+                            <option value="url">Redirigir a URL Externa</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Variable Dinámica del Negocio</label>
+                        <input type="text" id="inspector-var-input" value="{{ custom_values.nombre_de_negocio }}" oninput="BuilderApp.updateText(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-lg font-mono text-xs outline-none focus:border-blue-500">
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800">
+                        <p class="font-extrabold text-slate-400 uppercase text-[10px] mb-2">Campos del Formulario Integrado</p>
+                        <div class="space-y-1.5 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" checked class="rounded bg-slate-700 border-slate-600"> Nombre Completo *</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" checked class="rounded bg-slate-700 border-slate-600"> Teléfono / WhatsApp *</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" checked class="rounded bg-slate-700 border-slate-600"> Correo Electrónico *</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" checked class="rounded bg-slate-700 border-slate-600"> Comentarios / Presupuesto</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 space-y-2">
+                <button onclick="BuilderApp.saveAndPublish()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Guardar y Publicar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const BuilderApp = {
+            currentSelected: 'logo',
+            selectElement(type) {
+                this.currentSelected = type;
+                const badge = document.getElementById('inspector-badge');
+                if(badge) badge.innerText = type.toUpperCase();
+            },
+            updateText(val) {
+                if(this.currentSelected === 'business') {
+                    const el = document.getElementById('preview-business-name');
+                    if(el) el.innerText = val || '{{ custom_values.nombre_de_negocio }}';
+                }
+            },
+            saveAndPublish() {
+                alert("🎉 ¡Landing Page y Formulario publicados con éxito! Listos para vincular en tus campañas de Meta Ads.");
+                window.location.href = '/';
+            }
+        };
+        window.onload = () => lucide.createIcons();
+    </script>
+</body>
+</html>

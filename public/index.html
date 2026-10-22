@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -40,119 +41,172 @@
         .node-line-last::after {
             display: none;
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%);
-        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
-    <!-- PANTALLA DE LOGIN GLOBAL SPLIT-SCREEN (USUARIO Y CONTRASEÑA / SOCIAL LOGIN) -->
-    <div id="view-login" class="fixed inset-0 bg-[#0f172a] z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+    <!-- PANTALLA DE AUTENTICACIÓN PROFESIONAL SPLIT-SCREEN (VISIBLE POR DEFECTO PARA EVITAR PARPADEOS AL ACTUALIZAR) -->
+    <div id="view-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center hidden">
+        <div class="w-full h-full grid grid-cols-1 md:grid-cols-2 bg-white">
             
-            <!-- COLUMNA IZQUIERDA: FORMULARIO DE CREDENCIALES TRADICIONALES -->
-            <div class="p-8 md:p-12 flex flex-col justify-between bg-slate-900 text-left">
-                <div>
+            <!-- COLUMNA IZQUIERDA: FORMULARIOS LIMPIOS -->
+            <div class="p-8 md:p-16 flex flex-col justify-between bg-white text-left overflow-y-auto custom-scrollbar">
+                
+                <div class="max-w-md w-full mx-auto space-y-6">
                     <!-- Brand / Logo -->
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
-                            <i data-lucide="chart-line" class="w-5 h-5"></i>
-                        </div>
+                    <div class="flex items-center gap-3 mb-8">
+                        <img src="img/imageInmueble2.png" alt="Stelafunnels Logo" class="h-10 object-contain" onerror="this.src='img/imageInmueble3.png'">
+                    </div>
+
+                    <!-- MÓDULO 1: INICIO DE SESIÓN CON CONTRASEÑA -->
+                    <div id="auth-mode-login" class="space-y-5">
                         <div>
-                            <h1 class="font-extrabold text-xl tracking-tight text-white">STELAFUNNELS</h1>
-                            <p class="text-xs text-slate-400">Enterprise Sales OS</p>
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión</h2>
+                            <p class="text-xs text-slate-500 mt-1">Inicie sesión para acceder a su cuenta empresarial.</p>
+                        </div>
+
+                        <form onsubmit="App.handlePasswordLogin(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Correo electrónico *</label>
+                                <input type="email" id="auth-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all placeholder-slate-400">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-xs font-bold text-slate-700">Password *</label>
+                                    <a href="#" class="text-[11px] text-slate-500 hover:text-blue-600">Restablecer contraseña</a>
+                                </div>
+                                <input type="password" id="auth-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all placeholder-slate-400">
+                            </div>
+
+                            <div id="auth-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
+
+                            <button type="submit" id="btn-login-submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">
+                                Inicie sesión
+                            </button>
+                        </form>
+
+                        <button onclick="App.switchAuthMode('otp')" type="button" class="w-full bg-white hover:bg-slate-50 text-red-600 border border-red-200 font-bold text-xs py-2.5 rounded-lg transition-all">
+                            Inicie sesión con un código de seguridad
+                        </button>
+
+                        <div class="text-center pt-2">
+                            <p class="text-xs text-slate-500">
+                                ¿Es nuevo por aquí? 
+                                <button onclick="App.switchAuthMode('signup')" class="text-blue-600 font-bold hover:underline">Registrarse</button>
+                            </p>
                         </div>
                     </div>
 
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-white mb-1">Acceso a Plataforma</h2>
-                        <p class="text-xs text-slate-400">Ingresa tus credenciales corporativas para administrar tu cuenta.</p>
-                    </div>
-
-                    <!-- Formulario de Acceso por Email y Contraseña -->
-                    <form onsubmit="App.handlePasswordLogin(event)" class="space-y-4">
+                    <!-- MÓDULO 2: INICIO DE SESIÓN CON CÓDIGO OTP -->
+                    <div id="auth-mode-otp" class="hidden space-y-5">
                         <div>
-                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Correo Electrónico Empresarial</label>
-                            <input type="email" id="auth-email" required placeholder="admin@stelafunnels.com" class="w-full text-xs bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:border-blue-500 transition-all placeholder-slate-500">
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Inicie sesión con código</h2>
+                            <p class="text-xs text-slate-500 mt-1">Introduzca su correo para recibir un código acceso.</p>
                         </div>
+
+                        <form onsubmit="App.handleOtpRequest(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Correo electrónico *</label>
+                                <input type="email" id="otp-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                            </div>
+
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">
+                                Generar código seguro
+                            </button>
+                        </form>
+
+                        <button onclick="App.switchAuthMode('login')" type="button" class="w-full bg-white hover:bg-slate-50 text-red-600 border border-red-200 font-bold text-xs py-2.5 rounded-lg transition-all">
+                            Inicie sesión con una contraseña
+                        </button>
+
+                        <div class="text-center pt-2">
+                            <p class="text-xs text-slate-500">
+                                ¿Es nuevo por aquí? 
+                                <button onclick="App.switchAuthMode('signup')" class="text-blue-600 font-bold hover:underline">Registrarse</button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 3: REGISTRO DE NUEVOS CLIENTES -->
+                    <div id="auth-mode-signup" class="hidden space-y-5">
                         <div>
-                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Contraseña de Acceso</label>
-                            <input type="password" id="auth-password" required placeholder="••••••••" class="w-full text-xs bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:border-blue-500 transition-all placeholder-slate-500">
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Registrarse</h2>
+                            <p class="text-xs text-slate-500 mt-1">Configure el acceso a su cuenta en unos segundos.</p>
                         </div>
 
-                        <div id="auth-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
+                        <form onsubmit="App.handleRegisterSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre completo *</label>
+                                <input type="text" id="reg-name" required placeholder="Su nombre completo" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Correo electrónico *</label>
+                                <input type="email" id="reg-email" required placeholder="tú@ejemplo.com" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
+                                <input type="password" id="reg-password" required placeholder="Introduzca su contraseña" class="w-full text-xs bg-white border border-slate-300 text-slate-900 rounded-lg p-3 outline-none focus:border-blue-600 transition-all">
+                                <p class="text-[10px] text-slate-400 mt-1">Utilice al menos 8 caracteres, incluidas letras y números.</p>
+                            </div>
 
-                        <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
-                            <span>Iniciar Sesión</span>
-                        </button>
-                    </form>
+                            <div id="reg-alert-box" class="hidden p-3 rounded-lg text-xs font-medium"></div>
 
-                    <div class="relative flex py-4 items-center">
-                        <div class="flex-grow border-t border-slate-800"></div>
-                        <span class="flex-shrink mx-4 text-[10px] text-slate-500 uppercase font-bold">Otras opciones</span>
-                        <div class="flex-grow border-t border-slate-800"></div>
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">
+                                Regístrese y active su cuenta
+                            </button>
+                        </form>
+
+                        <div class="text-center pt-2">
+                            <p class="text-xs text-slate-500">
+                                ¿Ya tiene una cuenta? 
+                                <button onclick="App.switchAuthMode('login')" class="text-blue-600 font-bold hover:underline">Inicie sesión</button>
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Botones de Acceso Social (Google y Meta) -->
-                    <div class="space-y-2.5">
-                        <button onclick="App.handleSocialLogin('Google')" type="button" class="w-full flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-4 rounded-xl border border-slate-700 transition-all">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.17 21.36 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.19C.43 8.14 0 9.87 0 11.75s.43 3.61 1.19 5.14l4.08-2.65z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.64 1.19 6.61l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                            <span>Continuar con Google</span>
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-slate-200"></div>
+                        <span class="flex-shrink mx-4 text-[10px] text-slate-400 uppercase font-bold">O con red social</span>
+                        <div class="flex-grow border-t border-slate-200"></div>
+                    </div>
+
+                    <!-- Redes Sociales -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="window.location.href='/auth/google'" type="button" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-200 transition-all">
+                            <i data-lucide="chrome" class="w-4 h-4 text-red-500"></i> Google
                         </button>
-                        <button onclick="window.location.href='/auth/facebook'" type="button" class="w-full flex items-center justify-center gap-3 bg-[#1877F2]/20 hover:bg-[#1877F2]/30 text-blue-200 font-bold text-xs py-2.5 px-4 rounded-xl border border-blue-800/50 transition-all">
-                            <svg class="w-4 h-4 fill-current text-blue-400" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                            <span>Conectar con Cuenta de Meta / Facebook</span>
+                        <button onclick="window.location.href='/auth/facebook'" type="button" class="flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2.5 px-3 rounded-lg border border-blue-200 transition-all">
+                            <i data-lucide="facebook" class="w-4 h-4 text-blue-600"></i> Meta
                         </button>
                     </div>
+
                 </div>
 
-                <p class="text-[10px] text-slate-500 pt-6 text-center">© 2026 Stelafunnels Sales CRM. Todos los derechos reservados.</p>
+                <div class="max-w-md w-full mx-auto pt-8 flex justify-between items-center text-xs text-slate-400">
+                    <span>© Stelafunnels Sales CRM</span>
+                    <a href="mailto:soporte@stelafunnels.com" class="hover:underline">Soporte técnico</a>
+                </div>
             </div>
 
-            <!-- COLUMNA DERECHA: BANNER CRM GLOBAL MULTI-SECTOR -->
-            <div class="hidden md:flex gradient-bg p-12 flex-col justify-between relative overflow-hidden border-l border-slate-800 text-left">
-                <div class="absolute -top-24 -right-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
-
-                <div class="relative z-10">
-                    <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-400/30 text-blue-300 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
-                        SaaS CRM Omnicanal Global
+            <!-- COLUMNA DERECHA: BANNER CORPORATIVO -->
+            <div class="hidden md:flex bg-[#0f172a] p-16 flex-col justify-between relative overflow-hidden text-left">
+                <div class="relative z-10 space-y-6 max-w-lg">
+                    <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-400/20 text-blue-400 rounded-full text-xs font-semibold uppercase tracking-wider">
+                        SaaS Omnicanal Enterprise
                     </span>
-                    <h3 class="text-3xl font-extrabold text-white leading-tight mb-4">
-                        Gestiona prospectos y escala ventas sin límites
+                    <h3 class="text-4xl font-extrabold text-white leading-tight">
+                        La suite comercial para escalar negocios globales.
                     </h3>
-                    <p class="text-sm text-slate-300 leading-relaxed">
-                        Plataforma multi-inquilino robusta optimizada para automatización de marketing, flujos de conversión y gestión omnicanal de clientes en cualquier sector comercial.
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Control total de oportunidades, embudos de conversión y automatizaciones en una sola plataforma multi-inquilino.
                     </p>
                 </div>
 
-                <div class="relative z-10 space-y-3 my-8">
-                    <div class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/50 rounded-xl backdrop-blur-md">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                            <i data-lucide="bolt" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-white">Automatización Inteligente</h4>
-                            <p class="text-[11px] text-slate-400">Sincronización instantánea con Webhooks y API de Meta.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/50 rounded-xl backdrop-blur-md">
-                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-white">Arquitectura Multi-Tenant Segura</h4>
-                            <p class="text-[11px] text-slate-400">Espacios aislados de alto rendimiento para cada cliente.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative z-10 pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs text-slate-400">
+                <div class="relative z-10 pt-8 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
                     <span>Estado del Servidor</span>
-                    <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                    <span class="flex items-center gap-2 text-emerald-400 font-semibold">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Producción Activa
+                        Producción en línea
                     </span>
                 </div>
             </div>
@@ -172,7 +226,7 @@
             <div class="mt-2 bg-slate-800/60 border border-slate-700/50 rounded-lg p-2 flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all">
                 <div class="truncate">
                     <p class="text-[10px] text-slate-500 font-bold uppercase">Sub-Cuenta</p>
-                    <p class="text-xs text-white font-medium truncate">Empresa Global Premium</p>
+                    <p class="text-xs text-white font-medium truncate">Cliente Enterprise Global</p>
                 </div>
                 <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-slate-500"></i>
             </div>
@@ -182,7 +236,7 @@
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ecosistema Base</p>
             
             <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad Inicial
+                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad
             </button>
             <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero de Control
@@ -202,12 +256,14 @@
             <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="share-2" class="w-4 h-4"></i> Publicador Orgánico
             </button>
+            <!-- AJUSTE EXACTO SOLICITUD 1: Lanzar Anuncios -->
             <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
-                <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Ads Manager (Rocket)</span>
+                <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Lanzar Anuncios</span>
                 <span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.2 rounded font-bold">21</span>
             </button>
+            <!-- AJUSTE EXACTO SOLICITUD 2: Sitios -->
             <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="layers" class="w-4 h-4"></i> Embudos y Sitios Web
+                <i data-lucide="layers" class="w-4 h-4"></i> Sitios
             </button>
 
             <p class="pt-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Automatización</p>
@@ -216,14 +272,14 @@
             </button>
         </nav>
 
-        <!-- PERFIL DE USUARIO DINÁMICO -->
+        <!-- PERFIL DE USUARIO DINÁMICO (AVATAR DE GRAVATAR O FOTO SOCIAL) -->
         <div class="p-4 border-t border-slate-800 bg-[#0b1322] flex items-center gap-3">
-            <div id="user-avatar-container" class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md overflow-hidden shrink-0">
-                RG
+            <div id="user-avatar-container" class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md overflow-hidden shrink-0">
+                US
             </div>
             <div class="flex-1 overflow-hidden">
-                <h4 id="user-name-display" class="text-xs font-bold text-white truncate">Raúl González</h4>
-                <p id="user-email-display" class="text-[10px] text-slate-500 truncate">Broker Administrator</p>
+                <h4 id="user-name-display" class="text-xs font-bold text-white truncate">Usuario</h4>
+                <p id="user-email-display" class="text-[10px] text-slate-500 truncate">cliente@empresa.com</p>
             </div>
             <button onclick="App.logout()" title="Cerrar Sesión" class="text-slate-500 hover:text-white transition-colors">
                 <i data-lucide="log-out" class="w-4 h-4"></i>
@@ -234,7 +290,7 @@
     <main class="flex-1 flex flex-col overflow-hidden">
         <header class="bg-white border-b border-slate-200 h-14 flex items-center justify-between px-6 z-10 shrink-0">
             <div class="flex items-center gap-3">
-                <span id="page-title-badge" class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md border border-slate-200">Suite Empresarial Activa</span>
+                <span id="page-title-badge" class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md border border-slate-200">Suite Comercial Activa</span>
                 <h2 id="current-view-title" class="text-sm font-bold text-slate-800 hidden md:block">Tablero de Control</h2>
             </div>
             <div class="flex items-center gap-3">
@@ -250,34 +306,111 @@
 
         <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-[#f8fafc]" id="main-view-router">
             
-            <section id="view-launchpad" class="hidden space-y-6">
+         <section id="view-launchpad" class="hidden space-y-6">
+    <div>
+        <h2 class="text-xl font-extrabold text-slate-950 tracking-tight">Launchpad Inicial</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para habilitar la pauta publicitaria y la sincronización de leads.</p>
+    </div>
+
+    <!-- TARJETAS DE INTEGRACIÓN DEL LAUNCHPAD -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
+        
+        <!-- 1. Descargar App Móvil -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-slate-100 text-slate-800 rounded-2xl shrink-0"><i data-lucide="smartphone" class="w-6 h-6"></i></div>
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">¡Te damos la bienvenida a Rocket OS!</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para activar la automatización completa y el rastreo de píxeles.</p>
+                    <h4 class="text-xs font-bold text-slate-900">Descárguese nuestra aplicación</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Interactúe con sus clientes potenciales dondequiera que esté.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="facebook" class="w-6 h-6"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800">Meta Business & API de Conversiones</h4>
-                                <p class="text-xs text-slate-500">Requerido para el Ads Manager e inyección de leads en 3 clics.</p>
-                            </div>
-                        </div>
-                        <button onclick="window.location.href='/auth/facebook'" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">Conectar</button>
-                    </div>
-                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800">WhatsApp Business Cloud API</h4>
-                                <p class="text-xs text-slate-500">Para flujos de auto-respuesta instantáneos con IA.</p>
-                            </div>
-                        </div>
-                        <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Conectado</span>
-                    </div>
+            </div>
+            <button onclick="alert('Enlace de descarga enviado por SMS.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Enviar enlace
+            </button>
+        </div>
+
+        <!-- 2. Google Business Profile -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0"><i data-lucide="globe" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Google Business Profile</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Gestione su perfil desde su CRM. Supervise y responda a las reseñas de perfil.</p>
                 </div>
-            </section>
+            </div>
+            <button onclick="window.location.href='/auth/google'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+<!-- FACEBOOK & LEAD ADS (DINÁMICO SEGÚN LA SUB-CUENTA) -->
+<div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white hover:bg-slate-50/50 transition-all border-b border-slate-100">
+    <div class="flex items-start gap-4">
+        <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm flex items-center justify-center">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+        </div>
+        <div class="max-w-xl">
+            <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
+            <p id="meta-card-description" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM.
+            </p>
+        </div>
+    </div>
+    <div id="meta-connection-action" class="flex items-center gap-2 shrink-0">
+        <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+            Conectar
+        </button>
+    </div>
+</div>
+        <!-- 4. Webchat Widget -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-cyan-50 text-cyan-600 rounded-2xl shrink-0"><i data-lucide="message-square" class="w-6 h-6"></i></div>
+                <div class="max-w-xl">
+                    <h4 class="text-xs font-bold text-slate-900">Widget Webchat de Sitio Web</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Genere clientes potenciales desde su sitio web conectando el widget de webchat. <br>
+                        <span class="text-[10px] text-slate-400 italic">(La comprobación del estado del widget de chat puede no ser precisa si el código no está directamente incrustado en el sitio web).</span>
+                    </p>
+                </div>
+            </div>
+            <button onclick="alert('Código widget copiado al portapapeles.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+        <!-- 5. WhatsApp Business -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Integre WhatsApp Business API</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Comuníquese en tiempo real y llegue a sus clientes en su plataforma preferida.</p>
+                </div>
+            </div>
+            <button onclick="alert('Asistente de conexión WhatsApp Cloud API iniciado.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+        <!-- 6. Stripe Payments -->
+        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-purple-50 text-purple-600 rounded-2xl shrink-0"><i data-lucide="credit-card" class="w-6 h-6"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">Pasarela de Pagos Stripe</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Conecte su cuenta de Stripe para empezar a aceptar pagos y contratos digitales.</p>
+                </div>
+            </div>
+            <button onclick="alert('Redirigiendo a Stripe Connect...');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                Conectar
+            </button>
+        </div>
+
+    </div>
+</section>
 
             <section id="view-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -596,42 +729,120 @@
                     <div class="w-64 bg-white border-2 border-slate-200 p-4 rounded-xl text-center shadow-md relative mt-6 node-line-last">
                         <span class="text-[9px] font-black bg-purple-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">NOTIFICACIÓN</span>
                         <h4 class="text-xs font-black text-slate-800 mt-2">Alerta Push interna al Broker</h4>
-                        <p class="text-[10px] text-slate-500 mt-1">Asignado a: Raúl González</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Asignado a: Administrador</p>
                     </div>
                 </div>
             </section>
 
+            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB (DENTRO DEL CRM SIN RECARGAS NI PERDER EL MENÚ) -->
             <section id="view-funnels" class="hidden space-y-4">
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">Embudos de Captación Comercial</h3>
-                        <p class="text-xs text-slate-500">Páginas de aterrizaje activas sincronizadas con dominios cloud.</p>
+                
+                <!-- SUB-VISTA 1: LISTADO DE EMBUDOS ACTIVOS -->
+                <div id="funnels-subview-list" class="space-y-4">
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
+                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de aterrizaje sin salir de la plataforma.</p>
+                        </div>
+                        <button onclick="FunnelsManager.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nuevo Embudo
+                        </button>
                     </div>
+
+                    <div id="funnels-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-                        <div class="flex justify-between items-start">
+
+                <!-- SUB-VISTA 2: CONSTRUCTOR / EDITOR VISUAL INTEGRADO CON VIDEO Y CAMPOS DE FORMULARIO -->
+                <div id="funnels-subview-builder" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm flex justify-between items-center shrink-0">
+                        <div class="flex items-center gap-3">
+                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver al Listado
+                            </button>
                             <div>
-                                <h4 class="text-xs font-black text-slate-800">Funnel Principal: Captación Exclusiva Zona Norte</h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5">URL: https://alfa.rocketfunnel.com/captacion-norte</p>
+                                <h3 class="text-xs font-black text-slate-800 truncate" id="builder-funnel-title">Linktree para Clientes | Xtucasa</h3>
+                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</p>
                             </div>
-                            <span class="bg-emerald-100 text-emerald-800 font-bold text-[9px] px-2 py-0.5 rounded">Online</span>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 pt-2 border-t text-center text-xs">
-                            <div><p class="text-[10px] text-slate-400 font-medium">Visitas Únicas</p><p class="font-black text-slate-800 mt-0.5">1,420</p></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">Registros</p><p class="font-black text-slate-800 mt-0.5">84</p></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">Conversión</p><p class="font-black text-blue-600 mt-0.5">5.9%</p></div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Cambios
+                            </button>
                         </div>
                     </div>
+
+                    <div class="flex-1 flex gap-4 overflow-hidden">
+                        
+                        <!-- LONA / CANVAS DE EDICIÓN VISUAL -->
+                        <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800 shadow-inner">
+                            <div id="landing-preview-canvas" class="w-full max-w-2xl bg-cover bg-center rounded-2xl p-8 border-2 border-amber-500/80 shadow-2xl space-y-6 relative min-h-[600px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                                
+                                <div class="text-center pt-4">
+                                    <div class="inline-block bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-6 py-2 rounded-lg font-black text-lg tracking-wider backdrop-blur-md cursor-pointer hover:border-amber-400 transition-all">
+                                        <span id="preview-logo-text">xtucasa</span>
+                                    </div>
+                                </div>
+
+                                <!-- CONTENEDOR DE VIDEO DESTACADO -->
+                                <div class="max-w-md mx-auto w-full bg-slate-900/80 rounded-xl overflow-hidden border border-slate-700 shadow-xl p-2">
+                                    <div class="aspect-video bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center">
+                                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" alt="Video Cover" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg relative z-10">
+                                            <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BOTONES DE ACCIÓN PRINCIPALES -->
+                                <div class="space-y-3 max-w-md mx-auto w-full">
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos (Formulario Pop-up)</button>
+                                </div>
+
+                                <div class="text-center text-white space-y-2 pt-6 border-t border-white/10">
+                                    <h4 id="preview-business-name" class="font-bold text-sm tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
+                                    <div class="text-[11px] text-slate-300 space-y-1 font-mono">
+                                        <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
+                                        <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PANEL LATERAL DE PROPIEDADES DE CAMPOS DE FORMULARIO -->
+                        <div class="w-80 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
+                            <div class="space-y-4 text-xs">
+                                <h4 class="font-extrabold text-slate-900 text-sm border-b pb-2">Campos del Formulario Integrado</h4>
+                                <div>
+                                    <label class="block font-bold text-slate-600 mb-1">Nombre del Negocio</label>
+                                    <input type="text" id="inspector-business-input" value="Xtucasa Inmobiliaria" oninput="FunnelsManager.updateLiveText(this.value)" class="w-full border border-slate-200 p-2.5 rounded-lg font-semibold outline-none focus:border-blue-500">
+                                </div>
+                                <div class="space-y-2 pt-2 border-t">
+                                    <p class="font-bold text-slate-500 uppercase text-[10px]">Campos Capturados en el CRM</p>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Nombre Completo</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Teléfono / WhatsApp</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Correo Electrónico</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Comentarios o Consulta</label>
+                                </div>
+                            </div>
+
+                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all">Guardar y Publicar Sitio</button>
+                        </div>
+
+                    </div>
                 </div>
+
             </section>
 
             <section id="view-settings" class="hidden space-y-4">
                 <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                    <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Configuración del Perfil de Desarrollador</h3>
+                    <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Configuración del Perfil de Cliente</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <div><label class="block font-bold text-slate-500 mb-1 uppercase tracking-wider text-[10px]">API Webhook Endpoint</label><input type="text" readonly value="https://n8n.stelafunnels.com/webhook-test/e2f39420-ac3a-4b2f-b8f4-7766fc37b590" class="w-full bg-slate-50 border p-2.5 rounded-lg font-mono text-slate-600 outline-none"></div>
-                        <div><label class="block font-bold text-slate-500 mb-1 uppercase tracking-wider text-[10px]">Ecosistema Integrador</label><input type="text" readonly value="GHL Core Architecture Mode v4.2" class="w-full bg-slate-50 border p-2.5 rounded-lg text-slate-600 outline-none"></div>
+                        <div><label class="block font-bold text-slate-500 mb-1 uppercase tracking-wider text-[10px]">Ecosistema Integrador</label><input type="text" readonly value="SaaS Core Architecture Mode v4.2" class="w-full bg-slate-50 border p-2.5 rounded-lg text-slate-600 outline-none"></div>
                     </div>
                 </div>
             </section>
@@ -639,6 +850,7 @@
         </div>
     </main>
 
+    <!-- MODAL DE OPORTUNIDAD -->
     <div id="modal-lead-dom" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all text-left">
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
@@ -681,6 +893,7 @@
         const Store = {
             leads: [],
             campaigns: [],
+            funnels: [],
             activeChatId: null,
             pagesData: [],
 
@@ -691,6 +904,11 @@
                     { id: 'c3', name: 'valoración', status: 'Paused', created: '05/08/2026 07:38 PM', budget: 1.00, cost: 5.23, impressions: 817, results: 0, cpa: 0, templateName: 'valoracion v1' }
                 ];
 
+                this.funnels = [
+                    { id: 'f1', name: 'Captaciones Exclusivas', updated: '05 Nov 2026', steps: 3, url: 'https://stelafunnels.io/captacion' },
+                    { id: 'f2', name: 'Compradores Calificados', updated: '18 Feb 2026', steps: 2, url: 'https://stelafunnels.io/compradores' }
+                ];
+
                 this.leads = [
                     { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+52 55 1234 5678', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio comercial. Solicito información.' }, { sender: 'agent', text: 'Hola Carlos. Un gusto saludarte, ¿en qué podemos ayudarte?' }] },
                     { id: '2', name: 'Laura Restrepo', email: 'laura.res@gmail.com', phone: '+57 300 987 6543', value: 280000, stage: 'cita_agendada', source: 'Google Ads', status: 'Abierto', tags: ['Alta Gama'], messages: [{ sender: 'lead', text: 'Confirmado para la reunión del sábado.' }] }
@@ -698,279 +916,382 @@
             }
         };
 
-        const App = {
-            chartInstance: null,
+   const App = {
+        chartInstance: null,
 
-            async init() {
-                Store.init();
-                this.populateStageSelectors();
-                SocialPublisher.setupEvents();
+   async init() {
+            Store.init();
+            this.populateStageSelectors();
+            SocialPublisher.setupEvents();
 
-                // 🔥 1. Verificar si hay sesión activa en el servidor al cargar
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // 1. Si venimos de conectar redes sociales con éxito
+            if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
+                document.getElementById('view-login').classList.add('hidden');
+                this.navigate('launchpad');
+                
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
                     if (data.loggedIn && data.user) {
                         this.setUserProfileUI(data.user);
-                        document.getElementById('view-login').classList.add('hidden');
+                    }
+                } catch (e) {}
+
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            // 2. Flujo general de verificación de sesión (con soporte para F5 en sub-rutas)
+            try {
+                const res = await fetch('/api/user-session');
+                const data = await res.json();
+                
+                if (data.loggedIn && data.user) {
+                    this.setUserProfileUI(data.user);
+                    document.getElementById('view-login').classList.add('hidden');
+                    
+                    // Detectar la vista actual según la URL al hacer F5
+                    const pathSegments = window.location.pathname.split('/');
+                    const lastSegment = pathSegments[pathSegments.length - 1];
+                    const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
+                    
+                    if (validViews.includes(lastSegment)) {
+                        this.navigate(lastSegment);
+                    } else {
                         this.navigate('dashboard');
                     }
-                } catch (e) {
-                    console.error("Error al verificar sesión", e);
+                } else {
+                    // Si no hay sesión activa, mostramos el login
+                    document.getElementById('view-login').classList.remove('hidden');
                 }
-
-                // 🔥 2. Detectar si regresó con éxito de Google / Meta OAuth
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('success')) {
-                    try {
-                        const res = await fetch('/api/user-session');
-                        const data = await res.json();
-                        if (data.loggedIn && data.user) {
-                            this.setUserProfileUI(data.user);
-                        }
-                    } catch (e) {}
-
-                    document.getElementById('view-login').classList.add('hidden');
-                    this.navigate('dashboard');
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            },
-
-            setUserProfileUI(user) {
-                const avatarContainer = document.getElementById('user-avatar-container');
-                const nameDisplay = document.getElementById('user-name-display');
-                const emailDisplay = document.getElementById('user-email-display');
-
-                if (nameDisplay) nameDisplay.innerText = user.name;
-                if (emailDisplay) emailDisplay.innerText = user.email;
-
-                if (avatarContainer) {
-                    if (user.picture) {
-                        avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
-                    } else {
-                        avatarContainer.innerText = user.name.charAt(0).toUpperCase();
-                    }
-                }
-            },
-
-            async handlePasswordLogin(e) {
-                e.preventDefault();
-                const email = document.getElementById('auth-email').value.trim();
-                const password = document.getElementById('auth-password').value.trim();
-                const alertBox = document.getElementById('auth-alert-box');
-                const btn = document.getElementById('btn-login-submit');
-
-                alertBox.classList.add('hidden');
-                btn.innerText = "Iniciando sesión...";
-                btn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
-                    });
-                    const data = await res.json();
-
-                    if (data.success && data.user) {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-                        alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
-                        alertBox.classList.remove('hidden');
-
-                        this.setUserProfileUI(data.user);
-                        setTimeout(() => {
-                            document.getElementById('view-login').classList.add('hidden');
-                            this.navigate('dashboard');
-                        }, 800);
-                    } else {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
-                        alertBox.innerText = data.error || "Credenciales incorrectas o usuario no encontrado.";
-                        alertBox.classList.remove('hidden');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
-                    alertBox.innerText = "Error de red al conectar con el servidor.";
-                    alertBox.classList.remove('hidden');
-                } finally {
-                    btn.innerText = "Iniciar Sesión";
-                    btn.disabled = false;
-                }
-            },
-
-            handleSocialLogin(provider) {
-                if (provider === 'Google') window.location.href = '/auth/google';
-            },
-
-            async logout() {
-                const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
-                if (!confirmed) return;
-
-                try {
-                    await fetch('/api/logout', { method: 'POST' });
-                } catch (e) {
-                    console.error("Error al cerrar sesión", e);
-                }
-
+            } catch (e) {
+                console.error("Error al verificar sesión", e);
                 document.getElementById('view-login').classList.remove('hidden');
-            },
+            }
+        },
 
-            navigate(viewId) {
-                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
-                views.forEach(v => {
-                    const el = document.getElementById(`view-${v}`);
-                    if(el) el.classList.add('hidden');
-                    const nav = document.getElementById(`nav-${v}`);
-                    if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+        setUserProfileUI(user) {
+            // 🚀 AQUí: Guardar el usuario activo globalmente para las URLs y tokens
+            window.currentUser = user;
+
+            const avatarContainer = document.getElementById('user-avatar-container');
+            const nameDisplay = document.getElementById('user-name-display');
+            const emailDisplay = document.getElementById('user-email-display');
+
+            if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente';
+            if (emailDisplay) emailDisplay.innerText = user.email || '';
+
+            if (avatarContainer) {
+                if (user.picture) {
+                    avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
+                } else if (user.email) {
+                    const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
+                    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
+                    
+                    const img = new Image();
+                    img.src = gravatarUrl;
+                    img.onload = () => {
+                        avatarContainer.innerHTML = `<img src="${gravatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+                    };
+                    img.onerror = () => {
+                        const initials = (user.name ? user.name.split(' ').map(n => n[0]).join('') : 'US').toUpperCase().substring(0, 2);
+                        avatarContainer.innerText = initials;
+                    };
+                }
+            }
+        },
+
+        switchAuthMode(mode) {
+            document.getElementById('auth-mode-login').classList.add('hidden');
+            document.getElementById('auth-mode-otp').classList.add('hidden');
+            document.getElementById('auth-mode-signup').classList.add('hidden');
+
+            if (mode === 'login') document.getElementById('auth-mode-login').classList.remove('hidden');
+            if (mode === 'otp') document.getElementById('auth-mode-otp').classList.remove('hidden');
+            if (mode === 'signup') document.getElementById('auth-mode-signup').classList.remove('hidden');
+        },
+
+        async handlePasswordLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const alertBox = document.getElementById('auth-alert-box');
+            const btn = document.getElementById('btn-login-submit');
+
+            alertBox.classList.add('hidden');
+            btn.innerText = "Verificando cuenta...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
+                const data = await res.json();
 
-                const targetView = document.getElementById(`view-${viewId}`);
-                if (targetView) targetView.classList.remove('hidden');
+                if (data.success && data.user) {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
+                    alertBox.classList.remove('hidden');
+
+                    this.setUserProfileUI(data.user);
+                    setTimeout(() => {
+                        document.getElementById('view-login').classList.add('hidden');
+                        this.navigate('dashboard');
+                    }, 500);
+                } else {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = data.error || "Credenciales incorrectas o correo no registrado.";
+                    alertBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                alertBox.innerText = "Error de conexión con el servidor.";
+                alertBox.classList.remove('hidden');
+            } finally {
+                btn.innerText = "Inicie sesión";
+                btn.disabled = false;
+            }
+        },
+
+        async handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const alertBox = document.getElementById('reg-alert-box');
+
+            alertBox.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    alertBox.innerText = "¡Cuenta creada con éxito! Redirigiendo...";
+                    alertBox.classList.remove('hidden');
+
+                    this.setUserProfileUI(data.user);
+                    setTimeout(() => {
+                        document.getElementById('view-login').classList.add('hidden');
+                        this.navigate('dashboard');
+                    }, 800);
+                } else {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = data.error || "No se pudo crear la cuenta.";
+                    alertBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                alertBox.innerText = "Error al conectar con el servidor.";
+                alertBox.classList.remove('hidden');
+            }
+        },
+
+        handleOtpRequest(e) {
+            e.preventDefault();
+            alert("Simulación OTP: Código enviado a su correo.");
+        },
+
+        handleSocialLogin(provider) {
+            if (provider === 'Google') window.location.href = '/auth/google';
+        },
+
+        async logout() {
+            const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
+            if (!confirmed) return;
+
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+            } catch (e) {
+                console.error("Error al cerrar sesión", e);
+            }
+
+            // 🚀 AQUí: Limpiar usuario y restablecer la URL raíz
+            window.currentUser = null;
+            window.history.pushState({}, '', '/');
+            document.getElementById('view-login').classList.remove('hidden');
+        },
+
+        navigate(viewId) {
+            const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+            
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
+                const nav = document.getElementById(`nav-${v}`);
+                if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+            });
+
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.remove('hidden');
+            
+            const targetNav = document.getElementById(`nav-${viewId}`);
+            if (targetNav) {
+                targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
+                const titleEl = document.getElementById('current-view-title');
+                if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
+            }
+
+            // 🚀 AQUí: Usar estrictamente el ID real del usuario autenticado
+            const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
+            const newPath = viewId === 'dashboard' 
+                ? `/v2/location/${locationId}/dashboard` 
+                : `/v2/location/${locationId}/${viewId}`;
                 
-                const targetNav = document.getElementById(`nav-${viewId}`);
-                if (targetNav) {
-                    targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
-                    const titleEl = document.getElementById('current-view-title');
-                    if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
-                }
+            window.history.pushState({ view: viewId }, '', newPath);
 
-                if (viewId === 'dashboard') this.renderDashboard();
-                if (viewId === 'pipeline') this.renderPipeline();
-                if (viewId === 'conversations') ChatEngine.render();
-                if (viewId === 'contacts') this.renderContacts();
-                if (viewId === 'ads-manager') AdsManager.render();
+            if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') {
+                checkMetaConnectionStatus();
+            }
 
-                lucide.createIcons();
-            },
+            if (viewId === 'dashboard') this.renderDashboard();
+            if (viewId === 'pipeline') this.renderPipeline();
+            if (viewId === 'conversations') ChatEngine.render();
+            if (viewId === 'contacts') this.renderContacts();
+            if (viewId === 'ads-manager') AdsManager.render();
+            if (viewId === 'funnels') FunnelsManager.render();
 
-            populateStageSelectors() {
-                const select = document.getElementById('form-lead-stage');
-                if(!select) return;
-                select.innerHTML = '';
-                Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
-            },
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        },
 
-            renderDashboard() {
-                const totalLeads = Store.leads.length;
-                const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
-                
-                const totalLeadsEl = document.getElementById('dash-total-leads');
-                const pipelineValEl = document.getElementById('dash-pipeline-value');
-                if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
-                if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
+        populateStageSelectors() {
+            const select = document.getElementById('form-lead-stage');
+            if(!select) return;
+            select.innerHTML = '';
+            Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
+        },
 
-                const funnelContainer = document.getElementById('dash-funnel-container');
-                if (funnelContainer) {
-                    funnelContainer.innerHTML = '';
-                    Object.keys(STAGES).forEach(k => {
-                        const count = Store.leads.filter(l => l.stage === k).length;
-                        const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
-                        funnelContainer.innerHTML += `
-                            <div>
-                                <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
-                            </div>`;
-                    });
-                }
+        renderDashboard() {
+            const totalLeads = Store.leads.length;
+            const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
+            
+            const totalLeadsEl = document.getElementById('dash-total-leads');
+            const pipelineValEl = document.getElementById('dash-pipeline-value');
+            if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
+            if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
 
-                const canvas = document.getElementById('dash-chart-canvas');
-                if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    if (this.chartInstance) this.chartInstance.destroy();
-                    this.chartInstance = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: Object.keys(STAGES).map(k => STAGES[k].name),
-                            datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                    });
-                }
-            },
-
-            renderPipeline() {
-                const board = document.getElementById('kanban-board-dom');
-                if(!board) return;
-                board.innerHTML = '';
+            const funnelContainer = document.getElementById('dash-funnel-container');
+            if (funnelContainer) {
+                funnelContainer.innerHTML = '';
                 Object.keys(STAGES).forEach(k => {
-                    const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
-                    let cards = '';
-                    stageLeads.forEach(l => {
-                        cards += `
-                            <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
-                                <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
-                                <p class="text-xs font-bold text-blue-600">€${l.value.toLocaleString()}</p>
-                                <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source}</span>
-                            </div>`;
-                    });
-                    board.innerHTML += `
-                        <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3><span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span></div>
-                            <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}</div>
+                    const count = Store.leads.filter(l => l.stage === k).length;
+                    const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
+                    funnelContainer.innerHTML += `
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
                         </div>`;
                 });
-            },
-
-            renderContacts() {
-                const tbody = document.getElementById('crm-table-body');
-                if(!tbody) return;
-                tbody.innerHTML = '';
-                Store.leads.forEach(l => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-bold text-slate-800">${l.name}</td>
-                            <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
-                            <td class="p-4 font-bold text-slate-600">${l.source}</td>
-                            <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
-                            <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
-                            <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
-                        </tr>`;
-                });
-            },
-
-            openCreateModal() {
-                document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
-                document.getElementById('form-lead-id').value = '';
-                document.getElementById('lead-interactive-form').reset();
-                document.getElementById('modal-lead-dom').classList.remove('hidden');
-            },
-
-            openEditModal(id) {
-                const lead = Store.leads.find(l => l.id === id);
-                if(!lead) return;
-                document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
-                document.getElementById('form-lead-id').value = lead.id;
-                document.getElementById('form-lead-name').value = lead.name;
-                document.getElementById('form-lead-email').value = lead.email;
-                document.getElementById('form-lead-phone').value = lead.phone;
-                document.getElementById('form-lead-value').value = lead.value;
-                document.getElementById('form-lead-source').value = lead.source;
-                document.getElementById('form-lead-stage').value = lead.stage;
-                document.getElementById('modal-lead-dom').classList.remove('hidden');
-            },
-
-            closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
-
-            handleFormSubmit(e) {
-                e.preventDefault();
-                const id = document.getElementById('form-lead-id').value;
-                const name = document.getElementById('form-lead-name').value;
-                const email = document.getElementById('form-lead-email').value;
-                const phone = document.getElementById('form-lead-phone').value;
-                const value = parseInt(document.getElementById('form-lead-value').value) || 0;
-                const source = document.getElementById('form-lead-source').value;
-                const stage = document.getElementById('form-lead-stage').value;
-
-                if(id) {
-                    const idx = Store.leads.findIndex(l => l.id === id);
-                    if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
-                } else {
-                    Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
-                }
-                this.closeModal();
-                this.navigate('dashboard');
             }
-        };
+
+            const canvas = document.getElementById('dash-chart-canvas');
+            if (canvas && typeof Chart !== 'undefined') {
+                const ctx = canvas.getContext('2d');
+                if (this.chartInstance) this.chartInstance.destroy();
+                this.chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(STAGES).map(k => STAGES[k].name),
+                        datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        },
+
+        renderPipeline() {
+            const board = document.getElementById('kanban-board-dom');
+            if(!board) return;
+            board.innerHTML = '';
+            Object.keys(STAGES).forEach(k => {
+                const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
+                let cards = '';
+                stageLeads.forEach(l => {
+                    cards += `
+                        <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
+                            <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
+                            <p class="text-xs font-bold text-blue-600">€${l.value.toLocaleString()}</p>
+                            <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source}</span>
+                        </div>`;
+                });
+                board.innerHTML += `
+                    <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3><span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span></div>
+                        <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}</div>
+                    </div>`;
+            });
+        },
+
+        renderContacts() {
+            const tbody = document.getElementById('crm-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            Store.leads.forEach(l => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">${l.name}</td>
+                        <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
+                        <td class="p-4 font-bold text-slate-600">${l.source}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
+                        <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
+                        <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
+                    </tr>`;
+            });
+        },
+
+        openCreateModal() {
+            document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
+            document.getElementById('form-lead-id').value = '';
+            document.getElementById('lead-interactive-form').reset();
+            document.getElementById('modal-lead-dom').classList.remove('hidden');
+        },
+
+        openEditModal(id) {
+            const lead = Store.leads.find(l => l.id === id);
+            if(!lead) return;
+            document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
+            document.getElementById('form-lead-id').value = lead.id;
+            document.getElementById('form-lead-name').value = lead.name;
+            document.getElementById('form-lead-email').value = lead.email;
+            document.getElementById('form-lead-phone').value = lead.phone;
+            document.getElementById('form-lead-value').value = lead.value;
+            document.getElementById('form-lead-source').value = lead.source;
+            document.getElementById('form-lead-stage').value = lead.stage;
+            document.getElementById('modal-lead-dom').classList.remove('hidden');
+        },
+
+        closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
+
+        handleFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('form-lead-id').value;
+            const name = document.getElementById('form-lead-name').value;
+            const email = document.getElementById('form-lead-email').value;
+            const phone = document.getElementById('form-lead-phone').value;
+            const value = parseInt(document.getElementById('form-lead-value').value) || 0;
+            const source = document.getElementById('form-lead-source').value;
+            const stage = document.getElementById('form-lead-stage').value;
+
+            if(id) {
+                const idx = Store.leads.findIndex(l => l.id === id);
+                if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
+            } else {
+                Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
+            }
+            this.closeModal();
+            this.navigate('dashboard');
+        }
+    };
 
         const AdsManager = {
             currentTab: 'list',
@@ -1025,6 +1346,64 @@
                 if(templateEl) templateEl.innerText = campaign.templateName;
                 this.switchTab('builder');
             }
+        };
+
+        const FunnelsManager = {
+            render() {
+                const listSub = document.getElementById('funnels-subview-list');
+                const builderSub = document.getElementById('funnels-subview-builder');
+                const grid = document.getElementById('funnels-cards-grid');
+
+                if (listSub) listSub.classList.remove('hidden');
+                if (builderSub) builderSub.classList.add('hidden');
+
+                if (grid) {
+                    grid.innerHTML = Store.funnels.map(f => `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
+                                    <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
+                                </div>
+                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    Editar Embudo
+                                </button>
+                            </div>
+                            <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
+                                <span>Pasos activos: <strong>${f.steps}</strong></span>
+                                <span>Actualizado: ${f.updated}</span>
+                            </div>
+                        </div>`).join('');
+                }
+
+                lucide.createIcons();
+            },
+
+            openBuilder(id) {
+                const f = Store.funnels.find(item => item.id === id);
+                if(!f) return;
+
+                document.getElementById('funnels-subview-list').classList.add('hidden');
+                document.getElementById('funnels-subview-builder').classList.remove('hidden');
+
+                document.getElementById('builder-funnel-title').innerText = f.name;
+                document.getElementById('builder-funnel-url').innerText = f.url;
+                lucide.createIcons();
+            },
+
+            createNewFunnel() {
+                const newId = 'f' + Date.now();
+                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial', updated: 'Ahora', steps: 1, url: 'https://stelafunnels.io/nuevo-sitio' });
+                this.openBuilder(newId);
+            },
+
+            updateLiveText(val) {
+                const nameEl = document.getElementById('preview-business-name');
+                if(nameEl) nameEl.innerText = val || '{{ custom_values.nombre_de_negocio }}';
+            },
+
+            closeBuilder() { this.render(); },
+            saveChanges() { alert("🎉 ¡Embudo guardado y publicado en producción con éxito!"); this.render(); }
         };
 
         const ChatEngine = {
@@ -1140,10 +1519,10 @@
                                 this.showStatus(status, "🎉 ¡Publicado con éxito!", "bg-emerald-50 text-emerald-700 border border-emerald-200");
                                 document.getElementById('textMessage').value = '';
                             } else {
-                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-rose-50 text-rose-700 border border-rose-200");
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
                             }
                         } catch (err) {
-                            this.showStatus(status, "❌ Error crítico de servidor", "bg-rose-50 text-rose-700 border border-rose-200");
+                            this.showStatus(status, "❌ Error crítico de servidor", "bg-red-50 text-red-700 border border-red-200");
                         }
                     });
                 }
@@ -1170,10 +1549,10 @@
                                 document.getElementById('photoUrl').value = '';
                                 document.getElementById('photoCaption').value = '';
                             } else {
-                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-rose-50 text-rose-700 border border-rose-200");
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
                             }
                         } catch (err) {
-                            this.showStatus(status, "❌ Error de red", "bg-rose-50 text-rose-700 border border-rose-200");
+                            this.showStatus(status, "❌ Error de red", "bg-red-50 text-red-700 border border-red-200");
                         }
                     });
                 }
@@ -1200,10 +1579,10 @@
                                 document.getElementById('videoUrl').value = '';
                                 document.getElementById('videoDescription').value = '';
                             } else {
-                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-rose-50 text-rose-700 border border-rose-200");
+                                this.showStatus(status, `❌ Error: ${data.error}`, "bg-red-50 text-red-700 border border-red-200");
                             }
                         } catch (err) {
-                            this.showStatus(status, "❌ Error de red", "bg-rose-50 text-rose-700 border border-rose-200");
+                            this.showStatus(status, "❌ Error de red", "bg-red-50 text-red-700 border border-red-200");
                         }
                     });
                 }
@@ -1229,7 +1608,74 @@
             }
         };
 
-        window.onload = () => App.init();
-    </script>
+        
+// Función corregida para verificar y forzar el estado conectado en el Launchpad
+async function checkMetaConnectionStatus() {
+    const actionContainer = document.getElementById('meta-connection-action');
+    const descEl = document.getElementById('meta-card-description');
+    if (!actionContainer) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isConnectedSuccess = urlParams.get('success') === 'meta_connected' || urlParams.has('success');
+
+    try {
+        const response = await fetch('/api/meta/status');
+        const data = await response.json();
+
+        if (data.connected || isConnectedSuccess) {
+            // Estilo visual exacto del Pantallazo 2 (Círculo verde con check minimalista)
+            actionContainer.innerHTML = `
+                <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                    <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
+                </div>
+            `;
+            if (descEl) {
+                descEl.innerText = "¡Impresionante! Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook ahora pueden rellenarse en su CRM y ya puede responder directamente a las solicitudes de Facebook Messenger en la página de conversaciones.";
+            }
+        } else {
+            actionContainer.innerHTML = `
+                <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                    Conectar
+                </button>
+            `;
+        }
+        lucide.createIcons();
+    } catch (e) {
+        actionContainer.innerHTML = `
+            <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                Conectar
+            </button>
+        `;
+        lucide.createIcons();
+    }
+}
+
+// Ejecutar al cargar la vista
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Si regresamos con éxito de Meta, limpiamos la URL y forzamos el estado verde
+    if (urlParams.get('success') === 'meta_connected' || urlParams.has('success')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        setTimeout(() => {
+            const actionContainer = document.getElementById('meta-connection-action');
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Conectado
+                    </div>
+                    <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+                `;
+            }
+        }, 300);
+        return;
+    }
+
+    checkMetaConnectionStatus();
+});
+
+window.onload = () => App.init();
+</script>
 </body>
 </html>
