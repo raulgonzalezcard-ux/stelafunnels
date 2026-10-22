@@ -919,16 +919,15 @@
 const App = {
         chartInstance: null,
 
-        async init() {
+      async init() {
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
 
-            // 🚀 PRIORIDAD ABSOLUTA: Si regresamos de Meta o Google con éxito
+            // 1. Si regresamos de conectar redes sociales
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 document.getElementById('view-login').classList.add('hidden');
-                this.navigate('launchpad');
                 
                 try {
                     const res = await fetch('/api/user-session');
@@ -938,11 +937,12 @@ const App = {
                     }
                 } catch (e) {}
 
+                this.navigate('launchpad');
                 window.history.replaceState({}, document.title, window.location.pathname);
                 return;
             }
 
-            // Flujo normal de verificación de sesión con soporte para F5 en sub-rutas
+            // 2. Verificación normal de sesión y recuperación de vista activa tras F5
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -951,9 +951,10 @@ const App = {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
-                    // 🚀 DETECTAR LA VISTA ACTUAL SEGÚN LA URL AL HACER F5
-                    const pathSegments = window.location.pathname.split('/');
-                    const lastSegment = pathSegments[pathSegments.length - 1];
+                    // 🚀 DETECCIÓN MEJORADA DE SUB-RUTAS (Ej: /v2/location/ID/launchpad)
+                    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+                    const lastSegment = pathSegments[pathSegments.length - 1] || 'dashboard';
+                    
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
                     
                     if (validViews.includes(lastSegment)) {
