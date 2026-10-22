@@ -1087,7 +1087,12 @@
             },
 
             handleSocialLogin(provider) {
-                if (provider === 'Google') window.location.href = '/auth/google';
+                if (provider === 'Google') {
+                    const targetUrl = window.location.protocol === 'https:' || window.location.hostname !== 'localhost' 
+                        ? 'https://' + window.location.host + '/auth/google' 
+                        : '/auth/google';
+                    window.location.href = targetUrl;
+                }
             },
 
             async logout() {
