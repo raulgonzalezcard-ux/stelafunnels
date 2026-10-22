@@ -349,8 +349,8 @@
         <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm"><i data-lucide="facebook" class="w-6 h-6"></i></div>
         <div class="max-w-xl">
             <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
-            <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM y podrá responder a los mensajes en la página de conversaciones.
+            <p id="meta-card-description" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM.
             </p>
         </div>
     </div>
@@ -1104,42 +1104,52 @@
             },
 
         // Reemplaza tu función navigate actual por esta:
-                navigate(viewId) {
-                    const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
-                    views.forEach(v => {
-                        const el = document.getElementById(`view-${v}`);
-                        if(el) el.classList.add('hidden');
-                        const nav = document.getElementById(`nav-${v}`);
-                        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
-                    });
+             navigate(viewId) {
+    const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+    
+    // 1. Ocultar todas las vistas y limpiar estado activo del menú
+    views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if(el) el.classList.add('hidden');
+        const nav = document.getElementById(`nav-${v}`);
+        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+    });
 
-                    const targetView = document.getElementById(`view-${viewId}`);
-                    if (targetView) targetView.classList.remove('hidden');
-                    
-                    const targetNav = document.getElementById(`nav-${viewId}`);
-                    if (targetNav) {
-                        targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
-                        const titleEl = document.getElementById('current-view-title');
-                        if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
-                    }
+    // 2. Mostrar la vista seleccionada
+    const targetView = document.getElementById(`view-${viewId}`);
+    if (targetView) targetView.classList.remove('hidden');
+    
+    // 3. Resaltar el botón correspondiente en la barra lateral
+    const targetNav = document.getElementById(`nav-${viewId}`);
+    if (targetNav) {
+        targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
+        const titleEl = document.getElementById('current-view-title');
+        if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
+    }
 
-                    // 🚀 ACTUALIZAR LA URL DEL NAVEGADOR SIN RECARGAR LA PÁGINA
-                    const newPath = viewId === 'dashboard' ? '/' : `/${viewId}`;
-                    window.history.pushState({ view: viewId }, '', newPath);
+    // 🚀 4. REPLICAR LA ESTRUCTURA EXACTA DE URL DEL PANTALLAZO 2
+    // Generamos o leemos el ID de subcuenta del usuario en sesión
+    const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'SzvY8p7qZFamWugv8uT';
+    const newPath = viewId === 'dashboard' 
+        ? `/v2/location/${locationId}/dashboard` 
+        : `/v2/location/${locationId}/${viewId}`;
+        
+    window.history.pushState({ view: viewId }, '', newPath);
 
-                    if (viewId === 'launchpad') {
-                        checkMetaConnectionStatus();
-                    }
+    // 5. Ejecutar acciones de cada vista
+    if (viewId === 'launchpad') {
+        checkMetaConnectionStatus();
+    }
 
-                    if (viewId === 'dashboard') this.renderDashboard();
-                    if (viewId === 'pipeline') this.renderPipeline();
-                    if (viewId === 'conversations') ChatEngine.render();
-                    if (viewId === 'contacts') this.renderContacts();
-                    if (viewId === 'ads-manager') AdsManager.render();
-                    if (viewId === 'funnels') FunnelsManager.render();
+    if (viewId === 'dashboard') this.renderDashboard();
+    if (viewId === 'pipeline') this.renderPipeline();
+    if (viewId === 'conversations') ChatEngine.render();
+    if (viewId === 'contacts') this.renderContacts();
+    if (viewId === 'ads-manager') AdsManager.render();
+    if (viewId === 'funnels') FunnelsManager.render();
 
-                    lucide.createIcons();
-                },
+    lucide.createIcons();
+}
 
             populateStageSelectors() {
                 const select = document.getElementById('form-lead-stage');
@@ -1589,32 +1599,26 @@
 // Función corregida para verificar y forzar el estado conectado en el Launchpad
 async function checkMetaConnectionStatus() {
     const actionContainer = document.getElementById('meta-connection-action');
+    const descEl = document.getElementById('meta-card-description');
     if (!actionContainer) return;
 
-    // Si la URL acaba de regresar de Facebook con éxito, forzamos el estado visual verde de inmediato
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'meta_connected') {
-        actionContainer.innerHTML = `
-            <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
-                <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
-            </div>
-            <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
-        `;
-        lucide.createIcons();
-        return;
-    }
+    const isConnectedSuccess = urlParams.get('success') === 'meta_connected' || urlParams.has('success');
 
     try {
         const response = await fetch('/api/meta/status');
         const data = await response.json();
 
-        if (data.connected) {
+        if (data.connected || isConnectedSuccess) {
+            // Estilo visual exacto del Pantallazo 2 (Círculo verde con check minimalista)
             actionContainer.innerHTML = `
-                <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
-                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i> Conectado
+                <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                    <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
                 </div>
-                <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
             `;
+            if (descEl) {
+                descEl.innerText = "¡Impresionante! Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook ahora pueden rellenarse en su CRM y ya puede responder directamente a las solicitudes de Facebook Messenger en la página de conversaciones.";
+            }
         } else {
             actionContainer.innerHTML = `
                 <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
