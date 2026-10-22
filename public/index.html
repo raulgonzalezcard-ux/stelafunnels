@@ -236,7 +236,7 @@
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ecosistema Base</p>
             
             <button onclick="App.navigate('launchpad')" id="nav-launchpad" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
-                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad Inicial
+                <i data-lucide="rocket" class="w-4 h-4"></i> Launchpad
             </button>
             <button onclick="App.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tablero de Control
@@ -1103,38 +1103,43 @@
                 document.getElementById('view-login').classList.remove('hidden');
             },
 
-            navigate(viewId) {
-                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
-                views.forEach(v => {
-                    const el = document.getElementById(`view-${v}`);
-                    if(el) el.classList.add('hidden');
-                    const nav = document.getElementById(`nav-${v}`);
-                    if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
-                });
+        // Reemplaza tu función navigate actual por esta:
+                navigate(viewId) {
+                    const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+                    views.forEach(v => {
+                        const el = document.getElementById(`view-${v}`);
+                        if(el) el.classList.add('hidden');
+                        const nav = document.getElementById(`nav-${v}`);
+                        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+                    });
 
-                const targetView = document.getElementById(`view-${viewId}`);
-                if (targetView) targetView.classList.remove('hidden');
-                
-                const targetNav = document.getElementById(`nav-${viewId}`);
-                if (targetNav) {
-                    targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
-                    const titleEl = document.getElementById('current-view-title');
-                    if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
-                }
+                    const targetView = document.getElementById(`view-${viewId}`);
+                    if (targetView) targetView.classList.remove('hidden');
+                    
+                    const targetNav = document.getElementById(`nav-${viewId}`);
+                    if (targetNav) {
+                        targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
+                        const titleEl = document.getElementById('current-view-title');
+                        if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
+                    }
 
-                if (viewId === 'launchpad') {
-                    checkMetaConnectionStatus();
-                }
+                    // 🚀 ACTUALIZAR LA URL DEL NAVEGADOR SIN RECARGAR LA PÁGINA
+                    const newPath = viewId === 'dashboard' ? '/' : `/${viewId}`;
+                    window.history.pushState({ view: viewId }, '', newPath);
 
-                if (viewId === 'dashboard') this.renderDashboard();
-                if (viewId === 'pipeline') this.renderPipeline();
-                if (viewId === 'conversations') ChatEngine.render();
-                if (viewId === 'contacts') this.renderContacts();
-                if (viewId === 'ads-manager') AdsManager.render();
-                if (viewId === 'funnels') FunnelsManager.render();
+                    if (viewId === 'launchpad') {
+                        checkMetaConnectionStatus();
+                    }
 
-                lucide.createIcons();
-            },
+                    if (viewId === 'dashboard') this.renderDashboard();
+                    if (viewId === 'pipeline') this.renderPipeline();
+                    if (viewId === 'conversations') ChatEngine.render();
+                    if (viewId === 'contacts') this.renderContacts();
+                    if (viewId === 'ads-manager') AdsManager.render();
+                    if (viewId === 'funnels') FunnelsManager.render();
+
+                    lucide.createIcons();
+                },
 
             populateStageSelectors() {
                 const select = document.getElementById('form-lead-stage');
