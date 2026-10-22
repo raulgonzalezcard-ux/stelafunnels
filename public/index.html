@@ -961,6 +961,9 @@
         },
 
         setUserProfileUI(user) {
+            // 🚀 AQUí: Guardar el usuario activo globalmente para las URLs y tokens
+            window.currentUser = user;
+
             const avatarContainer = document.getElementById('user-avatar-container');
             const nameDisplay = document.getElementById('user-name-display');
             const emailDisplay = document.getElementById('user-email-display');
@@ -1101,6 +1104,9 @@
                 console.error("Error al cerrar sesión", e);
             }
 
+            // 🚀 AQUí: Limpiar usuario y restablecer la URL raíz
+            window.currentUser = null;
+            window.history.pushState({}, '', '/');
             document.getElementById('view-login').classList.remove('hidden');
         },
 
@@ -1124,7 +1130,8 @@
                 if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
             }
 
-            const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'SzvY8p7qZFamWugv8uT';
+            // 🚀 AQUí: Usar estrictamente el ID real del usuario autenticado
+            const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
             const newPath = viewId === 'dashboard' 
                 ? `/v2/location/${locationId}/dashboard` 
                 : `/v2/location/${locationId}/${viewId}`;
