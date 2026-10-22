@@ -913,377 +913,363 @@
             }
         };
 
-    const App = {
-            chartInstance: null,
+   const App = {
+        chartInstance: null,
 
-            async init() {
-                Store.init();
-                this.populateStageSelectors();
-                SocialPublisher.setupEvents();
+        async init() {
+            Store.init();
+            this.populateStageSelectors();
+            SocialPublisher.setupEvents();
 
-                // 🚀 PRIORIDAD ABSOLUTA: Si regresamos de Meta o Google con éxito, omitimos el fetch de sesión inicial
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
-                    document.getElementById('view-login').classList.add('hidden');
-                    this.navigate('launchpad');
-                    
-                    // Intentamos recuperar los datos del usuario en segundo plano sin bloquear la vista
-                    try {
-                        const res = await fetch('/api/user-session');
-                        const data = await res.json();
-                        if (data.loggedIn && data.user) {
-                            this.setUserProfileUI(data.user);
-                        }
-                    } catch (e) {}
-
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    return;
-                }
-
-                // Flujo normal de verificación para cuando entras por primera vez de forma directa
+            // 🚀 PRIORIDAD ABSOLUTA: Si regresamos de Meta o Google con éxito
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
+                document.getElementById('view-login').classList.add('hidden');
+                this.navigate('launchpad');
+                
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
-                    
                     if (data.loggedIn && data.user) {
                         this.setUserProfileUI(data.user);
-                        document.getElementById('view-login').classList.add('hidden');
-                        this.navigate('dashboard');
-                    } else {
-                        document.getElementById('view-login').classList.remove('hidden');
                     }
-                } catch (e) {
-                    console.error("Error al verificar sesión", e);
+                } catch (e) {}
+
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            // Flujo normal de verificación de sesión
+            try {
+                const res = await fetch('/api/user-session');
+                const data = await res.json();
+                
+                if (data.loggedIn && data.user) {
+                    this.setUserProfileUI(data.user);
+                    document.getElementById('view-login').classList.add('hidden');
+                    this.navigate('dashboard');
+                } else {
                     document.getElementById('view-login').classList.remove('hidden');
                 }
-            },
-                
-
-            setUserProfileUI(user) {
-                const avatarContainer = document.getElementById('user-avatar-container');
-                const nameDisplay = document.getElementById('user-name-display');
-                const emailDisplay = document.getElementById('user-email-display');
-
-                if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente';
-                if (emailDisplay) emailDisplay.innerText = user.email || '';
-
-                if (avatarContainer) {
-                    if (user.picture) {
-                        avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
-                    } else if (user.email) {
-                        const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
-                        const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
-                        
-                        const img = new Image();
-                        img.src = gravatarUrl;
-                        img.onload = () => {
-                            avatarContainer.innerHTML = `<img src="${gravatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
-                        };
-                        img.onerror = () => {
-                            const initials = (user.name ? user.name.split(' ').map(n => n[0]).join('') : 'US').toUpperCase().substring(0, 2);
-                            avatarContainer.innerText = initials;
-                        };
-                    }
-                }
-            },
-
-            switchAuthMode(mode) {
-                document.getElementById('auth-mode-login').classList.add('hidden');
-                document.getElementById('auth-mode-otp').classList.add('hidden');
-                document.getElementById('auth-mode-signup').classList.add('hidden');
-
-                if (mode === 'login') document.getElementById('auth-mode-login').classList.remove('hidden');
-                if (mode === 'otp') document.getElementById('auth-mode-otp').classList.remove('hidden');
-                if (mode === 'signup') document.getElementById('auth-mode-signup').classList.remove('hidden');
-            },
-
-            async handlePasswordLogin(e) {
-                e.preventDefault();
-                const email = document.getElementById('auth-email').value.trim();
-                const password = document.getElementById('auth-password').value.trim();
-                const alertBox = document.getElementById('auth-alert-box');
-                const btn = document.getElementById('btn-login-submit');
-
-                alertBox.classList.add('hidden');
-                btn.innerText = "Verificando cuenta...";
-                btn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
-                    });
-                    const data = await res.json();
-
-                    if (data.success && data.user) {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
-                        alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
-                        alertBox.classList.remove('hidden');
-
-                        this.setUserProfileUI(data.user);
-                        setTimeout(() => {
-                            document.getElementById('view-login').classList.add('hidden');
-                            this.navigate('dashboard');
-                        }, 500);
-                    } else {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                        alertBox.innerText = data.error || "Credenciales incorrectas o correo no registrado.";
-                        alertBox.classList.remove('hidden');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                    alertBox.innerText = "Error de conexión con el servidor.";
-                    alertBox.classList.remove('hidden');
-                } finally {
-                    btn.innerText = "Inicie sesión";
-                    btn.disabled = false;
-                }
-            },
-
-            async handleRegisterSubmit(e) {
-                e.preventDefault();
-                const name = document.getElementById('reg-name').value.trim();
-                const email = document.getElementById('reg-email').value.trim();
-                const password = document.getElementById('reg-password').value.trim();
-                const alertBox = document.getElementById('reg-alert-box');
-
-                alertBox.classList.add('hidden');
-
-                try {
-                    const res = await fetch('/api/auth/register', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, email, password })
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
-                        alertBox.innerText = "¡Cuenta creada con éxito! Redirigiendo...";
-                        alertBox.classList.remove('hidden');
-
-                        this.setUserProfileUI(data.user);
-                        setTimeout(() => {
-                            document.getElementById('view-login').classList.add('hidden');
-                            this.navigate('dashboard');
-                        }, 800);
-                    } else {
-                        alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                        alertBox.innerText = data.error || "No se pudo crear la cuenta.";
-                        alertBox.classList.remove('hidden');
-                    }
-                } catch (err) {
-                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
-                    alertBox.innerText = "Error al conectar con el servidor.";
-                    alertBox.classList.remove('hidden');
-                }
-            },
-
-            handleOtpRequest(e) {
-                e.preventDefault();
-                alert("Simulación OTP: Código enviado a su correo.");
-            },
-
-            handleSocialLogin(provider) {
-                if (provider === 'Google') {
-                    const targetUrl = window.location.protocol === 'https:' || window.location.hostname !== 'localhost' 
-                        ? 'https://' + window.location.host + '/auth/google' 
-                        : '/auth/google';
-                    window.location.href = targetUrl;
-                }
-            },
-
-            async logout() {
-                const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
-                if (!confirmed) return;
-
-                try {
-                    await fetch('/api/logout', { method: 'POST' });
-                } catch (e) {
-                    console.error("Error al cerrar sesión", e);
-                }
-
+            } catch (e) {
+                console.error("Error al verificar sesión", e);
                 document.getElementById('view-login').classList.remove('hidden');
-            },
+            }
+        },
 
-        // Reemplaza tu función navigate actual por esta:
-             navigate(viewId) {
-    const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
-    
-    // 1. Ocultar todas las vistas y limpiar estado activo del menú
-    views.forEach(v => {
-        const el = document.getElementById(`view-${v}`);
-        if(el) el.classList.add('hidden');
-        const nav = document.getElementById(`nav-${v}`);
-        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
-    });
+        setUserProfileUI(user) {
+            const avatarContainer = document.getElementById('user-avatar-container');
+            const nameDisplay = document.getElementById('user-name-display');
+            const emailDisplay = document.getElementById('user-email-display');
 
-    // 2. Mostrar la vista seleccionada
-    const targetView = document.getElementById(`view-${viewId}`);
-    if (targetView) targetView.classList.remove('hidden');
-    
-    // 3. Resaltar el botón correspondiente en la barra lateral
-    const targetNav = document.getElementById(`nav-${viewId}`);
-    if (targetNav) {
-        targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
-        const titleEl = document.getElementById('current-view-title');
-        if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
-    }
+            if (nameDisplay) nameDisplay.innerText = user.name || 'Cliente';
+            if (emailDisplay) emailDisplay.innerText = user.email || '';
 
-    // 🚀 4. REPLICAR LA ESTRUCTURA EXACTA DE URL DEL PANTALLAZO 2
-    // Generamos o leemos el ID de subcuenta del usuario en sesión
-    const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'SzvY8p7qZFamWugv8uT';
-    const newPath = viewId === 'dashboard' 
-        ? `/v2/location/${locationId}/dashboard` 
-        : `/v2/location/${locationId}/${viewId}`;
-        
-    window.history.pushState({ view: viewId }, '', newPath);
+            if (avatarContainer) {
+                if (user.picture) {
+                    avatarContainer.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
+                } else if (user.email) {
+                    const hash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
+                    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
+                    
+                    const img = new Image();
+                    img.src = gravatarUrl;
+                    img.onload = () => {
+                        avatarContainer.innerHTML = `<img src="${gravatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+                    };
+                    img.onerror = () => {
+                        const initials = (user.name ? user.name.split(' ').map(n => n[0]).join('') : 'US').toUpperCase().substring(0, 2);
+                        avatarContainer.innerText = initials;
+                    };
+                }
+            }
+        },
 
-    // 5. Ejecutar acciones de cada vista
-    if (viewId === 'launchpad') {
-        checkMetaConnectionStatus();
-    }
+        switchAuthMode(mode) {
+            document.getElementById('auth-mode-login').classList.add('hidden');
+            document.getElementById('auth-mode-otp').classList.add('hidden');
+            document.getElementById('auth-mode-signup').classList.add('hidden');
 
-    if (viewId === 'dashboard') this.renderDashboard();
-    if (viewId === 'pipeline') this.renderPipeline();
-    if (viewId === 'conversations') ChatEngine.render();
-    if (viewId === 'contacts') this.renderContacts();
-    if (viewId === 'ads-manager') AdsManager.render();
-    if (viewId === 'funnels') FunnelsManager.render();
+            if (mode === 'login') document.getElementById('auth-mode-login').classList.remove('hidden');
+            if (mode === 'otp') document.getElementById('auth-mode-otp').classList.remove('hidden');
+            if (mode === 'signup') document.getElementById('auth-mode-signup').classList.remove('hidden');
+        },
 
-    lucide.createIcons();
-}
+        async handlePasswordLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const alertBox = document.getElementById('auth-alert-box');
+            const btn = document.getElementById('btn-login-submit');
 
-            populateStageSelectors() {
-                const select = document.getElementById('form-lead-stage');
-                if(!select) return;
-                select.innerHTML = '';
-                Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
-            },
+            alertBox.classList.add('hidden');
+            btn.innerText = "Verificando cuenta...";
+            btn.disabled = true;
 
-            renderDashboard() {
-                const totalLeads = Store.leads.length;
-                const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (data.success && data.user) {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    alertBox.innerText = "¡Ingreso exitoso! Redirigiendo...";
+                    alertBox.classList.remove('hidden');
+
+                    this.setUserProfileUI(data.user);
+                    setTimeout(() => {
+                        document.getElementById('view-login').classList.add('hidden');
+                        this.navigate('dashboard');
+                    }, 500);
+                } else {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = data.error || "Credenciales incorrectas o correo no registrado.";
+                    alertBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                alertBox.innerText = "Error de conexión con el servidor.";
+                alertBox.classList.remove('hidden');
+            } finally {
+                btn.innerText = "Inicie sesión";
+                btn.disabled = false;
+            }
+        },
+
+        async handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const alertBox = document.getElementById('reg-alert-box');
+
+            alertBox.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    alertBox.innerText = "¡Cuenta creada con éxito! Redirigiendo...";
+                    alertBox.classList.remove('hidden');
+
+                    this.setUserProfileUI(data.user);
+                    setTimeout(() => {
+                        document.getElementById('view-login').classList.add('hidden');
+                        this.navigate('dashboard');
+                    }, 800);
+                } else {
+                    alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                    alertBox.innerText = data.error || "No se pudo crear la cuenta.";
+                    alertBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                alertBox.className = "p-3 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200";
+                alertBox.innerText = "Error al conectar con el servidor.";
+                alertBox.classList.remove('hidden');
+            }
+        },
+
+        handleOtpRequest(e) {
+            e.preventDefault();
+            alert("Simulación OTP: Código enviado a su correo.");
+        },
+
+        handleSocialLogin(provider) {
+            if (provider === 'Google') window.location.href = '/auth/google';
+        },
+
+        async logout() {
+            const confirmed = confirm("¿Estás seguro de que deseas cerrar sesión?");
+            if (!confirmed) return;
+
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+            } catch (e) {
+                console.error("Error al cerrar sesión", e);
+            }
+
+            document.getElementById('view-login').classList.remove('hidden');
+        },
+
+        navigate(viewId) {
+            const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+            
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
+                const nav = document.getElementById(`nav-${v}`);
+                if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+            });
+
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.remove('hidden');
+            
+            const targetNav = document.getElementById(`nav-${viewId}`);
+            if (targetNav) {
+                targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
+                const titleEl = document.getElementById('current-view-title');
+                if (titleEl) titleEl.innerText = targetNav.innerText.split('\n')[0];
+            }
+
+            const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'SzvY8p7qZFamWugv8uT';
+            const newPath = viewId === 'dashboard' 
+                ? `/v2/location/${locationId}/dashboard` 
+                : `/v2/location/${locationId}/${viewId}`;
                 
-                const totalLeadsEl = document.getElementById('dash-total-leads');
-                const pipelineValEl = document.getElementById('dash-pipeline-value');
-                if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
-                if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
+            window.history.pushState({ view: viewId }, '', newPath);
 
-                const funnelContainer = document.getElementById('dash-funnel-container');
-                if (funnelContainer) {
-                    funnelContainer.innerHTML = '';
-                    Object.keys(STAGES).forEach(k => {
-                        const count = Store.leads.filter(l => l.stage === k).length;
-                        const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
-                        funnelContainer.innerHTML += `
-                            <div>
-                                <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
-                            </div>`;
-                    });
-                }
+            if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') {
+                checkMetaConnectionStatus();
+            }
 
-                const canvas = document.getElementById('dash-chart-canvas');
-                if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    if (this.chartInstance) this.chartInstance.destroy();
-                    this.chartInstance = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: Object.keys(STAGES).map(k => STAGES[k].name),
-                            datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                    });
-                }
-            },
+            if (viewId === 'dashboard') this.renderDashboard();
+            if (viewId === 'pipeline') this.renderPipeline();
+            if (viewId === 'conversations') ChatEngine.render();
+            if (viewId === 'contacts') this.renderContacts();
+            if (viewId === 'ads-manager') AdsManager.render();
+            if (viewId === 'funnels') FunnelsManager.render();
 
-            renderPipeline() {
-                const board = document.getElementById('kanban-board-dom');
-                if(!board) return;
-                board.innerHTML = '';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        },
+
+        populateStageSelectors() {
+            const select = document.getElementById('form-lead-stage');
+            if(!select) return;
+            select.innerHTML = '';
+            Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
+        },
+
+        renderDashboard() {
+            const totalLeads = Store.leads.length;
+            const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
+            
+            const totalLeadsEl = document.getElementById('dash-total-leads');
+            const pipelineValEl = document.getElementById('dash-pipeline-value');
+            if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
+            if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
+
+            const funnelContainer = document.getElementById('dash-funnel-container');
+            if (funnelContainer) {
+                funnelContainer.innerHTML = '';
                 Object.keys(STAGES).forEach(k => {
-                    const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
-                    let cards = '';
-                    stageLeads.forEach(l => {
-                        cards += `
-                            <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
-                                <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
-                                <p class="text-xs font-bold text-blue-600">€${l.value.toLocaleString()}</p>
-                                <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source}</span>
-                            </div>`;
-                    });
-                    board.innerHTML += `
-                        <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3><span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span></div>
-                            <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}</div>
+                    const count = Store.leads.filter(l => l.stage === k).length;
+                    const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
+                    funnelContainer.innerHTML += `
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
                         </div>`;
                 });
-            },
-
-            renderContacts() {
-                const tbody = document.getElementById('crm-table-body');
-                if(!tbody) return;
-                tbody.innerHTML = '';
-                Store.leads.forEach(l => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-bold text-slate-800">${l.name}</td>
-                            <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
-                            <td class="p-4 font-bold text-slate-600">${l.source}</td>
-                            <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
-                            <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
-                            <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
-                        </tr>`;
-                });
-            },
-
-            openCreateModal() {
-                document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
-                document.getElementById('form-lead-id').value = '';
-                document.getElementById('lead-interactive-form').reset();
-                document.getElementById('modal-lead-dom').classList.remove('hidden');
-            },
-
-            openEditModal(id) {
-                const lead = Store.leads.find(l => l.id === id);
-                if(!lead) return;
-                document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
-                document.getElementById('form-lead-id').value = lead.id;
-                document.getElementById('form-lead-name').value = lead.name;
-                document.getElementById('form-lead-email').value = lead.email;
-                document.getElementById('form-lead-phone').value = lead.phone;
-                document.getElementById('form-lead-value').value = lead.value;
-                document.getElementById('form-lead-source').value = lead.source;
-                document.getElementById('form-lead-stage').value = lead.stage;
-                document.getElementById('modal-lead-dom').classList.remove('hidden');
-            },
-
-            closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
-
-            handleFormSubmit(e) {
-                e.preventDefault();
-                const id = document.getElementById('form-lead-id').value;
-                const name = document.getElementById('form-lead-name').value;
-                const email = document.getElementById('form-lead-email').value;
-                const phone = document.getElementById('form-lead-phone').value;
-                const value = parseInt(document.getElementById('form-lead-value').value) || 0;
-                const source = document.getElementById('form-lead-source').value;
-                const stage = document.getElementById('form-lead-stage').value;
-
-                if(id) {
-                    const idx = Store.leads.findIndex(l => l.id === id);
-                    if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
-                } else {
-                    Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
-                }
-                this.closeModal();
-                this.navigate('dashboard');
             }
-        };
+
+            const canvas = document.getElementById('dash-chart-canvas');
+            if (canvas && typeof Chart !== 'undefined') {
+                const ctx = canvas.getContext('2d');
+                if (this.chartInstance) this.chartInstance.destroy();
+                this.chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(STAGES).map(k => STAGES[k].name),
+                        datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        },
+
+        renderPipeline() {
+            const board = document.getElementById('kanban-board-dom');
+            if(!board) return;
+            board.innerHTML = '';
+            Object.keys(STAGES).forEach(k => {
+                const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
+                let cards = '';
+                stageLeads.forEach(l => {
+                    cards += `
+                        <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
+                            <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
+                            <p class="text-xs font-bold text-blue-600">€${l.value.toLocaleString()}</p>
+                            <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source}</span>
+                        </div>`;
+                });
+                board.innerHTML += `
+                    <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3><span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span></div>
+                        <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}</div>
+                    </div>`;
+            });
+        },
+
+        renderContacts() {
+            const tbody = document.getElementById('crm-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            Store.leads.forEach(l => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">${l.name}</td>
+                        <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
+                        <td class="p-4 font-bold text-slate-600">${l.source}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
+                        <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
+                        <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
+                    </tr>`;
+            });
+        },
+
+        openCreateModal() {
+            document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
+            document.getElementById('form-lead-id').value = '';
+            document.getElementById('lead-interactive-form').reset();
+            document.getElementById('modal-lead-dom').classList.remove('hidden');
+        },
+
+        openEditModal(id) {
+            const lead = Store.leads.find(l => l.id === id);
+            if(!lead) return;
+            document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
+            document.getElementById('form-lead-id').value = lead.id;
+            document.getElementById('form-lead-name').value = lead.name;
+            document.getElementById('form-lead-email').value = lead.email;
+            document.getElementById('form-lead-phone').value = lead.phone;
+            document.getElementById('form-lead-value').value = lead.value;
+            document.getElementById('form-lead-source').value = lead.source;
+            document.getElementById('form-lead-stage').value = lead.stage;
+            document.getElementById('modal-lead-dom').classList.remove('hidden');
+        },
+
+        closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
+
+        handleFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('form-lead-id').value;
+            const name = document.getElementById('form-lead-name').value;
+            const email = document.getElementById('form-lead-email').value;
+            const phone = document.getElementById('form-lead-phone').value;
+            const value = parseInt(document.getElementById('form-lead-value').value) || 0;
+            const source = document.getElementById('form-lead-source').value;
+            const stage = document.getElementById('form-lead-stage').value;
+
+            if(id) {
+                const idx = Store.leads.findIndex(l => l.id === id);
+                if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
+            } else {
+                Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
+            }
+            this.closeModal();
+            this.navigate('dashboard');
+        }
+    };
 
         const AdsManager = {
             currentTab: 'list',
