@@ -65,15 +65,16 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Sesiones optimizada para evitar rechazos del proxy inverso
+// Configuración de Sesiones optimizada para producción con HTTPS (Coolify / Nginx)
 app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
+    proxy: true, // 👈 Indicarle a express-session que confíe en el proxy inverso
     cookie: { 
-        secure: false, // Desactivado para evitar bloqueos del proxy inverso en Coolify
+        secure: true, // 👈 Obligatorio en producción con HTTPS para que el navegador guarde la cookie al refrescar
         httpOnly: true,
-        sameSite: 'lax', // Mantiene la cookie al volver de dominios externos como Facebook/Google
+        sameSite: 'lax', 
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
