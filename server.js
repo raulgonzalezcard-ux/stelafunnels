@@ -65,16 +65,17 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Sesiones optimizada para producción con HTTPS (Coolify / Nginx)
+// Configuración de Sesiones corregida con path global para producción HTTPS
 app.use(session({
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
     resave: false,
     saveUninitialized: false,
-    proxy: true, // 👈 Indicarle a express-session que confíe en el proxy inverso
+    proxy: true, // Confiar en el proxy inverso (Coolify / Nginx)
     cookie: { 
-        secure: true, // 👈 Obligatorio en producción con HTTPS para que el navegador guarde la cookie al refrescar
+        secure: true, // Obligatorio con HTTPS
         httpOnly: true,
         sameSite: 'lax', 
+        path: '/', // 👈 ¡ESTA ES LA CLAVE ABSOLUTA PARA RUTAS ANIDADAS Y F5!
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
 }));
