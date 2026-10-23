@@ -86,6 +86,35 @@ router.get('/leads', requireAuth, (req, res) => {
 });
 
 // =========================================================================
+// 📥 RECIBIR LEADS DESDE LAS LANDING PAGES (SITIOS / EMBUDOS)
+// =========================================================================
+router.post('/leads', requireAuth, (req, res) => {
+    const { name, email, phone, value, source, stage, notes } = req.body;
+    
+    if (!name || (!phone && !email)) {
+        return res.status(400).json({ success: false, error: "El nombre y al menos un método de contacto son obligatorios." });
+    }
+
+    const leadId = 'lead_' + Date.now();
+    const leadValue = parseInt(value) || 150000;
+    const leadStage = stage || 'lead_entrante';
+    const leadSource = source || 'Landing Page';
+    const leadTags = JSON.stringify(['Sitio Web', notes ? notes : 'Formulario Web']);
+
+    db.run(
+        `INSERT INTO leads (id, name, email, phone, value, stage, source, status, tags) VALUES (?, ?, ?, ?, ?, ?, ?, 'Abierto', ?)`,
+        [leadId, name, email || 'sin_correo@stelafunnels.com', phone || 'Sin teléfono', leadValue, leadStage, leadSource, leadTags],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ success: false, error: err.message });
+            }
+            console.log(`✅ ¡Nuevo lead captado desde la Landing Page: ${name} (${phone})!`);
+            res.json({ success: true, message: "¡Lead capturado con éxito!", leadId });
+        }
+    );
+});
+
+// =========================================================================
 // 🎯 1.1. SELECCIONAR PÁGINA Y SUSCRIBIR WEBHOOKS DE LEADS
 // =========================================================================
 router.post('/select-page', requireAuth, async (req, res) => {
