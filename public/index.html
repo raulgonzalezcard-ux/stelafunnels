@@ -722,91 +722,77 @@
                 </div>
             </section>
 
-            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB -->
+            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB (DENTRO DEL CRM SIN RECARGAS NI PERDER EL MENÚ) -->
             <section id="view-funnels" class="hidden space-y-4">
                 
-                <!-- SUB-VISTA 1: TABLA DE EMBUDOS ACTIVOS -->
+                <!-- SUB-VISTA 1: LISTADO DE EMBUDOS ACTIVOS -->
                 <div id="funnels-subview-list" class="space-y-4">
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
                         <div>
-                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web</h3>
-                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de captura.</p>
+                            <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web (Landing Pages)</h3>
+                            <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de aterrizaje sin salir de la plataforma.</p>
                         </div>
                         <button onclick="FunnelsManager.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nuevo Embudo
                         </button>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-slate-50 font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                                    <th class="p-4">Nombre</th>
-                                    <th class="p-4">Última actualización</th>
-                                    <th class="p-4">Pasos del embudo</th>
-                                    <th class="p-4 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="funnels-table-body" class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
-                        </table>
-                    </div>
+                    <div id="funnels-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <!-- SUB-VISTA 2: NAVEGADOR DE PASOS DEL EMBUDO Y BUILDER VISUAL -->
+                <!-- SUB-VISTA 2: CONSTRUCTOR / EDITOR VISUAL INTEGRADO CON VIDEO Y CAMPOS DE FORMULARIO -->
                 <div id="funnels-subview-builder" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-3">
                     
                     <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm flex justify-between items-center shrink-0">
                         <div class="flex items-center gap-3">
-                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
-                                ← Atrás
+                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver al Listado
                             </button>
                             <div>
-                                <h3 class="text-xs font-black text-slate-800" id="builder-funnel-title">Captaciones</h3>
-                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio</p>
+                                <h3 class="text-xs font-black text-slate-800 truncate" id="builder-funnel-title">Linktree para Clientes | Xtucasa</h3>
+                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</p>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <button onclick="FunnelsManager.saveChanges()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all">
-                                Publicar
+                            <button onclick="FunnelsManager.saveChanges()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Cambios
                             </button>
                         </div>
                     </div>
 
                     <div class="flex-1 flex gap-4 overflow-hidden">
                         
-                        <!-- COLUMNA IZQUIERDA: LISTA DE PASOS DEL EMBUDO -->
-                        <div class="w-64 bg-white border border-slate-200 rounded-2xl p-3 flex flex-col shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">Paso del embudo</p>
-                            <div id="funnel-steps-list" class="space-y-1"></div>
-                            <button onclick="alert('Nuevo paso agregado.')" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1">
-                                + Agregar nuevo paso
-                            </button>
-                        </div>
-
-                        <!-- LONA DE PREVISUALIZACIÓN TIPO LINKTREE/BIO-LINK -->
+                        <!-- LONA / CANVAS DE EDICIÓN VISUAL -->
                         <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800 shadow-inner">
-                            <div id="landing-preview-canvas" class="w-full max-w-lg bg-cover bg-center rounded-2xl p-8 border-2 border-slate-700 shadow-2xl space-y-6 relative min-h-[580px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.60), rgba(0,0,0,0.80)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                            <div id="landing-preview-canvas" class="w-full max-w-2xl bg-cover bg-center rounded-2xl p-8 border-2 border-amber-500/80 shadow-2xl space-y-6 relative min-h-[600px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
                                 
-                                <!-- LOGOTIPO Y MARCA -->
-                                <div class="text-center pt-2">
-                                    <div class="inline-block bg-slate-200/90 text-slate-900 font-extrabold text-lg px-8 py-2.5 rounded-lg shadow-md">
+                                <div class="text-center pt-4">
+                                    <div class="inline-block bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-6 py-2 rounded-lg font-black text-lg tracking-wider backdrop-blur-md cursor-pointer hover:border-amber-400 transition-all">
                                         <span id="preview-logo-text">xtucasa</span>
                                     </div>
                                 </div>
 
-                                <!-- LISTA DE BOTONES DE ACCIÓN RÁPIDA (BIO-LINK) -->
-                                <div class="space-y-3 max-w-sm mx-auto w-full">
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades (Compra o Alquila)</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Referidos (Trae un amigo y gana 500€)</button>
+                                <!-- CONTENEDOR DE VIDEO DESTACADO -->
+                                <div class="max-w-md mx-auto w-full bg-slate-900/80 rounded-xl overflow-hidden border border-slate-700 shadow-xl p-2">
+                                    <div class="aspect-video bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center">
+                                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" alt="Video Cover" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg relative z-10">
+                                            <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- FOOTER CON VARIABLES DE NEGOCIO -->
-                                <div class="text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px]">
-                                    <h4 id="preview-business-name" class="font-bold tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
-                                    <div class="text-[10px] text-slate-300 space-y-0.5 font-mono">
+                                <!-- BOTONES DE ACCIÓN PRINCIPALES -->
+                                <div class="space-y-3 max-w-md mx-auto w-full">
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades</button>
+                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-sm py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos (Formulario Pop-up)</button>
+                                </div>
+
+                                <div class="text-center text-white space-y-2 pt-6 border-t border-white/10">
+                                    <h4 id="preview-business-name" class="font-bold text-sm tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
+                                    <div class="text-[11px] text-slate-300 space-y-1 font-mono">
                                         <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
                                         <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
                                     </div>
@@ -814,20 +800,24 @@
                             </div>
                         </div>
 
-                        <!-- PANEL DERECHO DE EDICIÓN DE VALORES Y VARIABLES -->
-                        <div class="w-72 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
+                        <!-- PANEL LATERAL DE PROPIEDADES DE CAMPOS DE FORMULARIO -->
+                        <div class="w-80 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
                             <div class="space-y-4 text-xs">
-                                <h4 class="font-extrabold text-slate-900 text-xs border-b pb-2">Propiedades del Elemento</h4>
+                                <h4 class="font-extrabold text-slate-900 text-sm border-b pb-2">Campos del Formulario Integrado</h4>
                                 <div>
                                     <label class="block font-bold text-slate-600 mb-1">Nombre del Negocio</label>
                                     <input type="text" id="inspector-business-input" value="Xtucasa Inmobiliaria" oninput="FunnelsManager.updateLiveText(this.value)" class="w-full border border-slate-200 p-2.5 rounded-lg font-semibold outline-none focus:border-blue-500">
                                 </div>
-                                <div>
-                                    <label class="block font-bold text-slate-600 mb-1">Imagen del Logo / Texto</label>
-                                    <input type="text" value="{{ custom_values.logotipo }}" readonly class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-slate-500 font-mono">
+                                <div class="space-y-2 pt-2 border-t">
+                                    <p class="font-bold text-slate-500 uppercase text-[10px]">Campos Capturados en el CRM</p>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Nombre Completo</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Teléfono / WhatsApp</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Correo Electrónico</label>
+                                    <label class="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked class="rounded border-slate-300 text-blue-600"> Comentarios o Consulta</label>
                                 </div>
                             </div>
-                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all mt-4">Guardar Cambios</button>
+
+                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all">Guardar y Publicar Sitio</button>
                         </div>
 
                     </div>
@@ -903,9 +893,8 @@
                 ];
 
                 this.funnels = [
-                    { id: 'f1', name: 'Captaciones', updated: '05 Nov 2025 08:46 PM', steps: 24, url: 'https://xtucasainmobiliaria.realestaterocket.io/inicio' },
-                    { id: 'f2', name: 'Captaciones 2.0 NUEVOS ANUNCIOS', updated: 'Apr 09, 2026 03:19 PM', steps: 11, url: 'https://xtucasainmobiliaria.realestaterocket.io/captaciones-2' },
-                    { id: 'f3', name: 'Compradores', updated: 'Feb 18, 2026 01:36 PM', steps: 2, url: 'https://xtucasainmobiliaria.realestaterocket.io/compradores' }
+                    { id: 'f1', name: 'Captaciones Exclusivas', updated: '05 Nov 2026', steps: 3, url: 'https://stelafunnels.io/captacion' },
+                    { id: 'f2', name: 'Compradores Calificados', updated: '18 Feb 2026', steps: 2, url: 'https://stelafunnels.io/compradores' }
                 ];
 
                 this.leads = [
@@ -925,12 +914,14 @@ const App = {
 
             const loadingScreen = document.getElementById('app-loading-screen');
 
+            // Función auxiliar interna para garantizar que el spinner SIEMPRE se remueva
             const hideLoader = () => {
                 if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
                     loadingScreen.classList.add('hidden');
                 }
             };
 
+            // 1. DETECCIÓN DE RETORNO DE OAUTH (GOOGLE O META)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 try {
@@ -953,6 +944,7 @@ const App = {
                 return;
             }
 
+            // 2. VERIFICACIÓN NORMAL DE SESIÓN Y ENTRADA TRAS F5
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -961,6 +953,7 @@ const App = {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
+                    // Extraer vista exacta de la URL (ej: /v2/location/google_111.../launchpad -> launchpad)
                     const pathSegments = window.location.pathname.split('/').filter(Boolean);
                     const lastSegment = pathSegments[pathSegments.length - 1];
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
@@ -974,6 +967,7 @@ const App = {
                 console.error("Error al verificar sesión tras F5:", e);
                 document.getElementById('view-login').classList.remove('hidden');
             } finally {
+                // 🚀 Garantizar la ocultación inmediata del spinner bajo cualquier circunstancia
                 hideLoader();
             }
         },
@@ -1097,6 +1091,7 @@ const App = {
             const board = document.getElementById('kanban-board-dom');
             if(!board) return;
 
+            // 1. Obtener los leads reales guardados en SQLite
             try {
                 const res = await fetch('/api/meta/leads');
                 const data = await res.json();
@@ -1107,6 +1102,7 @@ const App = {
                 console.log("Cargando leads locales por fallback...");
             }
 
+            // 2. Renderizar las columnas del Kanban
             board.innerHTML = '';
             Object.keys(STAGES).forEach(k => {
                 const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
@@ -1249,35 +1245,31 @@ const App = {
         };
 
         const FunnelsManager = {
-            steps: [
-                { id: 's1', name: 'Linktree para Clientes', active: true },
-                { id: 's2', name: 'Linktree para Inmobiliaria', active: false },
-                { id: 's3', name: 'Vendemos tu Casa', active: false },
-                { id: 's4', name: 'Vendemos por 4990€', active: false },
-                { id: 's5', name: 'Te pagamos 500€', active: false },
-                { id: 's6', name: 'Valora tu Propiedad', active: false },
-                { id: 's7', name: 'Sin Comisiones', active: false },
-                { id: 's8', name: 'Compra Directa', active: false }
-            ],
-
             render() {
                 const listSub = document.getElementById('funnels-subview-list');
                 const builderSub = document.getElementById('funnels-subview-builder');
-                const tbody = document.getElementById('funnels-table-body');
+                const grid = document.getElementById('funnels-cards-grid');
 
                 if (listSub) listSub.classList.remove('hidden');
                 if (builderSub) builderSub.classList.add('hidden');
 
-                if (tbody) {
-                    tbody.innerHTML = Store.funnels.map(f => `
-                        <tr class="hover:bg-slate-50 border-b border-slate-100">
-                            <td class="p-4 font-bold text-slate-900 cursor-pointer hover:text-blue-600" onclick="FunnelsManager.openBuilder('${f.id}')">${f.name}</td>
-                            <td class="p-4 text-slate-500">${f.updated}</td>
-                            <td class="p-4 font-semibold text-slate-700">${f.steps} Pasos</td>
-                            <td class="p-4 text-right">
-                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="text-blue-600 font-bold hover:underline">Editar</button>
-                            </td>
-                        </tr>`).join('');
+                if (grid) {
+                    grid.innerHTML = Store.funnels.map(f => `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-800">${f.name}</h4>
+                                    <p class="text-[11px] text-blue-600 mt-0.5 font-mono">${f.url}</p>
+                                </div>
+                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    Editar Embudo
+                                </button>
+                            </div>
+                            <div class="flex justify-between text-xs pt-2 border-t text-slate-500 font-medium">
+                                <span>Pasos activos: <strong>${f.steps}</strong></span>
+                                <span>Actualizado: ${f.updated}</span>
+                            </div>
+                        </div>`).join('');
                 }
 
                 lucide.createIcons();
@@ -1292,27 +1284,7 @@ const App = {
 
                 document.getElementById('builder-funnel-title').innerText = f.name;
                 document.getElementById('builder-funnel-url').innerText = f.url;
-
-                this.renderSteps();
                 lucide.createIcons();
-            },
-
-            renderSteps() {
-                const list = document.getElementById('funnel-steps-list');
-                if(!list) return;
-
-                list.innerHTML = this.steps.map(s => `
-                    <div onclick="FunnelsManager.selectStep('${s.id}')" class="p-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center gap-2 ${s.active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold' : 'text-slate-600 hover:bg-slate-50'}">
-                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                        <span class="truncate">${s.name}</span>
-                    </div>`).join('');
-
-                lucide.createIcons();
-            },
-
-            selectStep(stepId) {
-                this.steps.forEach(s => s.active = (s.id === stepId));
-                this.renderSteps();
             },
 
             createNewFunnel() {
@@ -1323,13 +1295,11 @@ const App = {
 
             updateLiveText(val) {
                 const nameEl = document.getElementById('preview-business-name');
-                const logoEl = document.getElementById('preview-logo-text');
-                if(nameEl) nameEl.innerText = val || 'Xtucasa Inmobiliaria';
-                if(logoEl) logoEl.innerText = val || 'xtucasa';
+                if(nameEl) nameEl.innerText = val || '{{ custom_values.nombre_de_negocio }}';
             },
 
             closeBuilder() { this.render(); },
-            saveChanges() { alert("🎉 ¡Embudo guardado y publicado en producción!"); this.render(); }
+            saveChanges() { alert("🎉 ¡Embudo guardado y publicado en producción con éxito!"); this.render(); }
         };
 
         const ChatEngine = {
@@ -1594,6 +1564,8 @@ async function conectarMetaPages() {
             }
         }
 
+        
+// Función corregida para verificar y forzar el estado conectado en el Launchpad
 async function checkMetaConnectionStatus() {
     const actionContainer = document.getElementById('meta-connection-action');
     const descEl = document.getElementById('meta-card-description');
@@ -1607,20 +1579,21 @@ async function checkMetaConnectionStatus() {
         const data = await response.json();
 
         if (data.connected || isConnectedSuccess) {
-            actionContainer.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
-                        <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
-                    </div>
-                    <button onclick="conectarMetaPages()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm">
-                        Configurar Página
-                    </button>
-                </div>
-            `;
-            if (descEl) {
-                descEl.innerText = "¡Conectado! Haz clic en 'Configurar Página' para seleccionar tu Fanpage y habilitar la recepción de Leads.";
-            }
-        } else {
+    // 👈 Reemplaza todo esto aquí:
+    actionContainer.innerHTML = `
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
+            </div>
+            <button onclick="conectarMetaPages()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm">
+                Configurar Página
+            </button>
+        </div>
+    `;
+    if (descEl) {
+        descEl.innerText = "¡Conectado! Haz clic en 'Configurar Página' para seleccionar tu Fanpage y habilitar la recepción de Leads.";
+    }
+} else {
             actionContainer.innerHTML = `
                 <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
                     Conectar
@@ -1638,9 +1611,11 @@ async function checkMetaConnectionStatus() {
     }
 }
 
+// Ejecutar al cargar la vista
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     
+    // Si regresamos con éxito de Meta, limpiamos la URL y forzamos el estado verde
     if (urlParams.get('success') === 'meta_connected' || urlParams.has('success')) {
         window.history.replaceState({}, document.title, window.location.pathname);
         
