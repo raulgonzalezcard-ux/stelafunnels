@@ -42,6 +42,36 @@
         .node-line-last::after {
             display: none;
         }
+
+        /* Bounding Box Interactiva tipo GoHighLevel / Real Estate Rocket */
+        .builder-element {
+            position: relative;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+        .builder-element:hover {
+            outline: 2px dashed #f97316 !important;
+            outline-offset: 2px;
+        }
+        .builder-element.active-selected {
+            outline: 2px solid #f97316 !important;
+            outline-offset: 2px;
+        }
+        .builder-element.active-selected::after {
+            content: attr(data-element-type);
+            position: absolute;
+            bottom: -22px;
+            right: 0;
+            background-color: #f97316;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            z-index: 50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
@@ -723,16 +753,17 @@
             </section>
 
             <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB -->
-            <section id="view-funnels" class="hidden space-y-4">
+            <!-- MÓDULO INTEGRADO DE EMBUDOS Y PAGE BUILDER -->
+            <section id="view-funnels" class="hidden h-full flex flex-col">
                 
-                <!-- SUB-VISTA 1: TABLA DE EMBUDOS ACTIVOS -->
-                <div id="funnels-subview-list" class="space-y-4">
+                <!-- SUB-VISTA 1: TABLA DE EMBUDOS ACTIVOS EN EL CRM -->
+                <div id="funnels-subview-list" class="p-6 space-y-4">
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex justify-between items-center">
                         <div>
                             <h3 class="text-sm font-bold text-slate-900">Embudos y Sitios Web</h3>
                             <p class="text-xs text-slate-500">Administra tus embudos comerciales y páginas de captura.</p>
                         </div>
-                        <button onclick="FunnelsManager.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+                        <button onclick="PageBuilder.createNewFunnel()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nuevo Embudo
                         </button>
                     </div>
@@ -743,7 +774,7 @@
                                 <tr class="bg-slate-50 font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
                                     <th class="p-4">Nombre</th>
                                     <th class="p-4">Última actualización</th>
-                                    <th class="p-4">Pasos del embudo</th>
+                                    <th class="p-4">Pasos</th>
                                     <th class="p-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -752,87 +783,161 @@
                     </div>
                 </div>
 
-                <!-- SUB-VISTA 2: NAVEGADOR DE PASOS DEL EMBUDO Y BUILDER VISUAL -->
-                <div id="funnels-subview-builder" class="hidden h-[calc(100vh-140px)] flex flex-col space-y-3">
+                <!-- SUB-VISTA 2: BUILDER VISUAL DE PÁGINAS COMPLETO -->
+                <div id="funnels-subview-builder" class="hidden flex-1 flex flex-col bg-slate-900 overflow-hidden">
                     
-                    <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm flex justify-between items-center shrink-0">
+                    <!-- BARRA SUPERIOR DE HERRAMIENTAS (TOP BUILDER TOOLBAR) -->
+                    <div class="h-12 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 shadow-sm z-30">
+                        
                         <div class="flex items-center gap-3">
-                            <button onclick="FunnelsManager.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
+                            <button onclick="PageBuilder.closeBuilder()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
                                 ← Atrás
                             </button>
-                            <div>
-                                <h3 class="text-xs font-black text-slate-800" id="builder-funnel-title">Captaciones</h3>
-                                <p class="text-[10px] text-blue-600 font-mono" id="builder-funnel-url">https://xtucasainmobiliaria.realestaterocket.io/inicio</p>
+                            <div class="h-5 w-px bg-slate-200"></div>
+                            <!-- Botón + y herramientas de elementos -->
+                            <div class="flex items-center gap-1 text-slate-600">
+                                <button title="Agregar Elemento (+)" onclick="PageBuilder.addElementPrompt()" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                                <button title="Secciones" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="layers" class="w-4 h-4"></i></button>
+                                <button title="Filas & Columnas" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="columns" class="w-4 h-4"></i></button>
+                                <button title="Código Personalizado" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="code" class="w-4 h-4"></i></button>
+                                <button title="Texto / Título" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="type" class="w-4 h-4"></i></button>
+                                <button title="Medias e Imágenes" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="image" class="w-4 h-4"></i></button>
+                                <button title="Botones de Acción" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="square" class="w-4 h-4"></i></button>
                             </div>
                         </div>
 
+                        <!-- Selector de páginas, Responsive y Zoom -->
+                        <div class="flex items-center gap-4">
+                            <select id="builder-page-selector" onchange="PageBuilder.switchPageStep(this.value)" class="text-xs font-bold border border-slate-300 rounded-lg px-3 py-1 bg-white outline-none focus:border-blue-500">
+                                <option value="p1">Linktree para Clientes</option>
+                                <option value="p2">Linktree para Inmobiliaria</option>
+                                <option value="p3">Vendemos tu Casa</option>
+                            </select>
+                            <div class="h-4 w-px bg-slate-200"></div>
+                            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-slate-600">
+                                <button onclick="PageBuilder.setViewport('desktop')" id="view-btn-desktop" class="p-1 rounded bg-white shadow-sm text-blue-600"><i data-lucide="monitor" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="PageBuilder.setViewport('tablet')" id="view-btn-tablet" class="p-1 rounded hover:bg-white"><i data-lucide="tablet" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="PageBuilder.setViewport('mobile')" id="view-btn-mobile" class="p-1 rounded hover:bg-white"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                            <span class="text-[11px] font-mono text-slate-400 font-bold">100%</span>
+                        </div>
+
+                        <!-- Controles de la derecha: Vista previa, Guardar, Publicar -->
                         <div class="flex items-center gap-2">
-                            <button onclick="FunnelsManager.saveChanges()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-5 py-2 rounded-lg shadow-md transition-all">
-                                Publicar
+                            <button title="Vista previa" onclick="window.open(PageBuilder.currentFunnel.url, '_blank')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <button title="Guardar borrador" onclick="PageBuilder.saveChanges(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="save" class="w-4 h-4"></i></button>
+                            <button onclick="PageBuilder.saveChanges(true)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-4 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex-1 flex gap-4 overflow-hidden">
+                    <!-- URL del proceso -->
+                    <div class="bg-slate-50 border-b border-slate-200 py-1 px-4 text-center text-[11px] font-mono text-blue-600 flex items-center justify-center gap-2 shrink-0">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <a href="#" id="builder-live-url-display" target="_blank" class="hover:underline">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</a>
+                    </div>
+
+                    <!-- LONA VISUAL INTERACTIVA + INSPECTOR LATERAL -->
+                    <div class="flex-1 flex overflow-hidden">
                         
-                        <!-- COLUMNA IZQUIERDA: LISTA DE PASOS DEL EMBUDO -->
-                        <div class="w-64 bg-white border border-slate-200 rounded-2xl p-3 flex flex-col shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">Paso del embudo</p>
-                            <div id="funnel-steps-list" class="space-y-1"></div>
-                            <button onclick="alert('Nuevo paso agregado.')" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1">
-                                + Agregar nuevo paso
-                            </button>
-                        </div>
-
-                        <!-- LONA DE PREVISUALIZACIÓN TIPO LINKTREE/BIO-LINK -->
-                        <div class="flex-1 bg-slate-900/90 rounded-2xl p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border border-slate-800 shadow-inner">
-                            <div id="landing-preview-canvas" class="w-full max-w-lg bg-cover bg-center rounded-2xl p-8 border-2 border-slate-700 shadow-2xl space-y-6 relative min-h-[580px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.60), rgba(0,0,0,0.80)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
-                                
-                                <!-- LOGOTIPO Y MARCA -->
-                                <div class="text-center pt-2">
-                                    <div class="inline-block bg-slate-200/90 text-slate-900 font-extrabold text-lg px-8 py-2.5 rounded-lg shadow-md">
-                                        <span id="preview-logo-text">xtucasa</span>
+                        <!-- Lona Canvas -->
+                        <div class="flex-1 bg-slate-900/95 p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border-r border-slate-800">
+                            <div id="builder-canvas-viewport" class="w-full max-w-xl transition-all duration-300">
+                                <div id="landing-preview-canvas" class="w-full bg-cover bg-center rounded-2xl p-8 border-2 border-slate-700 shadow-2xl space-y-6 relative min-h-[620px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
+                                    
+                                    <!-- Elemento Logo (Seleccionable con Bounding Box) -->
+                                    <div class="text-center pt-2">
+                                        <div id="el-logo-container" onclick="PageBuilder.selectElement('logo', event)" data-element-type="Image" class="builder-element inline-block bg-slate-200/90 text-slate-900 font-extrabold text-lg px-8 py-2.5 rounded-lg shadow-md">
+                                            <span id="preview-logo-text">xtucasa</span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- LISTA DE BOTONES DE ACCIÓN RÁPIDA (BIO-LINK) -->
-                                <div class="space-y-3 max-w-sm mx-auto w-full">
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades (Compra o Alquila)</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
-                                    <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Referidos (Trae un amigo y gana 500€)</button>
-                                </div>
-
-                                <!-- FOOTER CON VARIABLES DE NEGOCIO -->
-                                <div class="text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px]">
-                                    <h4 id="preview-business-name" class="font-bold tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
-                                    <div class="text-[10px] text-slate-300 space-y-0.5 font-mono">
-                                        <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
-                                        <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                                    <!-- Elemento Botones -->
+                                    <div id="el-buttons-container" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Button Stack" class="builder-element space-y-3 max-w-sm mx-auto w-full p-2">
+                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades (Compra o Alquila)</button>
+                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
                                     </div>
+
+                                    <!-- Elemento Footer -->
+                                    <div id="el-footer-container" onclick="PageBuilder.selectElement('footer', event)" data-element-type="Custom Values" class="builder-element text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px] p-2">
+                                        <h4 id="preview-business-name" class="font-bold tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
+                                        <div class="text-[10px] text-slate-300 space-y-0.5 font-mono">
+                                            <p>📞 {{ custom_values.telefono_inmobiliaria }}</p>
+                                            <p>✉️ {{ custom_values.correo_inmobiliaria }}</p>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
 
-                        <!-- PANEL DERECHO DE EDICIÓN DE VALORES Y VARIABLES -->
-                        <div class="w-72 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shrink-0 shadow-sm overflow-y-auto custom-scrollbar">
-                            <div class="space-y-4 text-xs">
-                                <h4 class="font-extrabold text-slate-900 text-xs border-b pb-2">Propiedades del Elemento</h4>
-                                <div>
-                                    <label class="block font-bold text-slate-600 mb-1">Nombre del Negocio</label>
-                                    <input type="text" id="inspector-business-input" value="Xtucasa Inmobiliaria" oninput="FunnelsManager.updateLiveText(this.value)" class="w-full border border-slate-200 p-2.5 rounded-lg font-semibold outline-none focus:border-blue-500">
+                        <!-- INSPECTOR LATERAL DE 3 PESTAÑAS -->
+                        <aside class="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-xl">
+                            <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                                <h4 id="inspector-element-title" class="text-xs font-black text-slate-800 uppercase tracking-wider">Image</h4>
+                                <button onclick="PageBuilder.deselectElement()" class="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+                            </div>
+
+                            <!-- Pestañas de Navegación del Inspector -->
+                            <div class="flex border-b border-slate-200 text-xs font-bold text-center bg-slate-100/60">
+                                <button onclick="PageBuilder.switchInspectorTab('general')" id="tab-btn-general" class="flex-1 py-2.5 border-b-2 border-blue-600 text-blue-600">General</button>
+                                <button onclick="PageBuilder.switchInspectorTab('styles')" id="tab-btn-styles" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Estilos</button>
+                                <button onclick="PageBuilder.switchInspectorTab('animations')" id="tab-btn-animations" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Animaciones</button>
+                            </div>
+
+                            <!-- Contenido dinámico de las pestañas -->
+                            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-5 text-xs">
+                                <!-- Pestaña General -->
+                                <div id="tab-content-general" class="space-y-4">
+                                    <div>
+                                        <label class="block font-bold text-slate-600 mb-1">Nombre del elemento</label>
+                                        <input type="text" id="inspector-el-name" value="Image" class="w-full border border-slate-200 p-2 rounded-lg font-semibold outline-none focus:border-blue-500">
+                                    </div>
+                                    <div class="border-t pt-3 space-y-3">
+                                        <p class="font-bold text-slate-400 uppercase text-[10px]">Acciones de imagen</p>
+                                        <select class="w-full border border-slate-200 p-2 rounded-lg bg-white outline-none">
+                                            <option>Ninguno</option>
+                                            <option>Abrir URL</option>
+                                        </select>
+                                    </div>
+                                    <div class="border-t pt-3 space-y-3">
+                                        <p class="font-bold text-slate-400 uppercase text-[10px]">Imagen / Variable</p>
+                                        <input type="text" id="inspector-img-val" value="{{ custom_values.logotipo }}" oninput="PageBuilder.updateElementProperty('logoText', this.value)" class="w-full border border-slate-200 p-2 rounded-lg font-mono text-[11px] outline-none focus:border-blue-500">
+                                        <label class="block font-medium text-slate-600 mt-2">Texto alternativo (¡para SEO!)</label>
+                                        <input type="text" placeholder="SEO Alt Text" class="w-full border border-slate-200 p-2 rounded-lg outline-none">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block font-bold text-slate-600 mb-1">Imagen del Logo / Texto</label>
-                                    <input type="text" value="{{ custom_values.logotipo }}" readonly class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-slate-500 font-mono">
+
+                                <!-- Pestaña Estilos -->
+                                <div id="tab-content-styles" class="hidden space-y-4">
+                                    <div>
+                                        <label class="block font-bold text-slate-600 mb-1">Tamaño</label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div><span class="text-[10px] text-slate-400 font-bold">Anchura</span><div class="flex border rounded-lg overflow-hidden"><input type="number" value="250" class="w-full p-2 text-xs outline-none"><span class="p-2 bg-slate-50 text-slate-400 font-bold border-l">px</span></div></div>
+                                            <div><span class="text-[10px] text-slate-400 font-bold">Altura</span><div class="flex border rounded-lg overflow-hidden"><input type="text" value="auto" readonly class="w-full p-2 text-xs outline-none bg-slate-50 text-slate-400"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="border-t pt-3">
+                                        <label class="block font-bold text-slate-600 mb-1">Color de Fondo</label>
+                                        <input type="color" value="#e2e8f0" onchange="PageBuilder.updateBgColor(this.value)" class="w-full h-9 p-1 border rounded-lg cursor-pointer">
+                                    </div>
+                                </div>
+
+                                <!-- Pestaña Animaciones -->
+                                <div id="tab-content-animations" class="hidden space-y-4">
+                                    <p class="text-slate-400 italic text-[11px]">Configura efectos de entrada Fade-In / Bounce para este elemento.</p>
                                 </div>
                             </div>
-                            <button onclick="FunnelsManager.saveChanges()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition-all mt-4">Guardar Cambios</button>
-                        </div>
+
+                            <div class="p-3 border-t border-slate-200 bg-slate-50">
+                                <button onclick="PageBuilder.saveChanges(true)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 rounded-xl shadow transition-all">Guardar Cambios</button>
+                            </div>
+                        </aside>
 
                     </div>
                 </div>
-
             </section>
 
             <section id="view-settings" class="hidden space-y-4">
@@ -1248,41 +1353,130 @@ const App = {
             }
         };
 
-        const FunnelsManager = {
-            steps: [
-                { id: 's1', name: 'Linktree para Clientes', active: true },
-                { id: 's2', name: 'Linktree para Inmobiliaria', active: false },
-                { id: 's3', name: 'Vendemos tu Casa', active: false },
-                { id: 's4', name: 'Vendemos por 4990€', active: false },
-                { id: 's5', name: 'Te pagamos 500€', active: false },
-                { id: 's6', name: 'Valora tu Propiedad', active: false },
-                { id: 's7', name: 'Sin Comisiones', active: false },
-                { id: 's8', name: 'Compra Directa', active: false }
-            ],
+const PageBuilder = {
+            currentFunnel: null,
+            selectedElementKey: 'logo',
+            currentTab: 'general',
 
-            render() {
+            renderList() {
                 const listSub = document.getElementById('funnels-subview-list');
                 const builderSub = document.getElementById('funnels-subview-builder');
                 const tbody = document.getElementById('funnels-table-body');
-
+                
                 if (listSub) listSub.classList.remove('hidden');
                 if (builderSub) builderSub.classList.add('hidden');
 
                 if (tbody) {
                     tbody.innerHTML = Store.funnels.map(f => `
                         <tr class="hover:bg-slate-50 border-b border-slate-100">
-                            <td class="p-4 font-bold text-slate-900 cursor-pointer hover:text-blue-600" onclick="FunnelsManager.openBuilder('${f.id}')">${f.name}</td>
+                            <td class="p-4 font-bold text-slate-900 cursor-pointer hover:text-blue-600" onclick="PageBuilder.openBuilder('${f.id}')">${f.name}</td>
                             <td class="p-4 text-slate-500">${f.updated}</td>
                             <td class="p-4 font-semibold text-slate-700">${f.steps} Pasos</td>
                             <td class="p-4 text-right">
-                                <button onclick="FunnelsManager.openBuilder('${f.id}')" class="text-blue-600 font-bold hover:underline">Editar</button>
+                                <button onclick="PageBuilder.openBuilder('${f.id}')" class="text-blue-600 font-bold hover:underline">Editar en Page Builder</button>
                             </td>
                         </tr>`).join('');
                 }
-
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             },
 
+            openBuilder(id) {
+                this.currentFunnel = Store.funnels.find(f => f.id === id) || Store.funnels[0];
+                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : '5zyv8p7qZPFaMWugv8uT';
+                const pageId = 'ZolKfRYNdx1a3m0F16uY';
+
+                document.getElementById('funnels-subview-list').classList.add('hidden');
+                document.getElementById('funnels-subview-builder').classList.remove('hidden');
+
+                document.getElementById('builder-live-url-display').innerText = this.currentFunnel.url;
+                document.getElementById('builder-live-url-display').href = this.currentFunnel.url;
+
+                // Actualización de Ruta dinámica solicitada
+                const newPath = `/location/${locationId}/page-builder/${pageId}`;
+                window.history.pushState({ pageBuilder: true }, '', newPath);
+
+                this.selectElement('logo');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            },
+
+            closeBuilder() {
+                window.history.pushState({}, '', '/v2/location/demo/funnels');
+                this.renderList();
+            },
+
+            selectElement(key, evt) {
+                if (evt) evt.stopPropagation();
+                this.selectedElementKey = key;
+
+                document.querySelectorAll('.builder-element').forEach(el => el.classList.remove('active-selected'));
+                
+                let targetDom = null;
+                if (key === 'logo') targetDom = document.getElementById('el-logo-container');
+                if (key === 'buttons') targetDom = document.getElementById('el-buttons-container');
+                if (key === 'footer') targetDom = document.getElementById('el-footer-container');
+
+                if (targetDom) targetDom.classList.add('active-selected');
+
+                const titleEl = document.getElementById('inspector-element-title');
+                const nameInp = document.getElementById('inspector-el-name');
+                const imgValInp = document.getElementById('inspector-img-val');
+
+                if (key === 'logo') {
+                    if (titleEl) titleEl.innerText = 'Image';
+                    if (nameInp) nameInp.value = 'Image (Logo)';
+                    if (imgValInp) imgValInp.value = '{{ custom_values.logotipo }}';
+                } else if (key === 'buttons') {
+                    if (titleEl) titleEl.innerText = 'Button Stack';
+                    if (nameInp) nameInp.value = 'Action Buttons';
+                } else {
+                    if (titleEl) titleEl.innerText = 'Custom Values';
+                    if (nameInp) nameInp.value = 'Footer Values';
+                }
+            },
+
+            deselectElement() {
+                document.querySelectorAll('.builder-element').forEach(el => el.classList.remove('active-selected'));
+            },
+
+            switchInspectorTab(tab) {
+                ['general', 'styles', 'animations'].forEach(t => {
+                    const btn = document.getElementById(`tab-btn-${t}`);
+                    const content = document.getElementById(`tab-content-${t}`);
+                    if (btn) btn.className = (t === tab) ? "flex-1 py-2.5 border-b-2 border-blue-600 text-blue-600 font-bold" : "flex-1 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold";
+                    if (content) content.classList.toggle('hidden', t !== tab);
+                });
+            },
+
+            setViewport(mode) {
+                const viewport = document.getElementById('builder-canvas-viewport');
+                ['desktop', 'tablet', 'mobile'].forEach(m => {
+                    const btn = document.getElementById(`view-btn-${m}`);
+                    if (btn) btn.className = (m === mode) ? "p-1 rounded bg-white shadow-sm text-blue-600" : "p-1 rounded hover:bg-white text-slate-600";
+                });
+                if (viewport) {
+                    if (mode === 'desktop') viewport.className = "w-full max-w-xl transition-all duration-300";
+                    if (mode === 'tablet') viewport.className = "w-[500px] transition-all duration-300";
+                    if (mode === 'mobile') viewport.className = "w-[360px] transition-all duration-300";
+                }
+            },
+
+            updateElementProperty(prop, val) {
+                if (this.selectedElementKey === 'logo') {
+                    const logoText = document.getElementById('preview-logo-text');
+                    if (logoText) logoText.innerText = val || 'xtucasa';
+                }
+            },
+
+            updateBgColor(hex) {
+                const logoContainer = document.getElementById('el-logo-container');
+                if (logoContainer) logoContainer.style.backgroundColor = hex;
+            },
+
+            addElementPrompt() { alert("Herramienta activa para añadir nuevos bloques."); },
+            switchPageStep(val) { alert("Cambiando al paso: " + val); },
+            saveChanges(publish) { alert(publish ? "🎉 ¡Publicado con éxito en producción!" : "💾 Borrador guardado."); }
+        };
+        
             openBuilder(id) {
                 const f = Store.funnels.find(item => item.id === id);
                 if(!f) return;
