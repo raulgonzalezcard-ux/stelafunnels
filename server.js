@@ -469,12 +469,18 @@ app.use('/api/meta', metaRoutes);
 app.use('/api/webhooks', webhookRoutes);
 
 // ==========================================
-// 🖥️ ARCHIVOS ESTÁTICOS Y FALLBACK SPA
+// 🖥️ ARCHIVOS ESTÁTICOS Y FALLBACK SPA (RUTAS ANIDADAS /v2/...)
 // ==========================================
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 🚀 CLAVE ABSOLUTA: Redirigir TODA ruta anidada (como /v2/location/...) al index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'), (err) => {
+        if (err) {
+            console.error("❌ Error al enviar index.html:", err);
+            res.status(500).send("Error interno al cargar la aplicación.");
+        }
+    });
 });
 
 // ==========================================
