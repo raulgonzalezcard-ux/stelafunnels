@@ -906,14 +906,14 @@
 const App = {
         chartInstance: null,
 
-     async init() {
+  async init() {
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
 
             const loadingScreen = document.getElementById('app-loading-screen');
 
-            // 1. Si regresamos de OAuth de Meta o Google
+            // 🚀 DETECCIÓN INMEDIATA DE RETORNO DE OAUTH (GOOGLE O META)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 try {
@@ -930,11 +930,12 @@ const App = {
                     document.getElementById('view-login').classList.remove('hidden');
                 }
                 if (loadingScreen) loadingScreen.classList.add('hidden');
+                // Limpiar la URL de parámetros de éxito para evitar bucles
                 window.history.replaceState({}, document.title, window.location.pathname);
                 return;
             }
 
-            // 2. Verificación de Sesión e invocación estricta de ruta tras F5
+            // Flujo normal de verificación de sesión y F5 en sub-rutas
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -943,7 +944,6 @@ const App = {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
-                    // Extraer vista exacta de la URL (ej: /v2/location/123/launchpad -> launchpad)
                     const pathSegments = window.location.pathname.split('/').filter(Boolean);
                     const lastSegment = pathSegments[pathSegments.length - 1];
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
