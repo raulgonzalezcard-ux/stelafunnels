@@ -835,10 +835,9 @@
                                         </div>
                                     </div>
 
-                                    <div id="el-buttons-container" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Button Stack" class="builder-element space-y-3 max-w-sm mx-auto w-full p-2">
-                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
-                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades (Compra o Alquila)</button>
-                                        <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
+                                    <!-- 🚀 CONTENEDOR DINÁMICO DE PASOS INMOBILIARIOS (Reemplaza los botones estáticos) -->
+                                    <div id="funnel-step-container" class="builder-element bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-md mx-auto w-full space-y-4 text-slate-900" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Funnel Wizard Form">
+                                        <!-- El motor de pasos inyectará aquí de forma interactiva el contenido -->
                                     </div>
 
                                     <div id="el-footer-container" onclick="PageBuilder.selectElement('footer', event)" data-element-type="Custom Values" class="builder-element text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px] p-2">
@@ -992,6 +991,140 @@
                     { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+52 55 1234 5678', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio comercial. Solicito información.' }, { sender: 'agent', text: 'Hola Carlos. Un gusto saludarte, ¿en qué podemos ayudarte?' }] },
                     { id: '2', name: 'Laura Restrepo', email: 'laura.res@gmail.com', phone: '+57 300 987 6543', value: 280000, stage: 'cita_agendada', source: 'Google Ads', status: 'Abierto', tags: ['Alta Gama'], messages: [{ sender: 'lead', text: 'Confirmado para la reunión del sábado.' }] }
                 ];
+            }
+        };
+
+        // 🚀 MOTOR DE PASOS MULTI-ETAPA EXACTO PARA EL CLIENTE (PRODUCCIÓN)
+        const FunnelStepsEngine = {
+            currentStep: 1,
+            formData: {},
+
+            render() {
+                const container = document.getElementById('funnel-step-container');
+                if (!container) return;
+
+                if (this.currentStep === 1) {
+                    container.innerHTML = `
+                        <h3 class="font-extrabold text-xs text-slate-500 uppercase text-center mb-1">Rellena el siguiente Formulario para Vender tu Propiedad</h3>
+                        <h4 class="font-black text-base text-slate-900 text-center mb-4">¿Dónde está la propiedad? *</h4>
+                        <div class="space-y-2.5">
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all font-semibold text-xs">
+                                <input type="radio" name="ubicacion" value="San Fernando (Cádiz)" class="w-4 h-4 text-blue-600"> En San Fernando (Cádiz)
+                            </label>
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all font-semibold text-xs">
+                                <input type="radio" name="ubicacion" value="Resto de España" class="w-4 h-4 text-blue-600"> Resto de España
+                            </label>
+                        </div>
+                        <button onclick="FunnelStepsEngine.nextStep(1)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3.5 rounded-xl mt-4 shadow-lg transition-all flex items-center justify-center gap-1">Siguiente →</button>
+                    `;
+                } else if (this.currentStep === 2) {
+                    container.innerHTML = `
+                        <h3 class="font-extrabold text-xs text-slate-500 uppercase text-center mb-1">Rellena el siguiente Formulario para Vender tu Propiedad</h3>
+                        <h4 class="font-black text-base text-slate-900 text-center mb-4">Motivo de Venta *</h4>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Selecciona una opción</label>
+                            <select id="sel-motivo" class="w-full border border-slate-300 p-3 rounded-xl bg-white text-xs font-semibold outline-none focus:border-blue-600">
+                                <option value="Comprar otra vivienda">Comprar otra vivienda</option>
+                                <option value="Cambio de ciudad">Cambio de ciudad</option>
+                                <option value="Herencia">Herencia</option>
+                                <option value="No quiero seguir alquilando">No quiero seguir alquilando</option>
+                                <option value="Divorcio">Divorcio</option>
+                                <option value="Pagar una deuda">Pagar una deuda</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2.5 mt-4">
+                            <button onclick="FunnelStepsEngine.prevStep()" class="w-1/2 border border-slate-300 hover:bg-slate-50 py-3 rounded-xl font-bold text-xs transition-all">← Atrás</button>
+                            <button onclick="FunnelStepsEngine.nextStep(2)" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition-all">Siguiente →</button>
+                        </div>
+                    `;
+                } else if (this.currentStep === 3) {
+                    container.innerHTML = `
+                        <h3 class="font-extrabold text-xs text-slate-500 uppercase text-center mb-1">Rellena el siguiente Formulario para Vender tu Propiedad</h3>
+                        <h4 class="font-black text-base text-slate-900 text-center mb-4">¿Cuándo quieres vender? *</h4>
+                        <div class="space-y-2.5">
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="Lo antes posible" class="w-4 h-4 text-blue-600"> Lo antes posible</label>
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="En 3 - 6 meses" class="w-4 h-4 text-blue-600"> En 3 - 6 meses</label>
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="En más de 6 meses" class="w-4 h-4 text-blue-600"> En más de 6 meses</label>
+                        </div>
+                        <div class="flex gap-2.5 mt-4">
+                            <button onclick="FunnelStepsEngine.prevStep()" class="w-1/2 border border-slate-300 py-3 rounded-xl font-bold text-xs">← Atrás</button>
+                            <button onclick="FunnelStepsEngine.nextStep(3)" class="w-1/2 bg-slate-900 text-white py-3 rounded-xl font-bold text-xs shadow-lg">Siguiente →</button>
+                        </div>
+                    `;
+                } else if (this.currentStep === 4) {
+                    container.innerHTML = `
+                        <h3 class="font-extrabold text-xs text-slate-500 uppercase text-center mb-1">Rellena el siguiente Formulario para Vender tu Propiedad</h3>
+                        <h4 class="font-black text-base text-slate-900 text-center mb-3">Tipo de Propiedad y Medidas *</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Propiedad</label>
+                                <select id="sel-tipo" class="w-full border border-slate-300 p-2.5 rounded-xl bg-white text-xs font-semibold">
+                                    <option value="Casa">Casa</option><option value="Piso">Piso</option><option value="Chalet">Chalet</option><option value="Edificio">Edificio</option><option value="Terreno">Terreno</option><option value="Local Comercial">Local Comercial</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tamaño (m²)</label><input type="number" id="inp-tam" placeholder="120" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Baños</label><input type="number" id="inp-banos" placeholder="2" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Habitaciones</label><input type="number" id="inp-hab" placeholder="3" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                            </div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">¿Cuál sería tu precio no negociable? *</label><input type="number" id="inp-precio" placeholder="180000" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs font-bold text-blue-600"></div>
+                        </div>
+                        <div class="flex gap-2.5 mt-4">
+                            <button onclick="FunnelStepsEngine.prevStep()" class="w-1/2 border border-slate-300 py-3 rounded-xl font-bold text-xs">← Atrás</button>
+                            <button onclick="FunnelStepsEngine.finish()" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-xs shadow-lg">Enviar Lead 🚀</button>
+                        </div>
+                    `;
+                }
+            },
+
+            nextStep(stepNum) {
+                if (stepNum === 1) {
+                    const checked = document.querySelector('input[name="ubicacion"]:checked');
+                    if (!checked) { alert("⚠️ Por favor selecciona una ubicación."); return; }
+                    this.formData.ubicacion = checked.value;
+                } else if (stepNum === 2) {
+                    this.formData.motivo = document.getElementById('sel-motivo').value;
+                } else if (stepNum === 3) {
+                    const checked = document.querySelector('input[name="plazo"]:checked');
+                    if (!checked) { alert("⚠️ Por favor selecciona un plazo."); return; }
+                    this.formData.plazo = checked.value;
+                }
+                this.currentStep++;
+                this.render();
+            },
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.currentStep--;
+                    this.render();
+                }
+            },
+
+            finish() {
+                this.formData.tipo = document.getElementById('sel-tipo').value;
+                this.formData.tamano = document.getElementById('inp-tam').value;
+                this.formData.banos = document.getElementById('inp-banos').value;
+                this.formData.habitaciones = document.getElementById('inp-hab').value;
+                this.formData.precio = document.getElementById('inp-precio').value;
+
+                alert("🎉 ¡Lead inmobiliario calificado y sincronizado correctamente con StelaFunnels CRM!");
+                
+                Store.leads.unshift({
+                    id: Date.now().toString(),
+                    name: 'Propietario (' + (this.formData.ubicacion || 'San Fernando') + ')',
+                    email: 'lead.inmobiliaria@stelafunnels.com',
+                    phone: '+34 600 000 000',
+                    value: parseInt(this.formData.precio) || 150000,
+                    stage: 'lead_entrante',
+                    source: 'Landing Inmobiliaria',
+                    status: 'Abierto',
+                    tags: [this.formData.tipo || 'Piso', 'Valoración'],
+                    messages: [{ sender: 'lead', text: `Hola, quiero vender mi ${this.formData.tipo} en ${this.formData.ubicacion}. Motivo: ${this.formData.motivo}.` }]
+                });
+
+                this.currentStep = 1;
+                this.render();
             }
         };
 
@@ -1370,6 +1503,11 @@
                 window.history.pushState({ pageBuilder: true }, '', newPath);
 
                 this.selectElement('logo');
+
+                // 🚀 INICIALIZAR EL FORMULARIO MULTI-PASOS AL ABRIR EL EDITOR
+                FunnelStepsEngine.currentStep = 1;
+                FunnelStepsEngine.render();
+
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             },
 
@@ -1386,7 +1524,7 @@
                 
                 let targetDom = null;
                 if (key === 'logo') targetDom = document.getElementById('el-logo-container');
-                if (key === 'buttons') targetDom = document.getElementById('el-buttons-container');
+                if (key === 'buttons') targetDom = document.getElementById('funnel-step-container');
                 if (key === 'footer') targetDom = document.getElementById('el-footer-container');
 
                 if (targetDom) targetDom.classList.add('active-selected');
@@ -1400,8 +1538,8 @@
                     if (nameInp) nameInp.value = 'Image (Logo)';
                     if (imgValInp) imgValInp.value = '{{ custom_values.logotipo }}';
                 } else if (key === 'buttons') {
-                    if (titleEl) titleEl.innerText = 'Button Stack';
-                    if (nameInp) nameInp.value = 'Action Buttons';
+                    if (titleEl) titleEl.innerText = 'Funnel Form';
+                    if (nameInp) nameInp.value = 'Interactive Wizard';
                 } else {
                     if (titleEl) titleEl.innerText = 'Custom Values';
                     if (nameInp) nameInp.value = 'Footer Values';
