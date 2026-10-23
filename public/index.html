@@ -828,7 +828,8 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <button title="Vista previa" onclick="window.open(document.getElementById('builder-live-url-display').href, '_blank')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <!-- 🚀 BOTÓN DE VISTA PREVIA ACTUALIZADO PARA ABRIR LA LANDING INTERNA SIN ERROR DE CONEXIÓN -->
+                            <button title="Vista previa" onclick="App.openPublicFunnel()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
                             <button title="Guardar borrador" onclick="PageBuilder.saveChanges(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="save" class="w-4 h-4"></i></button>
                             <button onclick="PageBuilder.saveChanges(true)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-4 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
                                 <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar
@@ -836,9 +837,10 @@
                         </div>
                     </div>
 
+                    <!-- 🚀 BARRA DE URL VINCULADA DIRECTAMENTE A LA VISTA PÚBLICA DE PRUEBA INTERNA -->
                     <div class="bg-slate-50 border-b border-slate-200 py-1 px-4 text-center text-[11px] font-mono text-blue-600 flex items-center justify-center gap-2 shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <a href="https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio" id="builder-live-url-display" target="_blank" class="hover:underline">https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio</a>
+                        <a href="javascript:void(0)" onclick="App.openPublicFunnel()" id="builder-live-url-display" class="hover:underline font-bold">Abrir Vista Previa Interactiva (Prototipo Modo Prueba)</a>
                     </div>
 
                     <!-- LONA VISUAL INTERACTIVA + INSPECTOR LATERAL -->
@@ -999,9 +1001,9 @@
                 ];
 
                 this.funnels = [
-                    { id: 'f1', name: 'Captaciones', updated: '05 Nov 2025 08:46 PM', steps: 24, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio' },
-                    { id: 'f2', name: 'Captaciones 2.0 NUEVOS ANUNCIOS', updated: 'Apr 09, 2026 03:19 PM', steps: 11, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/captaciones-2' },
-                    { id: 'f3', name: 'Compradores', updated: 'Feb 18, 2026 01:36 PM', steps: 2, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/compradores' }
+                    { id: 'f1', name: 'Captaciones', updated: '05 Nov 2025 08:46 PM', steps: 24, url: '#public-funnel' },
+                    { id: 'f2', name: 'Captaciones 2.0 NUEVOS ANUNCIOS', updated: 'Apr 09, 2026 03:19 PM', steps: 11, url: '#public-funnel' },
+                    { id: 'f3', name: 'Compradores', updated: 'Feb 18, 2026 01:36 PM', steps: 2, url: '#public-funnel' }
                 ];
 
                 this.leads = [
@@ -1272,8 +1274,6 @@
             }
         };
 
-
-
         const App = {
             chartInstance: null,
 
@@ -1290,7 +1290,7 @@
                     }
                 };
 
-                // 🚀 DETECCIÓN AUTOMÁTICA DEL HASH DE META ADS
+                // 🚀 DETECCIÓN AUTOMÁTICA DEL HASH DE META ADS DE FORMA INTERNA
                 if (window.location.hash === '#public-funnel') {
                     hideLoader();
                     this.openPublicFunnel();
@@ -1371,7 +1371,7 @@
                 }
             },
 
-            // 🚀 AQUÍ VAN TUS FUNCIONES NUEVAS:
+            // 🚀 ABRE LA LANDING DE CUALIFICACIÓN INTERNAMENTE
             openPublicFunnel() {
                 window.location.hash = 'public-funnel';
                 document.getElementById('view-public-funnel').classList.remove('hidden');
@@ -1631,7 +1631,7 @@
         const PageBuilder = {
             currentFunnel: null,
             selectedElementKey: 'logo',
-            currentPageType: 'linktree', // 'linktree' o 'funnel'
+            currentPageType: 'linktree',
 
             renderList() {
                 const listSub = document.getElementById('funnels-subview-list');
@@ -1666,7 +1666,6 @@
                 const newPath = `/location/${locationId}/page-builder/${pageId}`;
                 window.history.pushState({ pageBuilder: true }, '', newPath);
 
-                // Inicializar en modo Linktree (Página Principal)
                 this.currentPageType = 'linktree';
                 const selector = document.getElementById('builder-page-selector');
                 if (selector) selector.value = 'p1';
@@ -1682,23 +1681,11 @@
                 this.renderList();
             },
 
-            // 🚀 CAMBIO DINÁMICO DE PÁGINA (LINKTREE PRINCIPAL VS FORMULARIO PASOS)
             switchPageStep(val) {
-                const urlDisplay = document.getElementById('builder-live-url-display');
-                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'client_enterprise';
-
                 if (val === 'p3') {
                     this.currentPageType = 'funnel';
-                    if (urlDisplay) {
-                        urlDisplay.innerText = `https://app.stelafunnels.com/v2/location/${locationId}/funnel/cualificacion-propiedad`;
-                        urlDisplay.href = urlDisplay.innerText;
-                    }
                 } else {
                     this.currentPageType = 'linktree';
-                    if (urlDisplay) {
-                        urlDisplay.innerText = `https://app.stelafunnels.com/v2/location/${locationId}/funnel/inicio`;
-                        urlDisplay.href = urlDisplay.innerText;
-                    }
                 }
                 this.renderCanvasContent();
             },
@@ -1708,7 +1695,6 @@
                 if (!container) return;
 
                 if (this.currentPageType === 'linktree') {
-                    // PANTALLA PRINCIPAL: LOS 4 BOTONES NATIVOS
                     container.innerHTML = `
                         <div id="el-buttons-container" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Button Stack" class="builder-element space-y-3 max-w-sm mx-auto w-full p-2">
                             <button onclick="PageBuilder.switchPageStep('p3')" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
@@ -1718,7 +1704,6 @@
                         </div>
                     `;
                 } else {
-                    // PÁGINA DE PASOS INTERACTIVA
                     container.innerHTML = `
                         <div id="funnel-step-container" class="builder-element bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-md mx-auto w-full space-y-4 text-slate-900" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="StelaFunnels Wizard Form"></div>
                     `;
@@ -1797,7 +1782,7 @@
 
             createNewFunnel() {
                 const newId = 'f' + Date.now();
-                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial StelaFunnels', updated: 'Ahora', steps: 1, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/nuevo' });
+                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial StelaFunnels', updated: 'Ahora', steps: 1, url: '#public-funnel' });
                 this.openBuilder(newId);
             },
 
