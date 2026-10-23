@@ -56,7 +56,10 @@ global.googleAccessToken = null;
 // ==========================================
 // 🛠️ MIDDLEWARES GLOBALES
 // ==========================================
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 app.use((req, res, next) => {
     res.setHeader('ngrok-skip-browser-warning', 'true');
@@ -73,13 +76,13 @@ app.use(session({
         dir: __dirname
     }),
     secret: process.env.SESSION_SECRET || 'stelafunnels_secure_production_key_2026',
-    resave: false,
-    saveUninitialized: false,
-    proxy: true, // Confiar en el proxy inverso
+    resave: true,          // 👈 Actualizado para forzar guardado en redirecciones OAuth
+    saveUninitialized: true, // 👈 Actualizado para persistir sesiones iniciales
+    proxy: true, 
     cookie: { 
-        secure: true, // Obligatorio con HTTPS
+        secure: true,      // Obligatorio con HTTPS
         httpOnly: true,
-        sameSite: 'lax', 
+        sameSite: 'none',  // 👈 CORRECCIÓN CLAVE: Permite cookies tras redirección de Google/Meta
         path: '/', 
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión
     }
@@ -127,11 +130,13 @@ app.post('/api/auth/register', async (req, res) => {
                             status 
                         };
 
-                        console.log(`👤 Nueva cuenta registrada y guardada: ${email}`);
-                        return res.status(201).json({
-                            success: true,
-                            message: 'Cuenta creada con éxito',
-                            user: req.session.user
+                        req.session.save(() => {
+                            console.log(`👤 Nueva cuenta registrada y guardada: ${email}`);
+                            return res.status(201).json({
+                                success: true,
+                                message: 'Cuenta creada con éxito',
+                                user: req.session.user
+                            });
                         });
                     }
                 );
@@ -186,11 +191,13 @@ app.post('/api/auth/login', async (req, res) => {
                 status: user.status 
             };
 
-            console.log(`🔓 Sesión iniciada correctamente: ${email}`);
-            return res.json({ 
-                success: true, 
-                message: '¡Bienvenido de nuevo!', 
-                user: req.session.user 
+            req.session.save(() => {
+                console.log(`🔓 Sesión iniciada correctamente: ${email}`);
+                return res.json({ 
+                    success: true, 
+                    message: '¡Bienvenido de nuevo!', 
+                    user: req.session.user 
+                });
             });
         });
 
