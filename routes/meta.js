@@ -74,6 +74,18 @@ router.get('/pages', requireAuth, async (req, res) => {
 });
 
 // =========================================================================
+// 📊 1.2. OBTENER LEADS DE SQLITE PARA EL PIPELINE COMERCIAL
+// =========================================================================
+router.get('/leads', requireAuth, (req, res) => {
+    db.all(`SELECT * FROM leads ORDER BY created_at DESC`, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: err.message });
+        }
+        res.json({ success: true, leads: rows });
+    });
+});
+
+// =========================================================================
 // 🎯 1.1. SELECCIONAR PÁGINA Y SUSCRIBIR WEBHOOKS DE LEADS
 // =========================================================================
 router.post('/select-page', requireAuth, async (req, res) => {

@@ -1087,9 +1087,22 @@ const App = {
             }
         },
 
-        renderPipeline() {
+       async renderPipeline() {
             const board = document.getElementById('kanban-board-dom');
             if(!board) return;
+
+            // 1. Obtener los leads reales guardados en SQLite
+            try {
+                const res = await fetch('/api/meta/leads');
+                const data = await res.json();
+                if (data.success && data.leads) {
+                    Store.leads = data.leads;
+                }
+            } catch (e) {
+                console.log("Cargando leads locales por fallback...");
+            }
+
+            // 2. Renderizar las columnas del Kanban
             board.innerHTML = '';
             Object.keys(STAGES).forEach(k => {
                 const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
@@ -1098,14 +1111,19 @@ const App = {
                     cards += `
                         <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
                             <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
-                            <p class="text-xs font-bold text-blue-600">€${l.value.toLocaleString()}</p>
-                            <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source}</span>
+                            <p class="text-xs font-bold text-blue-600">€${(l.value || 150000).toLocaleString()}</p>
+                            <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source || 'Facebook Ads'}</span>
                         </div>`;
                 });
                 board.innerHTML += `
                     <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
-                        <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3><span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span></div>
-                        <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}</div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span>
+                        </div>
+                        <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+                            ${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}
+                        </div>
                     </div>`;
             });
         },
