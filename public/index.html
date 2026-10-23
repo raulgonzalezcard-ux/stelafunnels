@@ -274,12 +274,10 @@
             <button onclick="App.navigate('social-media')" id="nav-social-media" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="share-2" class="w-4 h-4"></i> Publicador Orgánico
             </button>
-            <!-- AJUSTE EXACTO SOLICITUD 1: Lanzar Anuncios -->
             <button onclick="App.navigate('ads-manager')" id="nav-ads-manager" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all justify-between">
                 <span class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i> Lanzar Anuncios</span>
                 <span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.2 rounded font-bold">21</span>
             </button>
-            <!-- AJUSTE EXACTO SOLICITUD 2: Sitios -->
             <button onclick="App.navigate('funnels')" id="nav-funnels" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
                 <i data-lucide="layers" class="w-4 h-4"></i> Sitios
             </button>
@@ -290,7 +288,7 @@
             </button>
         </nav>
 
-        <!-- PERFIL DE USUARIO DINÁMICO (AVATAR DE GRAVATAR O FOTO SOCIAL) -->
+        <!-- PERFIL DE USUARIO DINÁMICO -->
         <div class="p-4 border-t border-slate-800 bg-[#0b1322] flex items-center gap-3">
             <div id="user-avatar-container" class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md overflow-hidden shrink-0">
                 US
@@ -325,110 +323,101 @@
         <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-[#f8fafc]" id="main-view-router">
             
          <section id="view-launchpad" class="hidden space-y-6">
-    <div>
-        <h2 class="text-xl font-extrabold text-slate-950 tracking-tight">Launchpad Inicial</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para habilitar la pauta publicitaria y la sincronización de leads.</p>
-    </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-950 tracking-tight">Launchpad Inicial</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Conecta tus canales esenciales para habilitar la pauta publicitaria y la sincronización de leads.</p>
+            </div>
 
-    <!-- TARJETAS DE INTEGRACIÓN DEL LAUNCHPAD -->
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
-        
-        <!-- 1. Descargar App Móvil -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-slate-100 text-slate-800 rounded-2xl shrink-0"><i data-lucide="smartphone" class="w-6 h-6"></i></div>
-                <div>
-                    <h4 class="text-xs font-bold text-slate-900">Descárguese nuestra aplicación</h4>
-                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Interactúe con sus clientes potenciales dondequiera que esté.</p>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-slate-100 text-slate-800 rounded-2xl shrink-0"><i data-lucide="smartphone" class="w-6 h-6"></i></div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">Descárguese nuestra aplicación</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Interactúe con sus clientes potenciales dondequiera que esté.</p>
+                        </div>
+                    </div>
+                    <button onclick="alert('Enlace de descarga enviado por SMS.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                        Enviar enlace
+                    </button>
+                </div>
+
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0"><i data-lucide="globe" class="w-6 h-6"></i></div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">Google Business Profile</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Gestione su perfil desde su CRM. Supervise y responda a las reseñas de perfil.</p>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='/auth/google'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                        Conectar
+                    </button>
+                </div>
+
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white hover:bg-slate-50/50 transition-all border-b border-slate-100">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm flex items-center justify-center">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        <div class="max-w-xl">
+                            <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
+                            <p id="meta-card-description" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM.
+                            </p>
+                        </div>
+                    </div>
+                    <div id="meta-connection-action" class="flex items-center gap-2 shrink-0">
+                        <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                            Conectar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-cyan-50 text-cyan-600 rounded-2xl shrink-0"><i data-lucide="message-square" class="w-6 h-6"></i></div>
+                        <div class="max-w-xl">
+                            <h4 class="text-xs font-bold text-slate-900">Widget Webchat de Sitio Web</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Genere clientes potenciales desde su sitio web conectando el widget de webchat.
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="alert('Código widget copiado al portapapeles.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                        Conectar
+                    </button>
+                </div>
+
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">Integre WhatsApp Business API</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Comuníquese en tiempo real y llegue a sus clientes en su plataforma preferida.</p>
+                        </div>
+                    </div>
+                    <button onclick="alert('Asistente de conexión WhatsApp Cloud API iniciado.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                        Conectar
+                    </button>
+                </div>
+
+                <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-purple-50 text-purple-600 rounded-2xl shrink-0"><i data-lucide="credit-card" class="w-6 h-6"></i></div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">Pasarela de Pagos Stripe</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Conecte su cuenta de Stripe para empezar a aceptar pagos y contratos digitales.</p>
+                        </div>
+                    </div>
+                    <button onclick="alert('Redirigiendo a Stripe Connect...');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
+                        Conectar
+                    </button>
                 </div>
             </div>
-            <button onclick="alert('Enlace de descarga enviado por SMS.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
-                Enviar enlace
-            </button>
-        </div>
-
-        <!-- 2. Google Business Profile -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0"><i data-lucide="globe" class="w-6 h-6"></i></div>
-                <div>
-                    <h4 class="text-xs font-bold text-slate-900">Google Business Profile</h4>
-                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Gestione su perfil desde su CRM. Supervise y responda a las reseñas de perfil.</p>
-                </div>
-            </div>
-            <button onclick="window.location.href='/auth/google'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
-                Conectar
-            </button>
-        </div>
-
-<!-- FACEBOOK & LEAD ADS (DINÁMICO SEGÚN LA SUB-CUENTA) -->
-<div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white hover:bg-slate-50/50 transition-all border-b border-slate-100">
-    <div class="flex items-start gap-4">
-        <div class="p-3 bg-blue-600 text-white rounded-2xl shrink-0 shadow-sm flex items-center justify-center">
-            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-        </div>
-        <div class="max-w-xl">
-            <h4 class="text-xs font-extrabold text-slate-900">Meta / Facebook Lead Ads & Messenger</h4>
-            <p id="meta-card-description" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook se rellenarán automáticamente en su CRM.
-            </p>
-        </div>
-    </div>
-    <div id="meta-connection-action" class="flex items-center gap-2 shrink-0">
-        <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
-            Conectar
-        </button>
-    </div>
-</div>
-        <!-- 4. Webchat Widget -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-cyan-50 text-cyan-600 rounded-2xl shrink-0"><i data-lucide="message-square" class="w-6 h-6"></i></div>
-                <div class="max-w-xl">
-                    <h4 class="text-xs font-bold text-slate-900">Widget Webchat de Sitio Web</h4>
-                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                        Genere clientes potenciales desde su sitio web conectando el widget de webchat. <br>
-                        <span class="text-[10px] text-slate-400 italic">(La comprobación del estado del widget de chat puede no ser precisa si el código no está directamente incrustado en el sitio web).</span>
-                    </p>
-                </div>
-            </div>
-            <button onclick="alert('Código widget copiado al portapapeles.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
-                Conectar
-            </button>
-        </div>
-
-        <!-- 5. WhatsApp Business -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
-                <div>
-                    <h4 class="text-xs font-bold text-slate-900">Integre WhatsApp Business API</h4>
-                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Comuníquese en tiempo real y llegue a sus clientes en su plataforma preferida.</p>
-                </div>
-            </div>
-            <button onclick="alert('Asistente de conexión WhatsApp Cloud API iniciado.');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
-                Conectar
-            </button>
-        </div>
-
-        <!-- 6. Stripe Payments -->
-        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-all">
-            <div class="flex items-start gap-4">
-                <div class="p-3 bg-purple-50 text-purple-600 rounded-2xl shrink-0"><i data-lucide="credit-card" class="w-6 h-6"></i></div>
-                <div>
-                    <h4 class="text-xs font-bold text-slate-900">Pasarela de Pagos Stripe</h4>
-                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Conecte su cuenta de Stripe para empezar a aceptar pagos y contratos digitales.</p>
-                </div>
-            </div>
-            <button onclick="alert('Redirigiendo a Stripe Connect...');" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm shrink-0 transition-all">
-                Conectar
-            </button>
-        </div>
-
-    </div>
-</section>
+        </section>
 
             <section id="view-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -752,7 +741,6 @@
                 </div>
             </section>
 
-            <!-- MÓDULO INTEGRADO DE EMBUDOS Y SITIOS WEB -->
             <!-- MÓDULO INTEGRADO DE EMBUDOS Y PAGE BUILDER -->
             <section id="view-funnels" class="hidden h-full flex flex-col">
                 
@@ -786,7 +774,7 @@
                 <!-- SUB-VISTA 2: BUILDER VISUAL DE PÁGINAS COMPLETO -->
                 <div id="funnels-subview-builder" class="hidden flex-1 flex flex-col bg-slate-900 overflow-hidden">
                     
-                    <!-- BARRA SUPERIOR DE HERRAMIENTAS (TOP BUILDER TOOLBAR) -->
+                    <!-- BARRA SUPERIOR DE HERRAMIENTAS -->
                     <div class="h-12 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 shadow-sm z-30">
                         
                         <div class="flex items-center gap-3">
@@ -794,7 +782,6 @@
                                 ← Atrás
                             </button>
                             <div class="h-5 w-px bg-slate-200"></div>
-                            <!-- Botón + y herramientas de elementos -->
                             <div class="flex items-center gap-1 text-slate-600">
                                 <button title="Agregar Elemento (+)" onclick="PageBuilder.addElementPrompt()" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i></button>
                                 <button title="Secciones" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="layers" class="w-4 h-4"></i></button>
@@ -806,7 +793,6 @@
                             </div>
                         </div>
 
-                        <!-- Selector de páginas, Responsive y Zoom -->
                         <div class="flex items-center gap-4">
                             <select id="builder-page-selector" onchange="PageBuilder.switchPageStep(this.value)" class="text-xs font-bold border border-slate-300 rounded-lg px-3 py-1 bg-white outline-none focus:border-blue-500">
                                 <option value="p1">Linktree para Clientes</option>
@@ -822,7 +808,6 @@
                             <span class="text-[11px] font-mono text-slate-400 font-bold">100%</span>
                         </div>
 
-                        <!-- Controles de la derecha: Vista previa, Guardar, Publicar -->
                         <div class="flex items-center gap-2">
                             <button title="Vista previa" onclick="window.open(PageBuilder.currentFunnel.url, '_blank')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
                             <button title="Guardar borrador" onclick="PageBuilder.saveChanges(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="save" class="w-4 h-4"></i></button>
@@ -832,7 +817,6 @@
                         </div>
                     </div>
 
-                    <!-- URL del proceso -->
                     <div class="bg-slate-50 border-b border-slate-200 py-1 px-4 text-center text-[11px] font-mono text-blue-600 flex items-center justify-center gap-2 shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <a href="#" id="builder-live-url-display" target="_blank" class="hover:underline">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</a>
@@ -841,26 +825,22 @@
                     <!-- LONA VISUAL INTERACTIVA + INSPECTOR LATERAL -->
                     <div class="flex-1 flex overflow-hidden">
                         
-                        <!-- Lona Canvas -->
                         <div class="flex-1 bg-slate-900/95 p-6 overflow-y-auto custom-scrollbar flex justify-center items-start relative border-r border-slate-800">
                             <div id="builder-canvas-viewport" class="w-full max-w-xl transition-all duration-300">
                                 <div id="landing-preview-canvas" class="w-full bg-cover bg-center rounded-2xl p-8 border-2 border-slate-700 shadow-2xl space-y-6 relative min-h-[620px] flex flex-col justify-between" style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');">
                                     
-                                    <!-- Elemento Logo (Seleccionable con Bounding Box) -->
                                     <div class="text-center pt-2">
                                         <div id="el-logo-container" onclick="PageBuilder.selectElement('logo', event)" data-element-type="Image" class="builder-element inline-block bg-slate-200/90 text-slate-900 font-extrabold text-lg px-8 py-2.5 rounded-lg shadow-md">
                                             <span id="preview-logo-text">xtucasa</span>
                                         </div>
                                     </div>
 
-                                    <!-- Elemento Botones -->
                                     <div id="el-buttons-container" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Button Stack" class="builder-element space-y-3 max-w-sm mx-auto w-full p-2">
                                         <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
                                         <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades (Compra o Alquila)</button>
                                         <button class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
                                     </div>
 
-                                    <!-- Elemento Footer -->
                                     <div id="el-footer-container" onclick="PageBuilder.selectElement('footer', event)" data-element-type="Custom Values" class="builder-element text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px] p-2">
                                         <h4 id="preview-business-name" class="font-bold tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
                                         <div class="text-[10px] text-slate-300 space-y-0.5 font-mono">
@@ -873,23 +853,20 @@
                             </div>
                         </div>
 
-                        <!-- INSPECTOR LATERAL DE 3 PESTAÑAS -->
+                        <!-- INSPECTOR LATERAL -->
                         <aside class="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-xl">
                             <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                                 <h4 id="inspector-element-title" class="text-xs font-black text-slate-800 uppercase tracking-wider">Image</h4>
                                 <button onclick="PageBuilder.deselectElement()" class="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
                             </div>
 
-                            <!-- Pestañas de Navegación del Inspector -->
                             <div class="flex border-b border-slate-200 text-xs font-bold text-center bg-slate-100/60">
                                 <button onclick="PageBuilder.switchInspectorTab('general')" id="tab-btn-general" class="flex-1 py-2.5 border-b-2 border-blue-600 text-blue-600">General</button>
                                 <button onclick="PageBuilder.switchInspectorTab('styles')" id="tab-btn-styles" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Estilos</button>
                                 <button onclick="PageBuilder.switchInspectorTab('animations')" id="tab-btn-animations" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Animaciones</button>
                             </div>
 
-                            <!-- Contenido dinámico de las pestañas -->
                             <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-5 text-xs">
-                                <!-- Pestaña General -->
                                 <div id="tab-content-general" class="space-y-4">
                                     <div>
                                         <label class="block font-bold text-slate-600 mb-1">Nombre del elemento</label>
@@ -910,7 +887,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Pestaña Estilos -->
                                 <div id="tab-content-styles" class="hidden space-y-4">
                                     <div>
                                         <label class="block font-bold text-slate-600 mb-1">Tamaño</label>
@@ -925,7 +901,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Pestaña Animaciones -->
                                 <div id="tab-content-animations" class="hidden space-y-4">
                                     <p class="text-slate-400 italic text-[11px]">Configura efectos de entrada Fade-In / Bounce para este elemento.</p>
                                 </div>
@@ -1020,283 +995,283 @@
             }
         };
 
-const App = {
-        chartInstance: null,
+        const App = {
+            chartInstance: null,
 
-    async init() {
-            Store.init();
-            this.populateStageSelectors();
-            SocialPublisher.setupEvents();
+            async init() {
+                Store.init();
+                this.populateStageSelectors();
+                SocialPublisher.setupEvents();
 
-            const loadingScreen = document.getElementById('app-loading-screen');
+                const loadingScreen = document.getElementById('app-loading-screen');
 
-            const hideLoader = () => {
-                if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
-                    loadingScreen.classList.add('hidden');
+                const hideLoader = () => {
+                    if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                        loadingScreen.classList.add('hidden');
+                    }
+                };
+
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
+                    try {
+                        const res = await fetch('/api/user-session');
+                        const data = await res.json();
+                        if (data.loggedIn && data.user) {
+                            this.setUserProfileUI(data.user);
+                            document.getElementById('view-login').classList.add('hidden');
+                            this.navigate('launchpad');
+                        } else {
+                            document.getElementById('view-login').classList.remove('hidden');
+                        }
+                    } catch (e) {
+                        console.error("Error en retorno OAuth:", e);
+                        document.getElementById('view-login').classList.remove('hidden');
+                    } finally {
+                        hideLoader();
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                    return;
                 }
-            };
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 try {
                     const res = await fetch('/api/user-session');
                     const data = await res.json();
+                    
                     if (data.loggedIn && data.user) {
                         this.setUserProfileUI(data.user);
                         document.getElementById('view-login').classList.add('hidden');
-                        this.navigate('launchpad');
+                        
+                        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+                        const lastSegment = pathSegments[pathSegments.length - 1];
+                        const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
+                        
+                        const activeView = validViews.includes(lastSegment) ? lastSegment : 'launchpad';
+                        this.navigate(activeView);
                     } else {
                         document.getElementById('view-login').classList.remove('hidden');
                     }
                 } catch (e) {
-                    console.error("Error en retorno OAuth:", e);
+                    console.error("Error al verificar sesión tras F5:", e);
                     document.getElementById('view-login').classList.remove('hidden');
                 } finally {
                     hideLoader();
-                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
-                return;
-            }
+            },
 
-            try {
-                const res = await fetch('/api/user-session');
-                const data = await res.json();
+            setUserProfileUI(user) {
+                window.currentUser = user;
+                const nameEl = document.getElementById('user-name-display');
+                const emailEl = document.getElementById('user-email-display');
+                const avatarEl = document.getElementById('user-avatar-container');
                 
-                if (data.loggedIn && data.user) {
-                    this.setUserProfileUI(data.user);
-                    document.getElementById('view-login').classList.add('hidden');
+                if (nameEl) nameEl.innerText = user.name || 'Usuario';
+                if (emailEl) emailEl.innerText = user.email || 'cliente@empresa.com';
+                if (avatarEl) {
+                    if (user.picture) {
+                        avatarEl.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
+                    } else {
+                        const initials = (user.name || 'US').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                        avatarEl.innerText = initials;
+                    }
+                }
+            },
+
+            async logout() {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/';
+                } catch (e) {
+                    window.location.reload();
+                }
+            },
+
+            navigate(viewId) {
+                const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
+                
+                views.forEach(v => {
+                    const el = document.getElementById(`view-${v}`);
+                    if (el) el.classList.add('hidden');
                     
-                    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-                    const lastSegment = pathSegments[pathSegments.length - 1];
-                    const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
+                    const nav = document.getElementById(`nav-${v}`);
+                    if (nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
+                });
+
+                const targetView = document.getElementById(`view-${viewId}`);
+                if (targetView) {
+                    targetView.classList.remove('hidden');
+                }
+                
+                const targetNav = document.getElementById(`nav-${viewId}`);
+                if (targetNav) {
+                    targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
+                    const titleEl = document.getElementById('current-view-title');
+                    if (titleEl) {
+                        titleEl.innerText = targetNav.innerText.split('\n')[0].trim();
+                    }
+                }
+
+                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
+                const newPath = viewId === 'dashboard' 
+                    ? `/v2/location/${locationId}/dashboard` 
+                    : `/v2/location/${locationId}/${viewId}`;
                     
-                    const activeView = validViews.includes(lastSegment) ? lastSegment : 'launchpad';
-                    this.navigate(activeView);
-                } else {
-                    document.getElementById('view-login').classList.remove('hidden');
-                }
-            } catch (e) {
-                console.error("Error al verificar sesión tras F5:", e);
-                document.getElementById('view-login').classList.remove('hidden');
-            } finally {
-                hideLoader();
-            }
-        },
+                window.history.pushState({ view: viewId }, '', newPath);
 
-        setUserProfileUI(user) {
-            window.currentUser = user;
-            const nameEl = document.getElementById('user-name-display');
-            const emailEl = document.getElementById('user-email-display');
-            const avatarEl = document.getElementById('user-avatar-container');
-            
-            if (nameEl) nameEl.innerText = user.name || 'Usuario';
-            if (emailEl) emailEl.innerText = user.email || 'cliente@empresa.com';
-            if (avatarEl) {
-                if (user.picture) {
-                    avatarEl.innerHTML = `<img src="${user.picture}" alt="Avatar" class="w-full h-full object-cover">`;
-                } else {
-                    const initials = (user.name || 'US').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                    avatarEl.innerText = initials;
-                }
-            }
-        },
+                if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') checkMetaConnectionStatus();
+                if (viewId === 'dashboard') this.renderDashboard();
+                if (viewId === 'pipeline') this.renderPipeline();
+                if (viewId === 'conversations') ChatEngine.render();
+                if (viewId === 'contacts') this.renderContacts();
+                if (viewId === 'ads-manager') AdsManager.render();
+                if (viewId === 'funnels') PageBuilder.renderList();
 
-        async logout() {
-            try {
-                await fetch('/api/logout', { method: 'POST' });
-                window.location.href = '/';
-            } catch (e) {
-                window.location.reload();
-            }
-        },
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            },
 
-        navigate(viewId) {
-            const views = ['launchpad', 'dashboard', 'social-media', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings'];
-            
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) el.classList.add('hidden');
+            populateStageSelectors() {
+                const select = document.getElementById('form-lead-stage');
+                if(!select) return;
+                select.innerHTML = '';
+                Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
+            },
+
+            renderDashboard() {
+                const totalLeads = Store.leads.length;
+                const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
                 
-                const nav = document.getElementById(`nav-${v}`);
-                if (nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:bg-slate-800/50 hover:text-white";
-            });
+                const totalLeadsEl = document.getElementById('dash-total-leads');
+                const pipelineValEl = document.getElementById('dash-pipeline-value');
+                if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
+                if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
 
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) {
-                targetView.classList.remove('hidden');
-            }
-            
-            const targetNav = document.getElementById(`nav-${viewId}`);
-            if (targetNav) {
-                targetNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-white bg-blue-600/10 border-l-4 border-blue-600";
-                const titleEl = document.getElementById('current-view-title');
-                if (titleEl) {
-                    titleEl.innerText = targetNav.innerText.split('\n')[0].trim();
+                const funnelContainer = document.getElementById('dash-funnel-container');
+                if (funnelContainer) {
+                    funnelContainer.innerHTML = '';
+                    Object.keys(STAGES).forEach(k => {
+                        const count = Store.leads.filter(l => l.stage === k).length;
+                        const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
+                        funnelContainer.innerHTML += `
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
+                            </div>`;
+                    });
                 }
-            }
 
-            const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
-            const newPath = viewId === 'dashboard' 
-                ? `/v2/location/${locationId}/dashboard` 
-                : `/v2/location/${locationId}/${viewId}`;
-                
-            window.history.pushState({ view: viewId }, '', newPath);
+                const canvas = document.getElementById('dash-chart-canvas');
+                if (canvas && typeof Chart !== 'undefined') {
+                    const ctx = canvas.getContext('2d');
+                    if (this.chartInstance) this.chartInstance.destroy();
+                    this.chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(STAGES).map(k => STAGES[k].name),
+                            datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    });
+                }
+            },
 
-            if (viewId === 'launchpad' && typeof checkMetaConnectionStatus === 'function') checkMetaConnectionStatus();
-            if (viewId === 'dashboard') this.renderDashboard();
-            if (viewId === 'pipeline') this.renderPipeline();
-            if (viewId === 'conversations') ChatEngine.render();
-            if (viewId === 'contacts') this.renderContacts();
-            if (viewId === 'ads-manager') AdsManager.render();
-            if (viewId === 'funnels') FunnelsManager.render();
+            async renderPipeline() {
+                const board = document.getElementById('kanban-board-dom');
+                if(!board) return;
 
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        },
+                try {
+                    const res = await fetch('/api/meta/leads');
+                    const data = await res.json();
+                    if (data.success && data.leads) {
+                        Store.leads = data.leads;
+                    }
+                } catch (e) {
+                    console.log("Cargando leads locales por fallback...");
+                }
 
-        populateStageSelectors() {
-            const select = document.getElementById('form-lead-stage');
-            if(!select) return;
-            select.innerHTML = '';
-            Object.keys(STAGES).forEach(k => { select.innerHTML += `<option value="${k}">${STAGES[k].name}</option>`; });
-        },
-
-        renderDashboard() {
-            const totalLeads = Store.leads.length;
-            const totalVal = Store.leads.filter(l => l.status === 'Abierto').reduce((sum, l) => sum + l.value, 0);
-            
-            const totalLeadsEl = document.getElementById('dash-total-leads');
-            const pipelineValEl = document.getElementById('dash-pipeline-value');
-            if(totalLeadsEl) totalLeadsEl.innerText = totalLeads;
-            if(pipelineValEl) pipelineValEl.innerText = `€${totalVal.toLocaleString()}`;
-
-            const funnelContainer = document.getElementById('dash-funnel-container');
-            if (funnelContainer) {
-                funnelContainer.innerHTML = '';
+                board.innerHTML = '';
                 Object.keys(STAGES).forEach(k => {
-                    const count = Store.leads.filter(l => l.stage === k).length;
-                    const pct = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
-                    funnelContainer.innerHTML += `
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1"><span>${STAGES[k].name}</span><span class="text-slate-500">${count} Leads (${pct}%)</span></div>
-                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="${STAGES[k].color} h-full" style="width: ${pct || 5}%"></div></div>
+                    const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
+                    let cards = '';
+                    stageLeads.forEach(l => {
+                        cards += `
+                            <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
+                                <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
+                                <p class="text-xs font-bold text-blue-600">€${(l.value || 150000).toLocaleString()}</p>
+                                <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source || 'Facebook Ads'}</span>
+                            </div>`;
+                    });
+                    board.innerHTML += `
+                        <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3>
+                                <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span>
+                            </div>
+                            <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+                                ${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}
+                            </div>
                         </div>`;
                 });
-            }
+            },
 
-            const canvas = document.getElementById('dash-chart-canvas');
-            if (canvas && typeof Chart !== 'undefined') {
-                const ctx = canvas.getContext('2d');
-                if (this.chartInstance) this.chartInstance.destroy();
-                this.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(STAGES).map(k => STAGES[k].name),
-                        datasets: [{ data: Object.keys(STAGES).map(k => Store.leads.filter(l => l.stage === k).reduce((s, l) => s + l.value, 0)), backgroundColor: '#2563eb', borderRadius: 8 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            renderContacts() {
+                const tbody = document.getElementById('crm-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                Store.leads.forEach(l => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 font-bold text-slate-800">${l.name}</td>
+                            <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
+                            <td class="p-4 font-bold text-slate-600">${l.source}</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
+                            <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
+                            <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
+                        </tr>`;
                 });
-            }
-        },
+            },
 
-       async renderPipeline() {
-            const board = document.getElementById('kanban-board-dom');
-            if(!board) return;
+            openCreateModal() {
+                document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
+                document.getElementById('form-lead-id').value = '';
+                document.getElementById('lead-interactive-form').reset();
+                document.getElementById('modal-lead-dom').classList.remove('hidden');
+            },
 
-            try {
-                const res = await fetch('/api/meta/leads');
-                const data = await res.json();
-                if (data.success && data.leads) {
-                    Store.leads = data.leads;
+            openEditModal(id) {
+                const lead = Store.leads.find(l => l.id === id);
+                if(!lead) return;
+                document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
+                document.getElementById('form-lead-id').value = lead.id;
+                document.getElementById('form-lead-name').value = lead.name;
+                document.getElementById('form-lead-email').value = lead.email;
+                document.getElementById('form-lead-phone').value = lead.phone;
+                document.getElementById('form-lead-value').value = lead.value;
+                document.getElementById('form-lead-source').value = lead.source;
+                document.getElementById('form-lead-stage').value = lead.stage;
+                document.getElementById('modal-lead-dom').classList.remove('hidden');
+            },
+
+            closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
+
+            handleFormSubmit(e) {
+                e.preventDefault();
+                const id = document.getElementById('form-lead-id').value;
+                const name = document.getElementById('form-lead-name').value;
+                const email = document.getElementById('form-lead-email').value;
+                const phone = document.getElementById('form-lead-phone').value;
+                const value = parseInt(document.getElementById('form-lead-value').value) || 0;
+                const source = document.getElementById('form-lead-source').value;
+                const stage = document.getElementById('form-lead-stage').value;
+
+                if(id) {
+                    const idx = Store.leads.findIndex(l => l.id === id);
+                    if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
+                } else {
+                    Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
                 }
-            } catch (e) {
-                console.log("Cargando leads locales por fallback...");
+                this.closeModal();
+                this.navigate('dashboard');
             }
-
-            board.innerHTML = '';
-            Object.keys(STAGES).forEach(k => {
-                const stageLeads = Store.leads.filter(l => l.stage === k && l.status === 'Abierto');
-                let cards = '';
-                stageLeads.forEach(l => {
-                    cards += `
-                        <div onclick="App.openEditModal('${l.id}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-2">
-                            <div class="flex justify-between items-start"><h4 class="font-bold text-xs text-slate-800 truncate max-w-[140px]">${l.name}</h4></div>
-                            <p class="text-xs font-bold text-blue-600">€${(l.value || 150000).toLocaleString()}</p>
-                            <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-semibold">${l.source || 'Facebook Ads'}</span>
-                        </div>`;
-                });
-                board.innerHTML += `
-                    <div class="w-72 bg-slate-100 rounded-xl p-3 flex flex-col shrink-0 max-h-full">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-xs font-black text-slate-700 uppercase">${STAGES[k].name}</h3>
-                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${stageLeads.length}</span>
-                        </div>
-                        <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
-                            ${cards || '<div class="text-center py-6 text-[10px] text-slate-400 border border-dashed border-slate-300 rounded-xl">Sin tratos</div>'}
-                        </div>
-                    </div>`;
-            });
-        },
-
-        renderContacts() {
-            const tbody = document.getElementById('crm-table-body');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            Store.leads.forEach(l => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 font-bold text-slate-800">${l.name}</td>
-                        <td class="p-4 text-slate-500 font-medium">${l.phone}<br><span class="text-[11px] text-slate-400">${l.email}</span></td>
-                        <td class="p-4 font-bold text-slate-600">${l.source}</td>
-                        <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">${STAGES[l.stage].name}</span></td>
-                        <td class="p-4">${l.tags.map(t => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">${t}</span>`).join('')}</td>
-                        <td class="p-4 text-center"><button onclick="App.openEditModal('${l.id}')" class="text-blue-600 font-bold hover:underline">Editar</button></td>
-                    </tr>`;
-            });
-        },
-
-        openCreateModal() {
-            document.getElementById('modal-title-dom').innerText = "Crear Oportunidad";
-            document.getElementById('form-lead-id').value = '';
-            document.getElementById('lead-interactive-form').reset();
-            document.getElementById('modal-lead-dom').classList.remove('hidden');
-        },
-
-        openEditModal(id) {
-            const lead = Store.leads.find(l => l.id === id);
-            if(!lead) return;
-            document.getElementById('modal-title-dom').innerText = "Editar Parámetros de Oportunidad";
-            document.getElementById('form-lead-id').value = lead.id;
-            document.getElementById('form-lead-name').value = lead.name;
-            document.getElementById('form-lead-email').value = lead.email;
-            document.getElementById('form-lead-phone').value = lead.phone;
-            document.getElementById('form-lead-value').value = lead.value;
-            document.getElementById('form-lead-source').value = lead.source;
-            document.getElementById('form-lead-stage').value = lead.stage;
-            document.getElementById('modal-lead-dom').classList.remove('hidden');
-        },
-
-        closeModal() { document.getElementById('modal-lead-dom').classList.add('hidden'); },
-
-        handleFormSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('form-lead-id').value;
-            const name = document.getElementById('form-lead-name').value;
-            const email = document.getElementById('form-lead-email').value;
-            const phone = document.getElementById('form-lead-phone').value;
-            const value = parseInt(document.getElementById('form-lead-value').value) || 0;
-            const source = document.getElementById('form-lead-source').value;
-            const stage = document.getElementById('form-lead-stage').value;
-
-            if(id) {
-                const idx = Store.leads.findIndex(l => l.id === id);
-                if(idx !== -1) Store.leads[idx] = { ...Store.leads[idx], name, email, phone, value, source, stage };
-            } else {
-                Store.leads.push({ id: Date.now().toString(), name, email, phone, value, source, stage, status: 'Abierto', tags: ['Inbound'], messages: [] });
-            }
-            this.closeModal();
-            this.navigate('dashboard');
-        }
-    };
+        };
 
         const AdsManager = {
             currentTab: 'list',
@@ -1353,7 +1328,7 @@ const App = {
             }
         };
 
-const PageBuilder = {
+        const PageBuilder = {
             currentFunnel: null,
             selectedElementKey: 'logo',
             currentTab: 'general',
@@ -1391,7 +1366,6 @@ const PageBuilder = {
                 document.getElementById('builder-live-url-display').innerText = this.currentFunnel.url;
                 document.getElementById('builder-live-url-display').href = this.currentFunnel.url;
 
-                // Actualización de Ruta dinámica solicitada
                 const newPath = `/location/${locationId}/page-builder/${pageId}`;
                 window.history.pushState({ pageBuilder: true }, '', newPath);
 
@@ -1472,58 +1446,15 @@ const PageBuilder = {
                 if (logoContainer) logoContainer.style.backgroundColor = hex;
             },
 
-            addElementPrompt() { alert("Herramienta activa para añadir nuevos bloques."); },
-            switchPageStep(val) { alert("Cambiando al paso: " + val); },
-            saveChanges(publish) { alert(publish ? "🎉 ¡Publicado con éxito en producción!" : "💾 Borrador guardado."); }
-        };
-        
-            openBuilder(id) {
-                const f = Store.funnels.find(item => item.id === id);
-                if(!f) return;
-
-                document.getElementById('funnels-subview-list').classList.add('hidden');
-                document.getElementById('funnels-subview-builder').classList.remove('hidden');
-
-                document.getElementById('builder-funnel-title').innerText = f.name;
-                document.getElementById('builder-funnel-url').innerText = f.url;
-
-                this.renderSteps();
-                lucide.createIcons();
-            },
-
-            renderSteps() {
-                const list = document.getElementById('funnel-steps-list');
-                if(!list) return;
-
-                list.innerHTML = this.steps.map(s => `
-                    <div onclick="FunnelsManager.selectStep('${s.id}')" class="p-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center gap-2 ${s.active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold' : 'text-slate-600 hover:bg-slate-50'}">
-                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                        <span class="truncate">${s.name}</span>
-                    </div>`).join('');
-
-                lucide.createIcons();
-            },
-
-            selectStep(stepId) {
-                this.steps.forEach(s => s.active = (s.id === stepId));
-                this.renderSteps();
-            },
-
             createNewFunnel() {
                 const newId = 'f' + Date.now();
                 Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial', updated: 'Ahora', steps: 1, url: 'https://stelafunnels.io/nuevo-sitio' });
                 this.openBuilder(newId);
             },
 
-            updateLiveText(val) {
-                const nameEl = document.getElementById('preview-business-name');
-                const logoEl = document.getElementById('preview-logo-text');
-                if(nameEl) nameEl.innerText = val || 'Xtucasa Inmobiliaria';
-                if(logoEl) logoEl.innerText = val || 'xtucasa';
-            },
-
-            closeBuilder() { this.render(); },
-            saveChanges() { alert("🎉 ¡Embudo guardado y publicado en producción!"); this.render(); }
+            addElementPrompt() { alert("Herramienta activa para añadir nuevos bloques."); },
+            switchPageStep(val) { alert("Cambiando al paso: " + val); },
+            saveChanges(publish) { alert(publish ? "🎉 ¡Publicado con éxito en producción!" : "💾 Borrador guardado."); }
         };
 
         const ChatEngine = {
@@ -1728,7 +1659,7 @@ const PageBuilder = {
             }
         };
 
-async function conectarMetaPages() {
+        async function conectarMetaPages() {
             try {
                 const res = await fetch('/api/meta/pages');
                 const data = await res.json();
@@ -1788,74 +1719,74 @@ async function conectarMetaPages() {
             }
         }
 
-async function checkMetaConnectionStatus() {
-    const actionContainer = document.getElementById('meta-connection-action');
-    const descEl = document.getElementById('meta-card-description');
-    if (!actionContainer) return;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const isConnectedSuccess = urlParams.get('success') === 'meta_connected' || urlParams.has('success');
-
-    try {
-        const response = await fetch('/api/meta/status');
-        const data = await response.json();
-
-        if (data.connected || isConnectedSuccess) {
-            actionContainer.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
-                        <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
-                    </div>
-                    <button onclick="conectarMetaPages()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm">
-                        Configurar Página
-                    </button>
-                </div>
-            `;
-            if (descEl) {
-                descEl.innerText = "¡Conectado! Haz clic en 'Configurar Página' para seleccionar tu Fanpage y habilitar la recepción de Leads.";
-            }
-        } else {
-            actionContainer.innerHTML = `
-                <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
-                    Conectar
-                </button>
-            `;
-        }
-        lucide.createIcons();
-    } catch (e) {
-        actionContainer.innerHTML = `
-            <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
-                Conectar
-            </button>
-        `;
-        lucide.createIcons();
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('success') === 'meta_connected' || urlParams.has('success')) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        setTimeout(() => {
+        async function checkMetaConnectionStatus() {
             const actionContainer = document.getElementById('meta-connection-action');
-            if (actionContainer) {
+            const descEl = document.getElementById('meta-card-description');
+            if (!actionContainer) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const isConnectedSuccess = urlParams.get('success') === 'meta_connected' || urlParams.has('success');
+
+            try {
+                const response = await fetch('/api/meta/status');
+                const data = await response.json();
+
+                if (data.connected || isConnectedSuccess) {
+                    actionContainer.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                                <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
+                            </div>
+                            <button onclick="conectarMetaPages()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm">
+                                Configurar Página
+                            </button>
+                        </div>
+                    `;
+                    if (descEl) {
+                        descEl.innerText = "¡Conectado! Haz clic en 'Configurar Página' para seleccionar tu Fanpage y habilitar la recepción de Leads.";
+                    }
+                } else {
+                    actionContainer.innerHTML = `
+                        <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                            Conectar
+                        </button>
+                    `;
+                }
+                lucide.createIcons();
+            } catch (e) {
                 actionContainer.innerHTML = `
-                    <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Conectado
-                    </div>
-                    <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+                    <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                        Conectar
+                    </button>
                 `;
+                lucide.createIcons();
             }
-        }, 300);
-        return;
-    }
+        }
 
-    checkMetaConnectionStatus();
-});
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('success') === 'meta_connected' || urlParams.has('success')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                setTimeout(() => {
+                    const actionContainer = document.getElementById('meta-connection-action');
+                    if (actionContainer) {
+                        actionContainer.innerHTML = `
+                            <div class="flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Conectado
+                            </div>
+                            <button onclick="window.location.href='/auth/facebook'" class="text-slate-400 hover:text-blue-600 p-2 text-xs font-semibold underline">Reconectar</button>
+                        `;
+                    }
+                }, 300);
+                return;
+            }
 
-window.onload = () => App.init();
-</script>
+            checkMetaConnectionStatus();
+        });
+
+        window.onload = () => App.init();
+    </script>
 </body>
 </html>
