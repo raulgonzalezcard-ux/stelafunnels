@@ -455,11 +455,44 @@ app.post('/api/logout', (req, res) => {
 });
 
 // ==========================================
-// 🚨 DETECTOR DE LEADS (WEBHOOKS) Y RUTAS
+// 🚨 DETECTOR UNIVERSAL DE LEADS (WEBHOOKS) DE META
 // ==========================================
-app.post('/api/webhooks', (req, res, next) => {
-    console.log("🔥 Lead entrante recibido:", JSON.stringify(req.body, null, 2));
-    next();
+app.post(['/api/meta/webhook', '/api/webhooks'], async (req, res) => {
+    try {
+        const body = req.body;
+        console.log("🔥 Webhook recibido de Meta:", JSON.stringify(body, null, 2));
+
+        if (body.object === 'page') {
+            for (const entry of body.entry) {
+                for (const change of entry.changes) {
+                    if (change.field === 'leadgen') {
+                        const leadgenId = change.value.leadgen_id;
+                        const pageId = change.value.page_id;
+                        console.log(`📩 Lead detectado - ID: ${leadgenId}, Página: ${pageId}`);
+
+                        const leadId = Date.now().toString();
+                        const name = "Lead de Meta en Vivo";
+                        const email = "lead_meta@stelafunnels.com";
+                        const phone = "+34 600 000 000";
+
+                        db.run(
+                            `INSERT OR REPLACE INTO leads (id, name, email, phone, value, stage, source, status, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                            [leadId, name, email, phone, 150000, 'lead_entrante', 'Facebook Ads', 'Abierto', '["Lead Ads"]'],
+                            (dbErr) => {
+                                if (dbErr) console.error("❌ Error al guardar en SQLite:", dbErr);
+                                else console.log("✅ ¡Lead guardado con éxito en SQLite y visible en el CRM!");
+                            }
+                        );
+                    }
+                }
+            }
+            return res.status(200).send('EVENT_RECEIVED');
+        }
+        res.sendStatus(404);
+    } catch (e) {
+        console.error("❌ Error procesando webhook universal:", e);
+        res.sendStatus(500);
+    }
 });
 
 const metaRoutes = require('./routes/meta');
