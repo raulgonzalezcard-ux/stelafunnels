@@ -7,6 +7,20 @@ const path = require('path');
 const dbPath = path.join(__dirname, '../database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
+// Asegurar que la tabla de leads exista para guardar los prospectos de Meta
+db.run(`CREATE TABLE IF NOT EXISTS leads (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT,
+    phone TEXT,
+    value INTEGER DEFAULT 150000,
+    stage TEXT DEFAULT 'lead_entrante',
+    source TEXT DEFAULT 'Facebook Ads',
+    status TEXT DEFAULT 'Abierto',
+    tags TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Middleware de seguridad para verificar sesión
 const requireAuth = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -21,7 +35,6 @@ const requireAuth = (req, res, next) => {
 router.get('/status', requireAuth, (req, res) => {
     const userId = req.session.user.id;
 
-    // Verificamos el token de Meta exclusivamente para ESTE usuario logueado
     db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], (err, row) => {
         if (err || !row || !row.meta_access_token) {
             return res.json({ connected: false });
@@ -37,33 +50,25 @@ router.get('/pages', requireAuth, async (req, res) => {
     try {
         const userId = req.session.user.id;
 
-        // Consultamos el token de Meta específico de ESTE usuario en la base de datos
         db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], async (err, row) => {
             if (err || !row || !row.meta_access_token) {
-                console.warn(`⚠️ Usuario ${userId} intentó listar páginas sin token de Meta conectado.`);
                 return res.status(401).json({ 
                     success: false, 
                     error: "Tu cuenta de Meta no está conectada. Ve al Launchpad y conéctala." 
                 });
             }
 
-            console.log(`🔍 Consultando a Meta páginas para el usuario ID: ${userId}...`);
             const url = `https://graph.facebook.com/v19.0/me/accounts?access_token=${row.meta_access_token}`;
-            
             const response = await fetch(url);
             const data = await response.json();
 
             if (data.error) {
-                console.error("❌ Error devuelto por Meta al listar páginas:", data.error);
                 return res.status(500).json({ success: false, error: data.error.message });
             }
 
-            console.log(`✅ Se encontraron ${data.data ? data.data.length : 0} páginas.`);
             res.json({ success: true, pages: data.data });
         });
-
     } catch (error) {
-        console.error("❌ Error crítico en GET /pages:", error);
         res.status(500).json({ success: false, error: "Error interno del servidor al procesar las páginas." });
     }
 });
@@ -84,19 +89,14 @@ router.post('/select-page', requireAuth, async (req, res) => {
         db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], async (err, row) => {
             const tokenToUse = pageAccessToken || (row ? row.meta_access_token : global.metaAccessToken);
 
-            // Suscribir la página a los eventos de Leads (leadgen)
             const subscribeUrl = `https://graph.facebook.com/v19.0/${pageId}/subscribed_apps?subscribed_fields=leadgen&access_token=${tokenToUse}`;
-            const subscribeResp = await fetch(subscribeUrl, {
-                method: 'POST'
-            });
+            const subscribeResp = await fetch(subscribeUrl, { method: 'POST' });
             const subData = await subscribeResp.json();
 
             if (subData.error) {
-                console.error("❌ Error al suscribir webhooks de Meta:", subData.error);
                 return res.status(400).json({ success: false, error: subData.error.message });
             }
 
-            // Guardar el estado de la página seleccionada en la sesión
             if (req.session.user) {
                 req.session.selectedPageId = pageId;
             }
@@ -104,82 +104,142 @@ router.post('/select-page', requireAuth, async (req, res) => {
             res.json({ success: true, message: 'Página vinculada y webhooks suscritos correctamente', subData });
         });
     } catch (error) {
-        console.error("Error al suscribir la página de Meta:", error);
         res.status(500).json({ success: false, error: 'Error al conectar con la API de Meta.' });
     }
 });
 
 // =========================================================================
-// ✍️ 2. PUBLICAR CONTENIDO: Texto plano
+// 🔔 WEBHOOK DE ENTRADA: Verificación y Recepción de LeadGen de Meta
 // =========================================================================
+
+// 1. Verificación Inicial del Webhook por Meta (GET)
+router.get('/webhook', (req, res) => {
+    const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'stelafunnels_secret_token';
+
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode && token) {
+        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            console.log('✅ Webhook de Meta verificado correctamente con el servidor!');
+            return res.status(200).send(challenge);
+        } else {
+            return res.sendStatus(403);
+        }
+    }
+    res.sendStatus(400);
+});
+
+// 2. Recepción de Leads en Tiempo Real (POST)
+router.post('/webhook', async (req, res) => {
+    try {
+        const body = req.body;
+
+        if (body.object === 'page') {
+            for (const entry of body.entry) {
+                for (const change of entry.changes) {
+                    if (change.field === 'leadgen') {
+                        const leadgenId = change.value.leadgen_id;
+                        const pageId = change.value.page_id;
+                        console.log(`📩 Nuevo Lead detectado con ID: ${leadgenId} en la página: ${pageId}`);
+
+                        db.get(`SELECT meta_access_token FROM users WHERE meta_access_token IS NOT NULL LIMIT 1`, [], async (err, row) => {
+                            const userToken = row ? row.meta_access_token : global.metaAccessToken;
+                            if (userToken) {
+                                const leadRes = await fetch(`https://graph.facebook.com/v19.0/${leadgenId}?access_token=${userToken}`);
+                                const leadData = await leadRes.json();
+
+                                if (leadData && leadData.field_data) {
+                                    let name = 'Lead de Meta';
+                                    let email = '';
+                                    let phone = '';
+
+                                    leadData.field_data.forEach(field => {
+                                        if (field.name === 'full_name' || field.name === 'nombre_completo') name = field.values[0];
+                                        if (field.name === 'email' || field.name === 'correo') email = field.values[0];
+                                        if (field.name === 'phone_number' || field.name === 'telefono') phone = field.values[0];
+                                    });
+
+                                    console.log(`🎉 Lead Procesado: ${name} | ${email} | ${phone}`);
+
+                                    // Guardar el lead en SQLite para que aparezca en el Pipeline y Contactos
+                                    const leadId = Date.now().toString();
+                                    db.run(
+                                        `INSERT OR REPLACE INTO leads (id, name, email, phone, value, stage, source, status, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                        [leadId, name, email || 'sin-correo@meta.com', phone || 'Sin teléfono', 150000, 'lead_entrante', 'Facebook Ads', 'Abierto', '["Lead Ads"]'],
+                                        (dbErr) => {
+                                            if (dbErr) console.error("❌ Error guardando lead en BD:", dbErr);
+                                            else console.log("✅ ¡Lead guardado en SQLite con éxito y listo para el CRM!");
+                                        }
+                                    );
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            res.status(200).send('EVENT_RECEIVED');
+        } else {
+            res.sendStatus(404);
+        }
+    } catch (error) {
+        console.error("❌ Error procesando webhook de Meta:", error);
+        res.sendStatus(500);
+    }
+});
+
+// ==========================================
+// ✍️ RESTO DE RUTAS DE PUBLICACIÓN (POST, FOTO, VIDEO)
+// ==========================================
 router.post('/post', requireAuth, async (req, res) => {
     try {
         const { pageId, pageToken, message } = req.body;
-
         if (!pageId || !pageToken || !message) {
             return res.status(400).json({ success: false, error: "Faltan parámetros obligatorios." });
         }
-
         const url = `https://graph.facebook.com/v19.0/${pageId}/feed`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: message, access_token: pageToken })
         });
-
         const data = await response.json();
-        if (data.error) {
-            return res.status(500).json({ success: false, error: data.error.message });
-        }
-
+        if (data.error) return res.status(500).json({ success: false, error: data.error.message });
         res.json({ success: true, message: "¡Publicado con éxito!", postId: data.id });
     } catch (error) {
         res.status(500).json({ success: false, error: "Error interno al publicar." });
     }
 });
 
-// =========================================================================
-// 🖼️ 3. SUBIR IMÁGENES
-// =========================================================================
 router.post('/photo', requireAuth, async (req, res) => {
     try {
         const { pageId, pageToken, imageUrl, caption } = req.body;
         if (!pageId || !pageToken || !imageUrl) {
             return res.status(400).json({ success: false, error: "Faltan parámetros obligatorios." });
         }
-
         const url = `https://graph.facebook.com/v19.0/${pageId}/photos`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: imageUrl, caption: caption || '', access_token: pageToken })
         });
-
         const data = await response.json();
-        if (data.error) {
-            return res.status(500).json({ success: false, error: data.error.message });
-        }
-
+        if (data.error) return res.status(500).json({ success: false, error: data.error.message });
         res.json({ success: true, message: "¡Fotografía publicada con éxito!", photoId: data.id });
     } catch (error) {
         res.status(500).json({ success: false, error: "Error interno al subir la imagen." });
     }
 });
 
-// =========================================================================
-// 🎥 4. SUBIR VIDEOS
-// =========================================================================
 router.post('/video', requireAuth, async (req, res) => {
     try {
         const { pageId, pageToken, videoUrl, description } = req.body;
         if (!pageId || !pageToken || !videoUrl) {
             return res.status(400).json({ success: false, error: "Faltan parámetros obligatorios." });
         }
-
         const videoResponse = await fetch(videoUrl);
-        if (!videoResponse.ok) {
-            return res.status(400).json({ success: false, error: "No se pudo descargar el video desde la URL." });
-        }
+        if (!videoResponse.ok) return res.status(400).json({ success: false, error: "No se pudo descargar el video." });
 
         const arrayBuffer = await videoResponse.arrayBuffer();
         const videoBuffer = Buffer.from(arrayBuffer);
@@ -194,10 +254,7 @@ router.post('/video', requireAuth, async (req, res) => {
         const response = await fetch(url, { method: 'POST', body: formData });
         const data = await response.json();
 
-        if (data.error) {
-            return res.status(500).json({ success: false, error: data.error.message });
-        }
-
+        if (data.error) return res.status(500).json({ success: false, error: data.error.message });
         res.json({ success: true, message: "¡Video publicado con éxito!", videoId: data.id });
     } catch (error) {
         res.status(500).json({ success: false, error: "Error interno al subir el video." });
