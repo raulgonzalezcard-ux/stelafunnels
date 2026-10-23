@@ -43,7 +43,7 @@
             display: none;
         }
 
-        /* Bounding Box Interactiva tipo GoHighLevel / Real Estate Rocket */
+        /* Bounding Box Interactiva tipo GoHighLevel / StelaFunnels */
         .builder-element {
             position: relative;
             transition: all 0.15s ease-in-out;
@@ -784,17 +784,17 @@
                             <div class="h-5 w-px bg-slate-200"></div>
                             <div class="flex items-center gap-1 text-slate-600">
                                 <button title="Agregar Elemento (+)" onclick="PageBuilder.addElementPrompt()" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                                <button title="Secciones" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="layers" class="w-4 h-4"></i></button>
-                                <button title="Filas & Columnas" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="columns" class="w-4 h-4"></i></button>
-                                <button title="Código Personalizado" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="code" class="w-4 h-4"></i></button>
-                                <button title="Texto / Título" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="type" class="w-4 h-4"></i></button>
-                                <button title="Medias e Imágenes" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="image" class="w-4 h-4"></i></button>
-                                <button title="Botones de Acción" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="square" class="w-4 h-4"></i></button>
+                                <button title="Secciones" onclick="alert('Módulo de Secciones desplegado');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="layers" class="w-4 h-4"></i></button>
+                                <button title="Filas & Columnas" onclick="alert('Módulo de Filas y Columnas desplegado');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="columns" class="w-4 h-4"></i></button>
+                                <button title="Código Personalizado" onclick="alert('Inyector de Código HTML/CSS/JS habilitado');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="code" class="w-4 h-4"></i></button>
+                                <button title="Texto / Título" onclick="alert('Añadir Bloque de Texto');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="type" class="w-4 h-4"></i></button>
+                                <button title="Medias e Imágenes" onclick="alert('Añadir Galería / Imagen');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="image" class="w-4 h-4"></i></button>
+                                <button title="Botones de Acción" onclick="alert('Añadir Botón de Acción');" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i data-lucide="square" class="w-4 h-4"></i></button>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-4">
-                            <select id="builder-page-selector" onchange="PageBuilder.switchPageStep(this.value)" class="text-xs font-bold border border-slate-300 rounded-lg px-3 py-1 bg-white outline-none focus:border-blue-500">
+                            <select id="builder-page-selector" onchange="PageBuilder.switchPageStep(this.value)" class="text-xs font-bold border border-slate-300 rounded-lg px-3 py-1 bg-white outline-none focus:border-blue-500 cursor-pointer">
                                 <option value="p1">Linktree para Clientes</option>
                                 <option value="p2">Linktree para Inmobiliaria</option>
                                 <option value="p3">Vendemos tu Casa</option>
@@ -809,7 +809,7 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <button title="Vista previa" onclick="window.open(PageBuilder.currentFunnel.url, '_blank')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <button title="Vista previa" onclick="window.open(document.getElementById('builder-live-url-display').href, '_blank')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
                             <button title="Guardar borrador" onclick="PageBuilder.saveChanges(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"><i data-lucide="save" class="w-4 h-4"></i></button>
                             <button onclick="PageBuilder.saveChanges(true)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-4 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
                                 <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar
@@ -819,7 +819,7 @@
 
                     <div class="bg-slate-50 border-b border-slate-200 py-1 px-4 text-center text-[11px] font-mono text-blue-600 flex items-center justify-center gap-2 shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <a href="#" id="builder-live-url-display" target="_blank" class="hover:underline">https://xtucasainmobiliaria.realestaterocket.io/inicio-page</a>
+                        <a href="https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio" id="builder-live-url-display" target="_blank" class="hover:underline">https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio</a>
                     </div>
 
                     <!-- LONA VISUAL INTERACTIVA + INSPECTOR LATERAL -->
@@ -835,10 +835,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- 🚀 CONTENEDOR DINÁMICO DE PASOS INMOBILIARIOS (Reemplaza los botones estáticos) -->
-                                    <div id="funnel-step-container" class="builder-element bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-md mx-auto w-full space-y-4 text-slate-900" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Funnel Wizard Form">
-                                        <!-- El motor de pasos inyectará aquí de forma interactiva el contenido -->
-                                    </div>
+                                    <!-- 🚀 CONTENEDOR DINÁMICO QUE CAMBIA SEGÚN LA PÁGINA SELECCIONADA EN EL DROPDOWN -->
+                                    <div id="builder-dynamic-canvas-slot"></div>
 
                                     <div id="el-footer-container" onclick="PageBuilder.selectElement('footer', event)" data-element-type="Custom Values" class="builder-element text-center text-white space-y-1.5 pt-4 border-t border-white/10 text-[11px] p-2">
                                         <h4 id="preview-business-name" class="font-bold tracking-wide">{{ custom_values.nombre_de_negocio }}</h4>
@@ -855,7 +853,7 @@
                         <!-- INSPECTOR LATERAL -->
                         <aside class="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-xl">
                             <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                                <h4 id="inspector-element-title" class="text-xs font-black text-slate-800 uppercase tracking-wider">Image</h4>
+                                <h4 id="inspector-element-title" class="text-xs font-black text-slate-800 uppercase tracking-wider">Image (Logo)</h4>
                                 <button onclick="PageBuilder.deselectElement()" class="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
                             </div>
 
@@ -869,13 +867,13 @@
                                 <div id="tab-content-general" class="space-y-4">
                                     <div>
                                         <label class="block font-bold text-slate-600 mb-1">Nombre del elemento</label>
-                                        <input type="text" id="inspector-el-name" value="Image" class="w-full border border-slate-200 p-2 rounded-lg font-semibold outline-none focus:border-blue-500">
+                                        <input type="text" id="inspector-el-name" value="Logo Header" class="w-full border border-slate-200 p-2 rounded-lg font-semibold outline-none focus:border-blue-500">
                                     </div>
                                     <div class="border-t pt-3 space-y-3">
-                                        <p class="font-bold text-slate-400 uppercase text-[10px]">Acciones de imagen</p>
+                                        <p class="font-bold text-slate-400 uppercase text-[10px]">Acciones de imagen / enlace</p>
                                         <select class="w-full border border-slate-200 p-2 rounded-lg bg-white outline-none">
                                             <option>Ninguno</option>
-                                            <option>Abrir URL</option>
+                                            <option>Abrir URL de StelaFunnels</option>
                                         </select>
                                     </div>
                                     <div class="border-t pt-3 space-y-3">
@@ -895,13 +893,13 @@
                                         </div>
                                     </div>
                                     <div class="border-t pt-3">
-                                        <label class="block font-bold text-slate-600 mb-1">Color de Fondo</label>
+                                        <label class="block font-bold text-slate-600 mb-1">Color de Fondo del Contenedor</label>
                                         <input type="color" value="#e2e8f0" onchange="PageBuilder.updateBgColor(this.value)" class="w-full h-9 p-1 border rounded-lg cursor-pointer">
                                     </div>
                                 </div>
 
                                 <div id="tab-content-animations" class="hidden space-y-4">
-                                    <p class="text-slate-400 italic text-[11px]">Configura efectos de entrada Fade-In / Bounce para este elemento.</p>
+                                    <p class="text-slate-400 italic text-[11px]">Configura efectos de entrada Fade-In / Bounce para este elemento al cargar la página.</p>
                                 </div>
                             </div>
 
@@ -982,19 +980,19 @@
                 ];
 
                 this.funnels = [
-                    { id: 'f1', name: 'Captaciones', updated: '05 Nov 2025 08:46 PM', steps: 24, url: 'https://xtucasainmobiliaria.realestaterocket.io/inicio' },
-                    { id: 'f2', name: 'Captaciones 2.0 NUEVOS ANUNCIOS', updated: 'Apr 09, 2026 03:19 PM', steps: 11, url: 'https://xtucasainmobiliaria.realestaterocket.io/captaciones-2' },
-                    { id: 'f3', name: 'Compradores', updated: 'Feb 18, 2026 01:36 PM', steps: 2, url: 'https://xtucasainmobiliaria.realestaterocket.io/compradores' }
+                    { id: 'f1', name: 'Captaciones', updated: '05 Nov 2025 08:46 PM', steps: 24, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/inicio' },
+                    { id: 'f2', name: 'Captaciones 2.0 NUEVOS ANUNCIOS', updated: 'Apr 09, 2026 03:19 PM', steps: 11, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/captaciones-2' },
+                    { id: 'f3', name: 'Compradores', updated: 'Feb 18, 2026 01:36 PM', steps: 2, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/compradores' }
                 ];
 
                 this.leads = [
-                    { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+52 55 1234 5678', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio comercial. Solicito información.' }, { sender: 'agent', text: 'Hola Carlos. Un gusto saludarte, ¿en qué podemos ayudarte?' }] },
-                    { id: '2', name: 'Laura Restrepo', email: 'laura.res@gmail.com', phone: '+57 300 987 6543', value: 280000, stage: 'cita_agendada', source: 'Google Ads', status: 'Abierto', tags: ['Alta Gama'], messages: [{ sender: 'lead', text: 'Confirmado para la reunión del sábado.' }] }
+                    { id: '1', name: 'Carlos Mendoza', email: 'carlos@mendoza.com', phone: '+34 655 123 456', value: 145000, stage: 'lead_entrante', source: 'Facebook Ads', status: 'Abierto', tags: ['Inversionista'], messages: [{ sender: 'lead', text: 'Hola, vi el anuncio comercial. Solicito información.' }, { sender: 'agent', text: 'Hola Carlos. Un gusto saludarte, ¿en qué podemos ayudarte?' }] },
+                    { id: '2', name: 'Laura Restrepo', email: 'laura.res@gmail.com', phone: '+34 600 987 654', value: 280000, stage: 'cita_agendada', source: 'Google Ads', status: 'Abierto', tags: ['Alta Gama'], messages: [{ sender: 'lead', text: 'Confirmado para la reunión del sábado.' }] }
                 ];
             }
         };
 
-        // 🚀 MOTOR DE PASOS MULTI-ETAPA EXACTO PARA EL CLIENTE (PRODUCCIÓN)
+        // 🚀 MOTOR DE PASOS MULTI-ETAPA EXACTO PARA EL CLIENTE (PRODUCCIÓN STELAFUNNELS)
         const FunnelStepsEngine = {
             currentStep: 1,
             formData: {},
@@ -1009,7 +1007,7 @@
                         <h4 class="font-black text-base text-slate-900 text-center mb-4">¿Dónde está la propiedad? *</h4>
                         <div class="space-y-2.5">
                             <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all font-semibold text-xs">
-                                <input type="radio" name="ubicacion" value="San Fernando (Cádiz)" class="w-4 h-4 text-blue-600"> En San Fernando (Cádiz)
+                                <input type="radio" name="ubicacion" value="San Fernando (Cádiz)" class="w-4 h-4 text-blue-600" checked> En San Fernando (Cádiz)
                             </label>
                             <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all font-semibold text-xs">
                                 <input type="radio" name="ubicacion" value="Resto de España" class="w-4 h-4 text-blue-600"> Resto de España
@@ -1043,7 +1041,7 @@
                         <h3 class="font-extrabold text-xs text-slate-500 uppercase text-center mb-1">Rellena el siguiente Formulario para Vender tu Propiedad</h3>
                         <h4 class="font-black text-base text-slate-900 text-center mb-4">¿Cuándo quieres vender? *</h4>
                         <div class="space-y-2.5">
-                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="Lo antes posible" class="w-4 h-4 text-blue-600"> Lo antes posible</label>
+                            <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="Lo antes posible" class="w-4 h-4 text-blue-600" checked> Lo antes posible</label>
                             <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="En 3 - 6 meses" class="w-4 h-4 text-blue-600"> En 3 - 6 meses</label>
                             <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 font-semibold text-xs"><input type="radio" name="plazo" value="En más de 6 meses" class="w-4 h-4 text-blue-600"> En más de 6 meses</label>
                         </div>
@@ -1064,11 +1062,11 @@
                                 </select>
                             </div>
                             <div class="grid grid-cols-3 gap-2">
-                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tamaño (m²)</label><input type="number" id="inp-tam" placeholder="120" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
-                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Baños</label><input type="number" id="inp-banos" placeholder="2" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
-                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Habitaciones</label><input type="number" id="inp-hab" placeholder="3" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tamaño (m²)</label><input type="number" id="inp-tam" placeholder="120" value="120" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Baños</label><input type="number" id="inp-banos" placeholder="2" value="2" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Habitaciones</label><input type="number" id="inp-hab" placeholder="3" value="3" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs"></div>
                             </div>
-                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">¿Cuál sería tu precio no negociable? *</label><input type="number" id="inp-precio" placeholder="180000" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs font-bold text-blue-600"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">¿Cuál sería tu precio no negociable? *</label><input type="number" id="inp-precio" placeholder="180000" value="180000" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs font-bold text-blue-600"></div>
                         </div>
                         <div class="flex gap-2.5 mt-4">
                             <button onclick="FunnelStepsEngine.prevStep()" class="w-1/2 border border-slate-300 py-3 rounded-xl font-bold text-xs">← Atrás</button>
@@ -1115,9 +1113,9 @@
                     name: 'Propietario (' + (this.formData.ubicacion || 'San Fernando') + ')',
                     email: 'lead.inmobiliaria@stelafunnels.com',
                     phone: '+34 600 000 000',
-                    value: parseInt(this.formData.precio) || 150000,
+                    value: parseInt(this.formData.precio) || 180000,
                     stage: 'lead_entrante',
-                    source: 'Landing Inmobiliaria',
+                    source: 'Landing Inmobiliaria StelaFunnels',
                     status: 'Abierto',
                     tags: [this.formData.tipo || 'Piso', 'Valoración'],
                     messages: [{ sender: 'lead', text: `Hola, quiero vender mi ${this.formData.tipo} en ${this.formData.ubicacion}. Motivo: ${this.formData.motivo}.` }]
@@ -1243,7 +1241,7 @@
                     }
                 }
 
-                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'demo_account';
+                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'client_enterprise';
                 const newPath = viewId === 'dashboard' 
                     ? `/v2/location/${locationId}/dashboard` 
                     : `/v2/location/${locationId}/${viewId}`;
@@ -1464,7 +1462,7 @@
         const PageBuilder = {
             currentFunnel: null,
             selectedElementKey: 'logo',
-            currentTab: 'general',
+            currentPageType: 'linktree', // 'linktree' o 'funnel'
 
             renderList() {
                 const listSub = document.getElementById('funnels-subview-list');
@@ -1490,30 +1488,74 @@
 
             openBuilder(id) {
                 this.currentFunnel = Store.funnels.find(f => f.id === id) || Store.funnels[0];
-                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : '5zyv8p7qZPFaMWugv8uT';
+                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'client_enterprise';
                 const pageId = 'ZolKfRYNdx1a3m0F16uY';
 
                 document.getElementById('funnels-subview-list').classList.add('hidden');
                 document.getElementById('funnels-subview-builder').classList.remove('hidden');
 
-                document.getElementById('builder-live-url-display').innerText = this.currentFunnel.url;
-                document.getElementById('builder-live-url-display').href = this.currentFunnel.url;
-
                 const newPath = `/location/${locationId}/page-builder/${pageId}`;
                 window.history.pushState({ pageBuilder: true }, '', newPath);
 
+                // Inicializar en modo Linktree (Página Principal)
+                this.currentPageType = 'linktree';
+                const selector = document.getElementById('builder-page-selector');
+                if (selector) selector.value = 'p1';
+                
+                this.switchPageStep('p1');
                 this.selectElement('logo');
-
-                // 🚀 INICIALIZAR EL FORMULARIO MULTI-PASOS AL ABRIR EL EDITOR
-                FunnelStepsEngine.currentStep = 1;
-                FunnelStepsEngine.render();
 
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             },
 
             closeBuilder() {
-                window.history.pushState({}, '', '/v2/location/demo/funnels');
+                window.history.pushState({}, '', '/v2/location/client_enterprise/funnels');
                 this.renderList();
+            },
+
+            // 🚀 CAMBIO DINÁMICO DE PÁGINA (LINKTREE PRINCIPAL VS FORMULARIO PASOS)
+            switchPageStep(val) {
+                const urlDisplay = document.getElementById('builder-live-url-display');
+                const locationId = (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'client_enterprise';
+
+                if (val === 'p3') {
+                    this.currentPageType = 'funnel';
+                    if (urlDisplay) {
+                        urlDisplay.innerText = `https://app.stelafunnels.com/v2/location/${locationId}/funnel/cualificacion-propiedad`;
+                        urlDisplay.href = urlDisplay.innerText;
+                    }
+                } else {
+                    this.currentPageType = 'linktree';
+                    if (urlDisplay) {
+                        urlDisplay.innerText = `https://app.stelafunnels.com/v2/location/${locationId}/funnel/inicio`;
+                        urlDisplay.href = urlDisplay.innerText;
+                    }
+                }
+                this.renderCanvasContent();
+            },
+
+            renderCanvasContent() {
+                const container = document.getElementById('builder-dynamic-canvas-slot');
+                if (!container) return;
+
+                if (this.currentPageType === 'linktree') {
+                    // PANTALLA PRINCIPAL: LOS 4 BOTONES NATIVOS
+                    container.innerHTML = `
+                        <div id="el-buttons-container" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="Button Stack" class="builder-element space-y-3 max-w-sm mx-auto w-full p-2">
+                            <button onclick="PageBuilder.switchPageStep('p3')" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Vende tu Propiedad</button>
+                            <button onclick="alert('Redirigiendo al Catálogo de Propiedades de StelaFunnels...');" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Catálogo de Propiedades <span class="block text-[10px] font-normal text-slate-500">(Compra o Alquila)</span></button>
+                            <button onclick="alert('Redirigiendo a Contáctanos...');" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Contáctanos</button>
+                            <button onclick="alert('Redirigiendo a Programa de Referidos (500€)...');" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-lg text-center transition-all">Referidos <span class="block text-[10px] font-normal text-slate-500">Trae a un amigo y gana 500€</span></button>
+                        </div>
+                    `;
+                } else {
+                    // PÁGINA DE PASOS INTERACTIVA
+                    container.innerHTML = `
+                        <div id="funnel-step-container" class="builder-element bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-md mx-auto w-full space-y-4 text-slate-900" onclick="PageBuilder.selectElement('buttons', event)" data-element-type="StelaFunnels Wizard Form"></div>
+                    `;
+                    FunnelStepsEngine.currentStep = 1;
+                    FunnelStepsEngine.render();
+                }
             },
 
             selectElement(key, evt) {
@@ -1524,7 +1566,7 @@
                 
                 let targetDom = null;
                 if (key === 'logo') targetDom = document.getElementById('el-logo-container');
-                if (key === 'buttons') targetDom = document.getElementById('funnel-step-container');
+                if (key === 'buttons') targetDom = this.currentPageType === 'linktree' ? document.getElementById('el-buttons-container') : document.getElementById('funnel-step-container');
                 if (key === 'footer') targetDom = document.getElementById('el-footer-container');
 
                 if (targetDom) targetDom.classList.add('active-selected');
@@ -1534,12 +1576,12 @@
                 const imgValInp = document.getElementById('inspector-img-val');
 
                 if (key === 'logo') {
-                    if (titleEl) titleEl.innerText = 'Image';
-                    if (nameInp) nameInp.value = 'Image (Logo)';
+                    if (titleEl) titleEl.innerText = 'Image (Logo)';
+                    if (nameInp) nameInp.value = 'Logo Header';
                     if (imgValInp) imgValInp.value = '{{ custom_values.logotipo }}';
                 } else if (key === 'buttons') {
-                    if (titleEl) titleEl.innerText = 'Funnel Form';
-                    if (nameInp) nameInp.value = 'Interactive Wizard';
+                    if (titleEl) titleEl.innerText = this.currentPageType === 'linktree' ? 'Button Stack' : 'StelaFunnels Form Wizard';
+                    if (nameInp) nameInp.value = this.currentPageType === 'linktree' ? 'Navigation Actions' : 'Interactive Qualification Wizard';
                 } else {
                     if (titleEl) titleEl.innerText = 'Custom Values';
                     if (nameInp) nameInp.value = 'Footer Values';
@@ -1586,13 +1628,12 @@
 
             createNewFunnel() {
                 const newId = 'f' + Date.now();
-                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial', updated: 'Ahora', steps: 1, url: 'https://stelafunnels.io/nuevo-sitio' });
+                Store.funnels.push({ id: newId, name: 'Nuevo Embudo Comercial StelaFunnels', updated: 'Ahora', steps: 1, url: 'https://app.stelafunnels.com/v2/location/client_enterprise/funnel/nuevo' });
                 this.openBuilder(newId);
             },
 
             addElementPrompt() { alert("Herramienta activa para añadir nuevos bloques."); },
-            switchPageStep(val) { alert("Cambiando al paso: " + val); },
-            saveChanges(publish) { alert(publish ? "🎉 ¡Publicado con éxito en producción!" : "💾 Borrador guardado."); }
+            saveChanges(publish) { alert(publish ? "🎉 ¡Publicado con éxito en producción y sincronizado con CRM StelaFunnels!" : "💾 Borrador guardado correctamente."); }
         };
 
         const ChatEngine = {
