@@ -906,14 +906,21 @@
 const App = {
         chartInstance: null,
 
-        async init() {
+    async init() {
             Store.init();
             this.populateStageSelectors();
             SocialPublisher.setupEvents();
 
             const loadingScreen = document.getElementById('app-loading-screen');
 
-            // 🚀 DETECCIÓN INMEDIATA DE RETORNO DE OAUTH (GOOGLE O META)
+            // Función auxiliar interna para garantizar que el spinner SIEMPRE se remueva
+            const hideLoader = () => {
+                if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                    loadingScreen.classList.add('hidden');
+                }
+            };
+
+            // 1. DETECCIÓN DE RETORNO DE OAUTH (GOOGLE O META)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
                 try {
@@ -929,13 +936,14 @@ const App = {
                 } catch (e) {
                     console.error("Error en retorno OAuth:", e);
                     document.getElementById('view-login').classList.remove('hidden');
+                } finally {
+                    hideLoader();
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
-                if (loadingScreen) loadingScreen.classList.add('hidden');
-                window.history.replaceState({}, document.title, window.location.pathname);
                 return;
             }
 
-            // Flujo normal de verificación de sesión y F5 en sub-rutas
+            // 2. VERIFICACIÓN NORMAL DE SESIÓN Y ENTRADA TRAS F5
             try {
                 const res = await fetch('/api/user-session');
                 const data = await res.json();
@@ -944,20 +952,22 @@ const App = {
                     this.setUserProfileUI(data.user);
                     document.getElementById('view-login').classList.add('hidden');
                     
+                    // Extraer vista exacta de la URL (ej: /v2/location/google_111.../launchpad -> launchpad)
                     const pathSegments = window.location.pathname.split('/').filter(Boolean);
                     const lastSegment = pathSegments[pathSegments.length - 1];
                     const validViews = ['launchpad', 'dashboard', 'conversations', 'pipeline', 'contacts', 'ads-manager', 'automations', 'funnels', 'settings', 'social-media'];
                     
-                    const activeView = validViews.includes(lastSegment) ? lastSegment : 'dashboard';
+                    const activeView = validViews.includes(lastSegment) ? lastSegment : 'launchpad';
                     this.navigate(activeView);
                 } else {
                     document.getElementById('view-login').classList.remove('hidden');
                 }
             } catch (e) {
-                console.error("Error al verificar sesión", e);
+                console.error("Error al verificar sesión tras F5:", e);
                 document.getElementById('view-login').classList.remove('hidden');
             } finally {
-                if (loadingScreen) loadingScreen.classList.add('hidden');
+                // 🚀 Garantizar la ocultación inmediata del spinner bajo cualquier circunstancia
+                hideLoader();
             }
         },
 
