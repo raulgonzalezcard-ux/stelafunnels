@@ -76,6 +76,25 @@
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 selection:bg-blue-500 selection:text-white">
 
+    <!-- 🚀 VISTA PÚBLICA EXTERNA PARA META ADS (LANDING PAGE INDEPENDIENTE) -->
+    <div id="view-public-funnel" class="fixed inset-0 bg-slate-950 z-[150] hidden flex flex-col items-center justify-between p-6 overflow-y-auto custom-scrollbar" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80'); background-size: cover; background-position: center;">
+        <div class="w-full max-w-xl flex justify-between items-center py-4">
+            <div class="bg-white/90 text-slate-900 font-black text-base px-6 py-2 rounded-xl shadow-lg">xtucasa</div>
+            <button onclick="App.exitPublicFunnel()" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-xl backdrop-blur-md transition-all border border-white/20">Volver al CRM</button>
+        </div>
+        
+        <div class="w-full max-w-md my-auto py-6">
+            <div id="public-funnel-card" class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl space-y-6 text-slate-900 border border-white/20">
+                <!-- Se inyecta dinámicamente el motor de pasos de cualificación inmobiliaria -->
+            </div>
+        </div>
+
+        <div class="w-full max-w-xl text-center text-white/70 text-xs py-4 space-y-1">
+            <p class="font-bold text-white">{{ custom_values.nombre_de_negocio }}</p>
+            <p class="font-mono text-[11px]">📞 +34 600 000 000 | ✉️ contacto@xtucasa.com</p>
+        </div>
+    </div>
+
     <!-- OVERLAY DE CARGA (PREVIENE PARPADEOS DE UI AL HACER F5) -->
     <div id="app-loading-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center gap-3">
         <div class="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
@@ -1126,6 +1145,135 @@
             }
         };
 
+        // MOTOR DE PASOS DE LA LANDING PÚBLICA EXTERNA (META ADS READY)
+        const PublicFunnelEngine = {
+            currentStep: 1,
+            formData: {},
+
+            render() {
+                const container = document.getElementById('public-funnel-card');
+                if (!container) return;
+
+                if (this.currentStep === 1) {
+                    container.innerHTML = `
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-black uppercase text-blue-600 tracking-wider bg-blue-50 px-2.5 py-1 rounded-full">Paso 1 de 4</span>
+                            <h3 class="font-extrabold text-xs text-slate-500 uppercase">Vende tu Propiedad sin Complicaciones</h3>
+                            <h4 class="font-black text-lg text-slate-900">¿Dónde está ubicada la propiedad? *</h4>
+                        </div>
+                        <div class="space-y-3 pt-2">
+                            <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all font-bold text-xs"><input type="radio" name="ubicacion" value="San Fernando (Cádiz)" class="w-4 h-4 text-blue-600" checked> En San Fernando (Cádiz)</label>
+                            <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all font-bold text-xs"><input type="radio" name="ubicacion" value="Resto de España" class="w-4 h-4 text-blue-600"> Resto de España</label>
+                        </div>
+                        <button onclick="PublicFunnelEngine.nextStep(1)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-4 rounded-2xl shadow-xl transition-all">Siguiente →</button>
+                    `;
+                } else if (this.currentStep === 2) {
+                    container.innerHTML = `
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-black uppercase text-blue-600 tracking-wider bg-blue-50 px-2.5 py-1 rounded-full">Paso 2 de 4</span>
+                            <h3 class="font-extrabold text-xs text-slate-500 uppercase">Cualificación Inmobiliaria</h3>
+                            <h4 class="font-black text-lg text-slate-900">¿Cuál es el motivo principal de venta? *</h4>
+                        </div>
+                        <div class="space-y-2 pt-2">
+                            <select id="pub-motivo" class="w-full border border-slate-300 p-3.5 rounded-2xl bg-white text-xs font-semibold outline-none focus:border-blue-600">
+                                <option value="Comprar otra vivienda">Comprar otra vivienda</option>
+                                <option value="Herencia">Herencia</option>
+                                <option value="Cambio de ciudad">Cambio de ciudad</option>
+                                <option value="Divorcio">Divorcio</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="PublicFunnelEngine.prevStep()" class="w-1/2 border border-slate-300 py-3.5 rounded-2xl font-bold text-xs hover:bg-slate-50">← Atrás</button>
+                            <button onclick="PublicFunnelEngine.nextStep(2)" class="w-1/2 bg-slate-900 text-white py-3.5 rounded-2xl font-bold text-xs shadow-lg">Siguiente →</button>
+                        </div>
+                    `;
+                } else if (this.currentStep === 3) {
+                    container.innerHTML = `
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-black uppercase text-blue-600 tracking-wider bg-blue-50 px-2.5 py-1 rounded-full">Paso 3 de 4</span>
+                            <h3 class="font-extrabold text-xs text-slate-500 uppercase">Valoración y Precio</h3>
+                            <h4 class="font-black text-lg text-slate-900">¿Cuál sería tu precio no negociable? *</h4>
+                        </div>
+                        <div>
+                            <input type="number" id="pub-precio" value="180000" class="w-full border border-slate-300 p-4 rounded-2xl text-base font-black text-blue-600 outline-none focus:border-blue-600">
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="PublicFunnelEngine.prevStep()" class="w-1/2 border border-slate-300 py-3.5 rounded-2xl font-bold text-xs hover:bg-slate-50">← Atrás</button>
+                            <button onclick="PublicFunnelEngine.nextStep(3)" class="w-1/2 bg-slate-900 text-white py-3.5 rounded-2xl font-bold text-xs shadow-lg">Siguiente →</button>
+                        </div>
+                    `;
+                } else if (this.currentStep === 4) {
+                    container.innerHTML = `
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-black uppercase text-emerald-600 tracking-wider bg-emerald-50 px-2.5 py-1 rounded-full">Paso Final</span>
+                            <h3 class="font-extrabold text-xs text-slate-500 uppercase">Datos de Contacto</h3>
+                            <h4 class="font-black text-lg text-slate-900">¿Dónde te enviamos la valoración? *</h4>
+                        </div>
+                        <div class="space-y-3">
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre Completo</label><input type="text" id="pub-name" placeholder="Tu nombre" class="w-full border border-slate-300 p-3 rounded-xl text-xs font-semibold outline-none" required></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teléfono Móvil (WhatsApp)</label><input type="text" id="pub-phone" placeholder="+34 600..." class="w-full border border-slate-300 p-3 rounded-xl text-xs font-semibold outline-none" required></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Correo Electrónico</label><input type="email" id="pub-email" placeholder="tú@correo.com" class="w-full border border-slate-300 p-3 rounded-xl text-xs font-semibold outline-none" required></div>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="PublicFunnelEngine.prevStep()" class="w-1/2 border border-slate-300 py-3.5 rounded-2xl font-bold text-xs">← Atrás</button>
+                            <button onclick="PublicFunnelEngine.finish()" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-2xl font-bold text-xs shadow-xl">Enviar y Ver Valoración 🚀</button>
+                        </div>
+                    `;
+                } else if (this.currentStep === 5) {
+                    container.innerHTML = `
+                        <div class="text-center space-y-4 py-4">
+                            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-black">✓</div>
+                            <h3 class="font-black text-2xl text-slate-900">¡Valoración Solicitada con Éxito!</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Hemos registrado tus datos en nuestro CRM comercial. Un asesor inmobiliario experto se comunicará contigo vía WhatsApp en menos de 5 minutos.</p>
+                            <button onclick="App.exitPublicFunnel()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-2xl shadow-lg mt-4">Volver al CRM / Explorar Paneles</button>
+                        </div>
+                    `;
+                }
+            },
+
+            nextStep(n) {
+                if (n === 1) this.formData.ubicacion = document.querySelector('input[name="ubicacion"]:checked').value;
+                if (n === 2) this.formData.motivo = document.getElementById('pub-motivo').value;
+                if (n === 3) this.formData.precio = parseInt(document.getElementById('pub-precio').value) || 180000;
+                this.currentStep++;
+                this.render();
+            },
+
+            prevStep() {
+                if (this.currentStep > 1) { this.currentStep--; this.render(); }
+            },
+
+            finish() {
+                const name = document.getElementById('pub-name').value;
+                const phone = document.getElementById('pub-phone').value;
+                const email = document.getElementById('pub-email').value;
+
+                if (!name || !phone || !email) {
+                    alert("⚠️ Por favor completa todos tus datos de contacto.");
+                    return;
+                }
+
+                Store.leads.unshift({
+                    id: Date.now().toString(),
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    value: this.formData.precio || 180000,
+                    stage: 'lead_entrante',
+                    source: 'Facebook Ads (Landing Externa)',
+                    status: 'Abierto',
+                    tags: ['Propietario', 'Meta Ads'],
+                    messages: [{ sender: 'lead', text: `Hola, quiero vender mi propiedad en ${this.formData.ubicacion}. Motivo: ${this.formData.motivo}. Precio: €${this.formData.precio}.` }]
+                });
+
+                this.currentStep = 5;
+                this.render();
+            }
+        };
+
+
+
         const App = {
             chartInstance: null,
 
@@ -1141,6 +1289,13 @@
                         loadingScreen.classList.add('hidden');
                     }
                 };
+
+                // 🚀 DETECCIÓN AUTOMÁTICA DEL HASH DE META ADS
+                if (window.location.hash === '#public-funnel') {
+                    hideLoader();
+                    this.openPublicFunnel();
+                    return;
+                }
 
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('success') || urlParams.get('success') === 'meta_connected' || urlParams.get('success') === 'google_connected') {
@@ -1207,13 +1362,27 @@
                 }
             },
 
-            async logout() {
+           async logout() {
                 try {
                     await fetch('/api/logout', { method: 'POST' });
                     window.location.href = '/';
                 } catch (e) {
                     window.location.reload();
                 }
+            },
+
+            // 🚀 AQUÍ VAN TUS FUNCIONES NUEVAS:
+            openPublicFunnel() {
+                window.location.hash = 'public-funnel';
+                document.getElementById('view-public-funnel').classList.remove('hidden');
+                PublicFunnelEngine.currentStep = 1;
+                PublicFunnelEngine.render();
+            },
+
+            exitPublicFunnel() {
+                window.location.hash = '';
+                document.getElementById('view-public-funnel').classList.add('hidden');
+                this.navigate('funnels');
             },
 
             navigate(viewId) {
