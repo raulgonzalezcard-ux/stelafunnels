@@ -1486,6 +1486,66 @@ const App = {
             }
         };
 
+async function conectarMetaPages() {
+            try {
+                const res = await fetch('/api/meta/pages');
+                const data = await res.json();
+
+                if (!data.success || !data.pages.length) {
+                    alert('No se encontraron páginas de Facebook asociadas a este token. Asegúrate de otorgar permisos de páginas.');
+                    return;
+                }
+
+                let optionsHtml = data.pages.map(p => `<option value="${p.id}" data-token="${p.access_token}">${p.name}</option>`).join('');
+                
+                const modalHtml = `
+                    <div id="meta-page-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+                        <div class="bg-white p-6 rounded-2xl w-96 shadow-2xl space-y-4 text-left">
+                            <h3 class="text-sm font-black text-slate-800 uppercase">Selecciona tu Página de Facebook</h3>
+                            <p class="text-xs text-slate-500">Elige la página comercial desde donde deseas recibir los clientes potenciales (Leads).</p>
+                            <select id="select-fb-page" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-blue-600 outline-none bg-white">
+                                ${optionsHtml}
+                            </select>
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button onclick="document.getElementById('meta-page-modal').remove()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                                <button onclick="guardarPaginaMetaSeleccionada()" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md">Vincular Página</button>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            } catch (e) {
+                console.error("Error cargando páginas de Meta:", e);
+                alert('Error al conectar con el servidor de Meta.');
+            }
+        }
+
+        async function guardarPaginaMetaSeleccionada() {
+            const select = document.getElementById('select-fb-page');
+            const pageId = select.value;
+            const pageAccessToken = select.options[select.selectedIndex].getAttribute('data-token');
+
+            try {
+                const res = await fetch('/api/meta/select-page', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pageId, pageAccessToken })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('¡Página de Facebook vinculada con éxito para recibir Leads!');
+                    document.getElementById('meta-page-modal').remove();
+                    location.reload();
+                } else {
+                    alert('Error al vincular: ' + (data.error || 'Desconocido'));
+                }
+            } catch (e) {
+                console.error("Error guardando página:", e);
+                alert('Error al procesar la solicitud.');
+            }
+        }
+
         
 // Función corregida para verificar y forzar el estado conectado en el Launchpad
 async function checkMetaConnectionStatus() {
@@ -1501,16 +1561,21 @@ async function checkMetaConnectionStatus() {
         const data = await response.json();
 
         if (data.connected || isConnectedSuccess) {
-            // Estilo visual exacto del Pantallazo 2 (Círculo verde con check minimalista)
-            actionContainer.innerHTML = `
-                <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
-                    <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
-                </div>
-            `;
-            if (descEl) {
-                descEl.innerText = "¡Impresionante! Los clientes potenciales que genere a partir de los anuncios de formulario de Facebook ahora pueden rellenarse en su CRM y ya puede responder directamente a las solicitudes de Facebook Messenger en la página de conversaciones.";
-            }
-        } else {
+    // 👈 Reemplaza todo esto aquí:
+    actionContainer.innerHTML = `
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
+            </div>
+            <button onclick="conectarMetaPages()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm">
+                Configurar Página
+            </button>
+        </div>
+    `;
+    if (descEl) {
+        descEl.innerText = "¡Conectado! Haz clic en 'Configurar Página' para seleccionar tu Fanpage y habilitar la recepción de Leads.";
+    }
+} else {
             actionContainer.innerHTML = `
                 <button onclick="window.location.href='/auth/facebook'" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all">
                     Conectar

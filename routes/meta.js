@@ -69,6 +69,47 @@ router.get('/pages', requireAuth, async (req, res) => {
 });
 
 // =========================================================================
+// 🎯 1.1. SELECCIONAR PÁGINA Y SUSCRIBIR WEBHOOKS DE LEADS
+// =========================================================================
+router.post('/select-page', requireAuth, async (req, res) => {
+    const { pageId, pageAccessToken } = req.body;
+    
+    if (!pageId) {
+        return res.status(400).json({ success: false, error: 'El ID de la página es obligatorio.' });
+    }
+
+    try {
+        const userId = req.session.user.id;
+
+        db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], async (err, row) => {
+            const tokenToUse = pageAccessToken || (row ? row.meta_access_token : global.metaAccessToken);
+
+            // Suscribir la página a los eventos de Leads (leadgen)
+            const subscribeUrl = `https://graph.facebook.com/v19.0/${pageId}/subscribed_apps?subscribed_fields=leadgen&access_token=${tokenToUse}`;
+            const subscribeResp = await fetch(subscribeUrl, {
+                method: 'POST'
+            });
+            const subData = await subscribeResp.json();
+
+            if (subData.error) {
+                console.error("❌ Error al suscribir webhooks de Meta:", subData.error);
+                return res.status(400).json({ success: false, error: subData.error.message });
+            }
+
+            // Guardar el estado de la página seleccionada en la sesión
+            if (req.session.user) {
+                req.session.selectedPageId = pageId;
+            }
+
+            res.json({ success: true, message: 'Página vinculada y webhooks suscritos correctamente', subData });
+        });
+    } catch (error) {
+        console.error("Error al suscribir la página de Meta:", error);
+        res.status(500).json({ success: false, error: 'Error al conectar con la API de Meta.' });
+    }
+});
+
+// =========================================================================
 // ✍️ 2. PUBLICAR CONTENIDO: Texto plano
 // =========================================================================
 router.post('/post', requireAuth, async (req, res) => {
