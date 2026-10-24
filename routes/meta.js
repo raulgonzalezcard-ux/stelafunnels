@@ -115,21 +115,21 @@ router.post('/leads', requireAuth, (req, res) => {
 });
 
 // =========================================================================
-// 🎯 1.1. SELECCIONAR PÁGINA Y SUSCRIBIR WEBHOOKS DE LEADS
+// 🎯 1.1. SELECCIONAR PÁGINA Y SUSCRIBIR WEBHOOKS DE LEADS (DINÁMICO POR USUARIO)
 // =========================================================================
 router.post('/select-page', requireAuth, async (req, res) => {
     const { pageId, pageAccessToken } = req.body;
-    
+    const userId = req.session.user.id; // 👈 Identifica al usuario actual en sesión
+
     if (!pageId) {
         return res.status(400).json({ success: false, error: 'El ID de la página es obligatorio.' });
     }
 
     try {
-        const userId = req.session.user.id;
-
         db.get(`SELECT meta_access_token FROM users WHERE id = ?`, [userId], async (err, row) => {
-            const tokenToUse = pageAccessToken || (row ? row.meta_access_token : global.metaAccessToken);
+            const tokenToUse = pageAccessToken || (row ? row.meta_access_token : null);
 
+            // Suscribe la página a los webhooks de Meta usando el token del cliente específico
             const subscribeUrl = `https://graph.facebook.com/v19.0/${pageId}/subscribed_apps?subscribed_fields=leadgen&access_token=${tokenToUse}`;
             const subscribeResp = await fetch(subscribeUrl, { method: 'POST' });
             const subData = await subscribeResp.json();
@@ -138,11 +138,10 @@ router.post('/select-page', requireAuth, async (req, res) => {
                 return res.status(400).json({ success: false, error: subData.error.message });
             }
 
-            if (req.session.user) {
-                req.session.selectedPageId = pageId;
-            }
+            // Guarda el ID de la página seleccionada en la sesión del usuario actual
+            req.session.selectedPageId = pageId;
 
-            res.json({ success: true, message: 'Página vinculada y webhooks suscritos correctamente', subData });
+            res.json({ success: true, message: 'Página vinculada con éxito', subData });
         });
     } catch (error) {
         res.status(500).json({ success: false, error: 'Error al conectar con la API de Meta.' });
