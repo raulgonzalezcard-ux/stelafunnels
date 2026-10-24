@@ -23,7 +23,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error al conectar con la base de datos SQLite:', err.message);
     } else {
-        console.log('📦 Conectado a la Base de Datos SQLite de producción[cite: 13].');
+        console.log('📦 Conectado a la Base de Datos SQLite de producción.');
     }
 });
 
@@ -276,58 +276,23 @@ app.get('/auth/facebook/callback', async (req, res) => {
 
         const accessToken = llData.access_token || data.access_token;
 
-        const persistTokenAndLogin = (targetUserId, userDataObj) => {
-            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, targetUserId], (updateErr) => {
-                if (updateErr) {
-                    console.error("❌ Error al actualizar token Meta en BD:", updateErr);
-                    return res.redirect('/?error=db_save_failed');
-                }
-                
-                req.session.user = userDataObj;
-
-                req.session.save((saveErr) => {
-                    if (saveErr) {
-                        console.error("❌ Error al guardar la sesión:", saveErr);
-                    }
-                    console.log(`✅ ¡Token de Meta guardado y sesión iniciada para el usuario ID: ${targetUserId}!`);
-                    return res.redirect('/?success=meta_connected');
-                });
-            });
-        };
-
+        // 👈 AJUSTE APLICADO EXACTAMENTE COMO LO SOLICITASTE:
         if (req.session && req.session.user && req.session.user.id) {
-            persistTokenAndLogin(req.session.user.id, req.session.user);
+            const userId = req.session.user.id;
+            db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, userId], (err) => {
+                if (err) console.error("Error guardando token de Meta:", err);
+                res.redirect('/?success=meta_connected');
+            });
         } else {
-            db.get(`SELECT * FROM users ORDER BY created_at ASC LIMIT 1`, [], (err, user) => {
+            // Fallback en caso de que la sesión se pierda durante la redirección de OAuth
+            db.get(`SELECT * FROM users ORDER BY created_at ASC LIMIT 1`, [], (dbErr, user) => {
                 if (user) {
-                    persistTokenAndLogin(user.id, {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        picture: null,
-                        role: user.role,
-                        status: user.status
+                    req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role, status: user.status };
+                    db.run(`UPDATE users SET meta_access_token = ? WHERE id = ?`, [accessToken, user.id], () => {
+                        req.session.save(() => res.redirect('/?success=meta_connected'));
                     });
                 } else {
-                    const defaultUserId = 'meta_user_' + Date.now();
-                    const hashedPassword = bcrypt.hashSync('default_pass_2026', 10);
-                    db.run(
-                        `INSERT INTO users (id, name, email, password, meta_access_token, status, role) VALUES (?, ?, ?, ?, ?, 'active', 'admin')`,
-                        [defaultUserId, 'Administrador Global', 'admin@stelafunnels.com', hashedPassword, accessToken],
-                        (insertErr) => {
-                            if (insertErr) {
-                                return res.redirect('/?error=no_user_found');
-                            }
-                            persistTokenAndLogin(defaultUserId, {
-                                id: defaultUserId,
-                                name: 'Administrador Global',
-                                email: 'admin@stelafunnels.com',
-                                picture: null,
-                                role: 'admin',
-                                status: 'active'
-                            });
-                        }
-                    );
+                    res.redirect('/?error=unauthorized');
                 }
             });
         }
